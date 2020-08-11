@@ -1,24 +1,17 @@
-import * as fs from 'fs';
 import * as crypto from 'crypto';
+import * as fs from 'fs';
 
-async function readFile(
-  fileStream: fs.ReadStream,
-  encoding = 'utf8',
+export async function hash(
+  filePath: string,
+  fileEncoding = 'utf8',
+  hashAlgorithm = 'md5',
+  hashEncoding: crypto.HexBase64Latin1Encoding = 'hex',
 ): Promise<string> {
-  fileStream.setEncoding(encoding);
+  const fileStream = fs.createReadStream(filePath, { encoding: fileEncoding });
+  const fileHash = crypto.createHash(hashAlgorithm);
   return new Promise((resolve, reject) => {
-    let data = '';
-    fileStream.on('data', (chunk) => (data += chunk));
-    fileStream.on('end', () => resolve(data));
+    fileStream.on('data', (data) => fileHash.update(data));
+    fileStream.on('end', () => resolve(fileHash.digest(hashEncoding)));
     fileStream.on('error', (error) => reject(error));
   });
-}
-
-export async function hash(filePath: string): Promise<string> {
-  const fileStream = fs.createReadStream(filePath);
-  const fileContent = await readFile(fileStream);
-  return crypto
-    .createHash('md5')
-    .update(fileContent)
-    .digest('hex');
 }
