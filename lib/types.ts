@@ -9,6 +9,7 @@ export const SupportFileExtensions = [
   '.hpp',
   '.hxx',
   '.h++',
+  '.i',
   '.ii',
   '.ixx',
   '.ipp',

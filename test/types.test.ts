@@ -13,6 +13,7 @@ describe('SupportFileExtensions', () => {
       '.hpp',
       '.hxx',
       '.h++',
+      '.i',
       '.ii',
       '.ixx',
       '.ipp',

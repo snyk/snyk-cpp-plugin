@@ -6,10 +6,27 @@ describe('find', () => {
     const fixturePath = path.join(__dirname, 'fixtures', 'example');
     const actual = await find(fixturePath);
     const expected = [
-      path.join(fixturePath, 'main.cpp'),
+      // c* files
       path.join(fixturePath, 'test.c'),
+      path.join(fixturePath, 'main.cpp'),
+      path.join(fixturePath, 'one', 'one.cc'),
+      path.join(fixturePath, 'one', 'two' ,'two.cxx'),
+      path.join(fixturePath, 'one', 'two' ,'three', 'three.c++'),
+      // h* files
       path.join(fixturePath, 'headers', 'test.h'),
+      path.join(fixturePath, 'headers', 'one', 'one.hh'),
+      path.join(fixturePath, 'headers', 'one', 'two', 'two.hxx'),
+      path.join(fixturePath, 'headers', 'one', 'two', 'three', 'three.h++'),
       path.join(fixturePath, 'headers', 'main.hpp'),
+      // i* files
+      path.join(fixturePath, 'templates', 'test.i'),
+      path.join(fixturePath, 'templates', 'test.ii'),
+      path.join(fixturePath, 'templates', 'test.ipp'),
+      path.join(fixturePath, 'templates', 'test.ixx'),
+      // t* files
+      path.join(fixturePath, 'templates', 'test.txx'),
+      path.join(fixturePath, 'templates', 'test.tpp'),
+      path.join(fixturePath, 'templates', 'sub', 'test.tpl'),
     ];
     expect(actual.sort()).toEqual(expected.sort());
   });
@@ -28,8 +45,8 @@ describe('find', () => {
     } catch (err) {
       expect(err).toMatchObject({
         path: filePath,
-        "code": "ENOENT",
-        "errno": -2,
+        code: 'ENOENT',
+        errno: -2,
       });
     }
   });
