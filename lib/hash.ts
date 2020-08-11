@@ -14,7 +14,7 @@ async function readFile(
   });
 }
 
-export async function hash(filePath: string) {
+export async function hash(filePath: string): Promise<string> {
   const fileStream = fs.createReadStream(filePath);
   const fileContent = await readFile(fileStream);
   return crypto

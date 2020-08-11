@@ -10,8 +10,8 @@ describe('find', () => {
       path.join(fixturePath, 'test.c'),
       path.join(fixturePath, 'main.cpp'),
       path.join(fixturePath, 'one', 'one.cc'),
-      path.join(fixturePath, 'one', 'two' ,'two.cxx'),
-      path.join(fixturePath, 'one', 'two' ,'three', 'three.c++'),
+      path.join(fixturePath, 'one', 'two', 'two.cxx'),
+      path.join(fixturePath, 'one', 'two', 'three', 'three.c++'),
       // h* files
       path.join(fixturePath, 'headers', 'test.h'),
       path.join(fixturePath, 'headers', 'one', 'one.hh'),
