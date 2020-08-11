@@ -63,12 +63,12 @@ workflows:
             branches:
               ignore:
                 - master
-  release:
-    jobs:
-      - release:
-          name: Release
-          context: nodejs-lib-release
-          filters:
-            branches:
-              only:
-                - master
+  # release:
+  #   jobs:
+  #     - release:
+  #         name: Release
+  #         context: nodejs-lib-release
+  #         filters:
+  #           branches:
+  #             only:
+  #               - master
