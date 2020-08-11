@@ -1,0 +1,18 @@
+export const SupportFileExtensions = [
+  '.c',
+  '.cc',
+  '.cpp',
+  '.cxx',
+  '.c++',
+  '.h',
+  '.hh',
+  '.hpp',
+  '.hxx',
+  '.h++',
+  '.ii',
+  '.ixx',
+  '.ipp',
+  '.txx',
+  '.tpp',
+  '.tpl',
+];
