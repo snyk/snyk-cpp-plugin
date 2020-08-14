@@ -1,64 +1,72 @@
 version: 2.1
-orbs:
-  node: circleci/node@2.1.1
 
-defaults: &defaults
-  resource_class: small
-  docker:
-    - image: node:8
+executors:
+  docker-node:
+    parameters:
+      version:
+        default: "lts"
+        type: string
+    docker:
+      - image: cimg/node:<<parameters.version>>
 
 commands:
-  setup_snyk_user:
+  npmrc:
     steps:
       - run:
-          name: Use snyk-main npmjs user
+          name: Create .npmrc
           command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> .npmrc
+  install:
+    steps:
+      - run:
+          name: Install
+          command: npm install
+  test:
+    steps:
+      - run:
+          name: Test
+          command: npm test
+  release:
+    steps:
+      - run:
+          name: Release
+          command: npx semantic-release
 
 jobs:
   test:
-    <<: *defaults
+    resource_class: small
+    parameters:
+      version:
+        default: "lts"
+        type: string
+    executor:
+      name: docker-node
+      version: <<parameters.version>>
     steps:
       - checkout
-      - setup_snyk_user
-      - node/install-packages:
-          override-ci: true
-          cache-key: package.json
-      - run:
-          name: Lint
-          command: npm run lint
-      - run:
-          name: Install JUnit coverage reporter
-          command: npm install --no-save jest-junit
-      - run:
-          name: Run tests with JUnit as reporter
-          command: npx jest --coverage --ci --maxWorkers=3 --reporters=default --reporters=jest-junit
-          environment:
-            JEST_JUNIT_OUTPUT_DIR: ./reports/junit/
-      - store_test_results:
-          path: ./reports/junit/
-      - store_artifacts:
-          path: ./reports/junit
+      - install
+      - test
+
   release:
-    <<: *defaults
-    docker:
-      - image: node:10
+    resource_class: small
+    executor:
+      name: docker-node
     steps:
       - checkout
-      - setup_snyk_user
-      - node/install-packages:
-          override-ci: true
-          cache-key: package.json
-      - run:
-          name: Release on GitHub
-          command: npx semantic-release
+      - npmrc
+      - install
+      - release
 
 workflows:
-  version: 2
   test:
     jobs:
       - test:
-          name: Test
-          context: nodejs-install
+          matrix:
+            parameters:
+              version:
+                - 8.17.0
+                - 10.22.0
+                - 12.18.3
+                - 14.8.0
           filters:
             branches:
               ignore:
@@ -66,8 +74,6 @@ workflows:
   release:
     jobs:
       - release:
-          name: Release
-          context: nodejs-lib-release
           filters:
             branches:
               only:
