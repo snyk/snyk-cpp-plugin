@@ -1,12 +1,12 @@
 import * as path from 'path';
 import { scan } from '../lib';
-import { ScannedProject } from '../lib/types';
+import { ScanResult } from '../lib/types';
 
 describe('scan', () => {
   it('should produce scanned projects', async () => {
     const fixturePath = path.join(__dirname, 'fixtures', 'hello-world');
     const actual = await scan({ path: fixturePath });
-    const expected: ScannedProject[] = [
+    const expected: ScanResult[] = [
       {
         artifacts: [
           {
