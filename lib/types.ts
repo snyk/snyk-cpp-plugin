@@ -19,22 +19,14 @@ export const SupportFileExtensions = [
 ];
 
 // TODO: use snyk-cli-interface
-export interface ScannedArtifact {
-  type:
-    | 'depTree'
-    | 'depGraph'
-    | 'callGraph'
-    | 'manifestFile'
-    | 'binaries'
-    | 'hashes'
-    | 'dockerLayers'
-    | 'cpp-fingerprints';
+export interface Artifact {
+  type: string;
   data: any;
   meta?: { [key: string]: any };
 }
 
-export interface ScannedProject {
-  artifacts: ScannedArtifact[];
+export interface ScanResult {
+  artifacts: Artifact[];
 }
 
 export interface Fingerprint {
