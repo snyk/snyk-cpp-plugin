@@ -1,4 +1,4 @@
-import { SupportFileExtensions } from '../lib/types';
+import { SupportFileExtensions } from '../lib';
 
 describe('SupportFileExtensions', () => {
   it('should export supported file extensions ', async () => {

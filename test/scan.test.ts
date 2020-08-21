@@ -1,6 +1,5 @@
 import * as path from 'path';
-import { scan } from '../lib';
-import { ScanResult } from '../lib/types';
+import { ScanResult, scan } from '../lib';
 
 describe('scan', () => {
   it('should produce scanned projects', async () => {
@@ -8,6 +7,7 @@ describe('scan', () => {
     const actual = await scan({ path: fixturePath });
     const expected: ScanResult[] = [
       {
+        type: 'cpp',
         artifacts: [
           {
             type: 'cpp-fingerprints',
@@ -25,8 +25,10 @@ describe('scan', () => {
                 hash: 'ad3365b3370ef6b1c3e778f875055f19',
               },
             ],
+            meta: {},
           },
         ],
+        meta: {},
       },
     ];
     expect(actual).toEqual(expected);
