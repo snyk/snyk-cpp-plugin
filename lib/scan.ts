@@ -21,9 +21,15 @@ export async function scan(options: Options): Promise<ScanResult[]> {
       });
     }
     const artifacts: Artifact[] = [
-      { type: 'cpp-fingerprints', data: fingerprints },
+      { type: 'cpp-fingerprints', data: fingerprints, meta: {} },
     ];
-    const scanResults: ScanResult[] = [{ artifacts }];
+    const scanResults: ScanResult[] = [
+      {
+        type: 'cpp',
+        artifacts,
+        meta: {},
+      },
+    ];
     return scanResults;
   } catch (error) {
     throw new Error(`Could not scan C/C++ project, ${error}`);

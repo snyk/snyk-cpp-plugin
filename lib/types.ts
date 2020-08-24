@@ -1,3 +1,5 @@
+import { DepGraphData } from '@snyk/dep-graph';
+
 export const SupportFileExtensions = [
   '.c',
   '.cc',
@@ -22,11 +24,13 @@ export const SupportFileExtensions = [
 export interface Artifact {
   type: string;
   data: any;
-  meta?: { [key: string]: any };
+  meta: { [key: string]: any };
 }
 
 export interface ScanResult {
+  type: string;
   artifacts: Artifact[];
+  meta: { [key: string]: any };
 }
 
 export interface Fingerprint {
@@ -36,4 +40,28 @@ export interface Fingerprint {
 
 export interface Options {
   path: string;
+}
+
+export interface TestResults {
+  depGraph: DepGraphData;
+  affectedPkgs: {
+    [pkgId: string]: {
+      pkg: {
+        name: string;
+        version: string;
+      };
+      issues: {
+        [issueId: string]: {
+          issueId: string;
+        };
+      };
+    };
+  };
+  issuesData: {
+    [issueId: string]: {
+      id: string;
+      severity: string;
+      title: string;
+    };
+  };
 }

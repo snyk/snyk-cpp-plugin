@@ -1,4 +1,21 @@
 import { display } from './display';
 import { scan } from './scan';
+import {
+  Artifact,
+  Fingerprint,
+  Options,
+  TestResults,
+  ScanResult,
+  SupportFileExtensions,
+} from './types';
 
-export { display, scan };
+export {
+  Artifact,
+  Fingerprint,
+  Options,
+  TestResults,
+  ScanResult,
+  SupportFileExtensions,
+  display,
+  scan,
+};
