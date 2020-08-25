@@ -1,11 +1,8 @@
 import { ScanResult, TestResults } from './types';
 import { createFromJSON } from '@snyk/dep-graph';
 
-export async function display(
-  scanResults: ScanResult[],
-  testResults: TestResults[],
-): Promise<string> {
-  const result = [];
+function displayFingerprints(scanResults: ScanResult[]): string[] {
+  const result: string[] = [];
   for (const { artifacts = [] } of scanResults) {
     for (const { data = [] } of artifacts) {
       for (const { filePath, hash } of data) {
@@ -19,9 +16,11 @@ export async function display(
       }
     }
   }
-  if (result.length) {
-    result.push('');
-  }
+  return result;
+}
+
+function displayTestResults(testResults: TestResults[]): string[] {
+  const result: string[] = [];
   for (const testResult of testResults) {
     const depGraph = createFromJSON(testResult.depGraph);
     const depCount = depGraph?.getDepPkgs()?.length || 0;
@@ -41,10 +40,13 @@ export async function display(
     }
     result.push('Issues');
     result.push('------');
-    result.push(`Tested ${dependencies} for known issues, found ${issues}.\n`);
-    for (const { pkg, issues } of Object.values(
-      testResult.affectedPkgs || [],
-    )) {
+    result.push(`Tested ${dependencies} for known issues, found ${issues}.`);
+
+    const affectedPkgs = Object.values(testResult.affectedPkgs || []);
+    if (affectedPkgs.length) {
+      result.push('');
+    }
+    for (const { pkg, issues } of affectedPkgs) {
       for (const issueId of Object.keys(issues)) {
         const issue = testResult.issuesData[issueId];
         result.push(
@@ -52,6 +54,38 @@ export async function display(
         );
       }
     }
+  }
+  return result;
+}
+
+function displayErrors(errors: string[]): string[] {
+  const result: string[] = [];
+  if (errors.length) {
+    result.push('Errors');
+    result.push('------');
+  }
+  for (const error of errors) {
+    result.push(error);
+  }
+  return result;
+}
+
+export async function display(
+  scanResults: ScanResult[],
+  testResults: TestResults[],
+  errors: string[],
+) {
+  const result = displayFingerprints(scanResults);
+  if (result.length) {
+    result.push('');
+  }
+  result.push(...displayTestResults(testResults));
+  if (errors.length && result.length) {
+    result.push('');
+  }
+  result.push(...displayErrors(errors));
+  if (result.length) {
+    result.push('');
   }
   return result.join('\n');
 }
