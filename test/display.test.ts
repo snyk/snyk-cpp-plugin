@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { TestResults, display, scan } from '../lib';
+import { TestResult, display, scan } from '../lib';
 import { DepGraphBuilder } from '@snyk/dep-graph';
 
 describe('display', () => {
@@ -17,7 +17,7 @@ describe('display', () => {
     builder.addPkgNode(dep, nodeId);
     builder.connectDep(builder.rootNodeId, nodeId);
     const depGraph = builder.build().toJSON();
-    const testResults: TestResults[] = [
+    const testResults: TestResult[] = [
       {
         depGraph,
         affectedPkgs: {
@@ -60,7 +60,7 @@ describe('display', () => {
     builder.addPkgNode(dep, nodeId);
     builder.connectDep(builder.rootNodeId, nodeId);
     const depGraph = builder.build().toJSON();
-    const testResults: TestResults[] = [
+    const testResults: TestResult[] = [
       {
         depGraph,
         affectedPkgs: {},
@@ -80,7 +80,7 @@ describe('display', () => {
     );
     const scanResult = await scan({ path: fixturePath });
     const depGraph = new DepGraphBuilder({ name: 'cpp' }).build().toJSON();
-    const testResults: TestResults[] = [
+    const testResults: TestResult[] = [
       {
         depGraph,
         affectedPkgs: {},
@@ -99,7 +99,7 @@ describe('display', () => {
       'display-no-scan-results.txt',
     );
     const depGraph = new DepGraphBuilder({ name: 'cpp' }).build().toJSON();
-    const testResults: TestResults[] = [
+    const testResults: TestResult[] = [
       {
         depGraph,
         affectedPkgs: {},
@@ -118,7 +118,7 @@ describe('display', () => {
       'display-no-scan-results.txt',
     );
     const depGraph = new DepGraphBuilder({ name: 'cpp' }).build().toJSON();
-    const testResults: TestResults[] = [
+    const testResults: TestResult[] = [
       {
         depGraph,
         affectedPkgs: {},
@@ -137,7 +137,7 @@ describe('display', () => {
       'display-no-scan-results.txt',
     );
     const depGraph = new DepGraphBuilder({ name: 'cpp' }).build().toJSON();
-    const testResults: TestResults[] = [
+    const testResults: TestResult[] = [
       {
         depGraph,
         affectedPkgs: {},
@@ -160,7 +160,7 @@ describe('display', () => {
       'display-no-scan-results.txt',
     );
     const depGraph = new DepGraphBuilder({ name: 'cpp' }).build().toJSON();
-    const testResults: TestResults[] = [
+    const testResults: TestResult[] = [
       {
         depGraph,
         affectedPkgs: {},
@@ -189,7 +189,7 @@ describe('display', () => {
     builder.addPkgNode(dep, nodeId);
     builder.connectDep(builder.rootNodeId, nodeId);
     const depGraph = builder.build().toJSON();
-    const testResults: TestResults[] = [
+    const testResults: TestResult[] = [
       {
         depGraph,
         affectedPkgs: {
@@ -234,7 +234,7 @@ describe('display', () => {
     builder.addPkgNode(dep, nodeId);
     builder.connectDep(builder.rootNodeId, nodeId);
     const depGraph = builder.build().toJSON();
-    const testResults: TestResults[] = [
+    const testResults: TestResult[] = [
       {
         depGraph,
         affectedPkgs: {},

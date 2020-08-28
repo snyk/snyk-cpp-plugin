@@ -1,5 +1,8 @@
-import { ScanResult, TestResults } from './types';
+import { ScanResult, TestResult } from './types';
 import { createFromJSON } from '@snyk/dep-graph';
+import Debug from 'debug';
+
+const debug = Debug('snyk-cpp-plugin');
 
 function displayFingerprints(scanResults: ScanResult[]): string[] {
   const result: string[] = [];
@@ -19,7 +22,7 @@ function displayFingerprints(scanResults: ScanResult[]): string[] {
   return result;
 }
 
-function displayTestResults(testResults: TestResults[]): string[] {
+function displayTestResults(testResults: TestResult[]): string[] {
   const result: string[] = [];
   for (const testResult of testResults) {
     const depGraph = createFromJSON(testResult.depGraph);
@@ -72,20 +75,25 @@ function displayErrors(errors: string[]): string[] {
 
 export async function display(
   scanResults: ScanResult[],
-  testResults: TestResults[],
+  testResults: TestResult[],
   errors: string[],
-) {
-  const result = displayFingerprints(scanResults);
-  if (result.length) {
-    result.push('');
+): Promise<string> {
+  try {
+    const result = displayFingerprints(scanResults);
+    if (result.length) {
+      result.push('');
+    }
+    result.push(...displayTestResults(testResults));
+    if (errors.length && result.length) {
+      result.push('');
+    }
+    result.push(...displayErrors(errors));
+    if (result.length) {
+      result.push('');
+    }
+    return result.join('\n');
+  } catch (error) {
+    debug(error.message || 'Error displaying results. ' + error);
+    return 'Error displaying results.';
   }
-  result.push(...displayTestResults(testResults));
-  if (errors.length && result.length) {
-    result.push('');
-  }
-  result.push(...displayErrors(errors));
-  if (result.length) {
-    result.push('');
-  }
-  return result.join('\n');
 }

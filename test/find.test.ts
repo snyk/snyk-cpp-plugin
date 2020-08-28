@@ -60,4 +60,11 @@ describe('find', () => {
       expect(err).toEqual(expected);
     }
   });
+
+  it('should handle broken files and continue to find other files', async () => {
+    const fixturePath = path.join(__dirname, 'fixtures', 'handle-broken');
+    const actual = await find(fixturePath);
+    const expected: string[] = [path.join(fixturePath, 'main.cpp')];
+    expect(actual).toEqual(expected);
+  });
 });

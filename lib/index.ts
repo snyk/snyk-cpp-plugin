@@ -4,7 +4,7 @@ import {
   Artifact,
   Fingerprint,
   Options,
-  TestResults,
+  TestResult,
   ScanResult,
   SupportFileExtensions,
 } from './types';
@@ -13,7 +13,7 @@ export {
   Artifact,
   Fingerprint,
   Options,
-  TestResults,
+  TestResult,
   ScanResult,
   SupportFileExtensions,
   display,
