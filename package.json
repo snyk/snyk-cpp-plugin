@@ -30,9 +30,11 @@
   },
   "dependencies": {
     "@snyk/dep-graph": "^1.19.3",
+    "debug": "^4.1.1",
     "tslib": "^2.0.0"
   },
   "devDependencies": {
+    "@types/debug": "^4.1.5",
     "@types/jest": "^25.2.3",
     "@types/node": "^8.10.62",
     "@typescript-eslint/eslint-plugin": "^3.8.0",

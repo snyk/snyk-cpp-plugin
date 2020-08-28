@@ -42,7 +42,7 @@ export interface Options {
   path: string;
 }
 
-export interface TestResults {
+export interface TestResult {
   depGraph: DepGraphData;
   affectedPkgs: {
     [pkgId: string]: {
