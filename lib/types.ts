@@ -20,7 +20,6 @@ export const SupportFileExtensions = [
   '.tpl',
 ];
 
-// TODO: use snyk-cli-interface
 export interface Artifact {
   type: string;
   data: any;
@@ -28,7 +27,6 @@ export interface Artifact {
 }
 
 export interface ScanResult {
-  type: string;
   artifacts: Artifact[];
   meta: { [key: string]: any };
 }
