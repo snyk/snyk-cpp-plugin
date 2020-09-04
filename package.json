@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@snyk/dep-graph": "^1.19.3",
+    "chalk": "^4.1.0",
     "debug": "^4.1.1",
     "tslib": "^2.0.0"
   },

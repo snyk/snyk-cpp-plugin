@@ -42,26 +42,25 @@ export interface Options {
   path: string;
 }
 
+export interface Issue {
+  pkgName: string;
+  pkgVersion?: string;
+  issueId: string;
+  fixInfo: {
+    nearestFixedInVersion?: string; // TODO: add more fix info
+  };
+}
+
+export interface IssuesData {
+  [issueId: string]: {
+    id: string;
+    severity: string;
+    title: string;
+  };
+}
+
 export interface TestResult {
-  depGraph: DepGraphData;
-  affectedPkgs: {
-    [pkgId: string]: {
-      pkg: {
-        name: string;
-        version: string;
-      };
-      issues: {
-        [issueId: string]: {
-          issueId: string;
-        };
-      };
-    };
-  };
-  issuesData: {
-    [issueId: string]: {
-      id: string;
-      severity: string;
-      title: string;
-    };
-  };
+  issues: Issue[];
+  issuesData: IssuesData;
+  depGraphData: DepGraphData;
 }
