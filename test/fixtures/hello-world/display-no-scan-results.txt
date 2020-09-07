@@ -1,3 +1,2 @@
-Issues
-------
-Tested 0 dependencies for known issues, found 0 issues.
+[97mIssues[39m
+Tested 0 dependencies for known issues, found [92m0 issues[39m.
