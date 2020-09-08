@@ -7,7 +7,6 @@ describe('scan', () => {
     const actual = await scan({ path: fixturePath });
     const expected: ScanResult[] = [
       {
-        type: 'cpp',
         artifacts: [
           {
             type: 'cpp-fingerprints',

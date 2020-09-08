@@ -25,7 +25,6 @@ export async function scan(options: Options): Promise<ScanResult[]> {
     ];
     const scanResults: ScanResult[] = [
       {
-        type: 'cpp',
         artifacts,
         meta: {},
       },
