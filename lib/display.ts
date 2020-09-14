@@ -1,7 +1,7 @@
 import * as chalk from 'chalk';
-import Debug from 'debug';
-import { ScanResult, TestResult, IssuesData, Issue } from './types';
 import { createFromJSON, DepGraph } from '@snyk/dep-graph';
+import Debug from 'debug';
+import { ScanResult, TestResult, IssuesData, Issue, Options } from './types';
 
 const debug = Debug('snyk-cpp-plugin');
 
@@ -106,11 +106,14 @@ export async function display(
   scanResults: ScanResult[],
   testResults: TestResult[],
   errors: string[],
+  options?: Options,
 ): Promise<string> {
   try {
     const result: string[] = [];
-    const fingerprintLines = displayFingerprints(scanResults);
-    result.push(...fingerprintLines);
+    if (options?.debug) {
+      const fingerprintLines = displayFingerprints(scanResults);
+      result.push(...fingerprintLines);
+    }
     for (const testResult of testResults) {
       const depGraph = createFromJSON(testResult.depGraphData);
       const dependencyLines = displayDependencies(depGraph);

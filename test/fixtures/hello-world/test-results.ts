@@ -17,7 +17,7 @@ function noDeps(): DepGraphData {
   return depGraph.toJSON();
 }
 
-export const withDepIssuesAndFix: TestResult[] = [
+export const withDepOneIssueAndFix: TestResult[] = [
   {
     depGraphData: withDep(),
     issues: [
@@ -35,6 +35,49 @@ export const withDepIssuesAndFix: TestResult[] = [
         id: 'cpp:hello-world:20161130',
         severity: 'medium',
         title: 'Cross-site Scripting (XSS)',
+      },
+    },
+  },
+];
+
+export const withDepThreeIssues: TestResult[] = [
+  {
+    depGraphData: withDep(),
+    issues: [
+      {
+        pkgName: 'hello-world',
+        pkgVersion: '1.2.3',
+        issueId: 'cpp:hello-world:123',
+        fixInfo: {},
+      },
+      {
+        pkgName: 'hello-world',
+        pkgVersion: '1.2.3',
+        issueId: 'cpp:hello-world:456',
+        fixInfo: {},
+      },
+      {
+        pkgName: 'hello-world',
+        pkgVersion: '1.2.3',
+        issueId: 'cpp:hello-world:789',
+        fixInfo: {},
+      },
+    ],
+    issuesData: {
+      ['cpp:hello-world:123']: {
+        id: 'cpp:hello-world:20161130',
+        severity: 'high',
+        title: 'Information Exposure',
+      },
+      ['cpp:hello-world:456']: {
+        id: 'cpp:hello-world:20161130',
+        severity: 'medium',
+        title: 'Use of Insufficiently Random Values',
+      },
+      ['cpp:hello-world:789']: {
+        id: 'cpp:hello-world:20161130',
+        severity: 'low',
+        title: 'Missing Encryption of Sensitive Data',
       },
     },
   },

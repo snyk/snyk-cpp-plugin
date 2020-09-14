@@ -38,6 +38,7 @@ export interface Fingerprint {
 
 export interface Options {
   path: string;
+  debug?: boolean;
 }
 
 export interface Issue {
