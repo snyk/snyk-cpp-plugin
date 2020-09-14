@@ -1,8 +1,9 @@
 import { join } from 'path';
-import { display, scan, ScanResult } from '../lib';
+import { display, Options, scan, ScanResult } from '../lib';
 import { readFixture } from './read-fixture';
 import {
-  withDepIssuesAndFix,
+  withDepOneIssueAndFix,
+  withDepThreeIssues,
   withDepNoIssues,
   noDepOrIssues,
 } from './fixtures/hello-world/test-results';
@@ -13,10 +14,36 @@ describe('display', () => {
   it('should return expected text for one dependency, one issue with fix, no errors', async () => {
     const scanResult = await scan({ path: helloWorldPath });
     const errors: string[] = [];
-    const actual = await display(scanResult, withDepIssuesAndFix, errors);
+    const actual = await display(scanResult, withDepOneIssueAndFix, errors);
     const expected = await readFixture(
       'hello-world',
       'display-one-dep-one-issue-with-fix-no-errors.txt',
+    );
+    expect(actual).toBe(expected);
+  });
+  it('should return expected text for one dependency, three issues, no errors', async () => {
+    const scanResult = await scan({ path: helloWorldPath });
+    const errors: string[] = [];
+    const actual = await display(scanResult, withDepThreeIssues, errors);
+    const expected = await readFixture(
+      'hello-world',
+      'display-one-dep-three-issues-no-errors.txt',
+    );
+    expect(actual).toBe(expected);
+  });
+  it('should return expected text for one dependency, one issue with fix, no errors when debug true', async () => {
+    const scanResult = await scan({ path: helloWorldPath });
+    const errors: string[] = [];
+    const options: Options = { path: '', debug: true };
+    const actual = await display(
+      scanResult,
+      withDepOneIssueAndFix,
+      errors,
+      options,
+    );
+    const expected = await readFixture(
+      'hello-world',
+      'display-one-dep-one-issue-with-fix-no-error-debug.txt',
     );
     expect(actual).toBe(expected);
   });
@@ -90,7 +117,7 @@ describe('display', () => {
     const errors: string[] = [
       'Could not test dependencies in test/fixtures/invalid',
     ];
-    const actual = await display(scanResult, withDepIssuesAndFix, errors);
+    const actual = await display(scanResult, withDepOneIssueAndFix, errors);
     const expected = await readFixture(
       'hello-world',
       'display-one-dep-one-issue-one-error.txt',

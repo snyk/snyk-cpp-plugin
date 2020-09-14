@@ -1,0 +1,18 @@
+[97mDependencies[39m
+hello-world@1.2.3
+
+[97mIssues[39m
+[91m✗ Information Exposure [high][39m
+  https://snyk.io/vuln/cpp:hello-world:123
+  in hello-world@1.2.3
+  no fix available
+[93m✗ Use of Insufficiently Random Values [medium][39m
+  https://snyk.io/vuln/cpp:hello-world:456
+  in hello-world@1.2.3
+  no fix available
+[94m✗ Missing Encryption of Sensitive Data [low][39m
+  https://snyk.io/vuln/cpp:hello-world:789
+  in hello-world@1.2.3
+  no fix available
+
+Tested 1 dependency for known issues, found [91m3 issues[39m.
