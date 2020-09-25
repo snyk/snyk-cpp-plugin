@@ -7,8 +7,8 @@ const debug = Debug('snyk-cpp-plugin');
 
 function displayFingerprints(scanResults: ScanResult[]): string[] {
   const result: string[] = [];
-  for (const { artifacts = [] } of scanResults) {
-    for (const { data = [] } of artifacts) {
+  for (const { facts = [] } of scanResults) {
+    for (const { data = [] } of facts) {
       for (const { filePath, hash } of data) {
         if (filePath && hash) {
           if (!result.length) {

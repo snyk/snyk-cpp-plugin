@@ -1,9 +1,15 @@
 import * as fs from 'fs';
 import { find } from './find';
 import { hash } from './hash';
-import { ScanResult, Options, Fingerprint, Artifact } from './types';
+import {
+  ScanResult,
+  Options,
+  Fingerprint,
+  Facts,
+  PluginResponse,
+} from './types';
 
-export async function scan(options: Options): Promise<ScanResult[]> {
+export async function scan(options: Options): Promise<PluginResponse> {
   try {
     if (!options.path) {
       throw 'invalid options no path provided.';
@@ -20,16 +26,18 @@ export async function scan(options: Options): Promise<ScanResult[]> {
         hash: md5,
       });
     }
-    const artifacts: Artifact[] = [
-      { type: 'cpp-fingerprints', data: fingerprints, meta: {} },
-    ];
+    const facts: Facts[] = [{ type: 'cpp-fingerprints', data: fingerprints }];
     const scanResults: ScanResult[] = [
       {
-        artifacts,
-        meta: {},
+        facts,
+        identity: {
+          type: 'cpp',
+        },
       },
     ];
-    return scanResults;
+    return {
+      scanResults,
+    };
   } catch (error) {
     throw new Error(`Could not scan C/C++ project, ${error}`);
   }

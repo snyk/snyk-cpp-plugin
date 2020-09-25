@@ -20,15 +20,26 @@ export const SupportFileExtensions = [
   '.tpl',
 ];
 
-export interface Artifact {
-  type: string;
-  data: any;
-  meta: { [key: string]: any };
+export interface PluginResponse {
+  scanResults: ScanResult[];
 }
 
 export interface ScanResult {
-  artifacts: Artifact[];
-  meta: { [key: string]: any };
+  identity: Identity;
+  facts: Facts[];
+  name?: string;
+  policy?: string;
+}
+
+export interface Identity {
+  type: string;
+  targetFile?: string;
+  args?: { [key: string]: string };
+}
+
+export interface Facts {
+  type: string;
+  data: any;
 }
 
 export interface Fingerprint {
@@ -46,7 +57,7 @@ export interface Issue {
   pkgVersion?: string;
   issueId: string;
   fixInfo: {
-    nearestFixedInVersion?: string; // TODO: add more fix info
+    nearestFixedInVersion?: string;
   };
 }
 

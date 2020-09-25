@@ -1,7 +1,7 @@
 import { display } from './display';
 import { scan } from './scan';
 import {
-  Artifact,
+  PluginResponse,
   Fingerprint,
   Options,
   TestResult,
@@ -10,7 +10,7 @@ import {
 } from './types';
 
 export {
-  Artifact,
+  PluginResponse,
   Fingerprint,
   Options,
   TestResult,

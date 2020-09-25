@@ -1,35 +1,38 @@
 import * as path from 'path';
-import { ScanResult, scan } from '../lib';
+import { scan, PluginResponse } from '../lib';
 
 describe('scan', () => {
   it('should produce scanned projects', async () => {
     const fixturePath = path.join(__dirname, 'fixtures', 'hello-world');
     const actual = await scan({ path: fixturePath });
-    const expected: ScanResult[] = [
-      {
-        artifacts: [
-          {
-            type: 'cpp-fingerprints',
-            data: [
-              {
-                filePath: path.join(fixturePath, 'add.cpp'),
-                hash: '52d1b046047db9ea0c581cafd4c68fe5',
-              },
-              {
-                filePath: path.join(fixturePath, 'add.h'),
-                hash: 'aeca71a6e39f99a24ecf4c088eee9cb8',
-              },
-              {
-                filePath: path.join(fixturePath, 'main.cpp'),
-                hash: 'ad3365b3370ef6b1c3e778f875055f19',
-              },
-            ],
-            meta: {},
+    const expected: PluginResponse = {
+      scanResults: [
+        {
+          facts: [
+            {
+              type: 'cpp-fingerprints',
+              data: [
+                {
+                  filePath: path.join(fixturePath, 'add.cpp'),
+                  hash: '52d1b046047db9ea0c581cafd4c68fe5',
+                },
+                {
+                  filePath: path.join(fixturePath, 'add.h'),
+                  hash: 'aeca71a6e39f99a24ecf4c088eee9cb8',
+                },
+                {
+                  filePath: path.join(fixturePath, 'main.cpp'),
+                  hash: 'ad3365b3370ef6b1c3e778f875055f19',
+                },
+              ],
+            },
+          ],
+          identity: {
+            type: 'cpp',
           },
-        ],
-        meta: {},
-      },
-    ];
+        },
+      ],
+    };
     expect(actual).toEqual(expected);
   });
 
