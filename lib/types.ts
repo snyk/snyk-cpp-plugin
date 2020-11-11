@@ -29,6 +29,7 @@ export interface ScanResult {
   facts: Facts[];
   name?: string;
   policy?: string;
+  target: GitTarget;
 }
 
 export interface Identity {
@@ -42,6 +43,11 @@ export interface Facts {
   data: any;
 }
 
+export interface GitTarget {
+  remoteUrl: string;
+  branch: string;
+}
+
 export interface Fingerprint {
   filePath: string;
   hash: string;
@@ -50,6 +56,7 @@ export interface Fingerprint {
 export interface Options {
   path: string;
   debug?: boolean;
+  projectName?: string;
 }
 
 export interface Issue {
