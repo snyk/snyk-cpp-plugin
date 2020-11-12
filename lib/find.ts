@@ -1,9 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { SupportFileExtensions } from './types';
-import Debug from 'debug';
-
-const debug = Debug('snyk-cpp-plugin');
+import { debug } from './debug';
 
 export async function find(dir: string): Promise<string[]> {
   const result: string[] = [];

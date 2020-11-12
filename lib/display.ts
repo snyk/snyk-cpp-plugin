@@ -1,9 +1,7 @@
 import * as chalk from 'chalk';
 import { createFromJSON, DepGraph } from '@snyk/dep-graph';
-import Debug from 'debug';
+import { debug } from './debug';
 import { ScanResult, TestResult, IssuesData, Issue, Options } from './types';
-
-const debug = Debug('snyk-cpp-plugin');
 
 function displayFingerprints(scanResults: ScanResult[]): string[] {
   const result: string[] = [];
