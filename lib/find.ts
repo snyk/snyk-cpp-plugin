@@ -1,28 +1,32 @@
 import * as fs from 'fs';
-import * as path from 'path';
+import { join, extname } from 'path';
+import { promisify } from 'util';
 import { SupportFileExtensions } from './types';
 import { debug } from './debug';
+
+const readdir = promisify(fs.readdir);
+const stat = promisify(fs.stat);
 
 export async function find(dir: string): Promise<string[]> {
   const result: string[] = [];
 
-  const dirStat = fs.statSync(dir);
+  const dirStat = await stat(dir);
   if (!dirStat.isDirectory()) {
     throw new Error(`${dir} is not a directory`);
   }
 
-  const paths = fs.readdirSync(dir);
+  const paths = await readdir(dir);
 
   for (const relativePath of paths) {
-    const absolutePath = path.join(dir, relativePath);
+    const absolutePath = join(dir, relativePath);
     try {
-      const stat = fs.statSync(absolutePath);
-      if (stat.isDirectory()) {
+      const fileStat = await stat(absolutePath);
+      if (fileStat.isDirectory()) {
         const subFiles = await find(absolutePath);
         result.push(...subFiles);
       }
-      if (stat.isFile()) {
-        const ext = path.extname(absolutePath);
+      if (fileStat.isFile()) {
+        const ext = extname(absolutePath);
         if (SupportFileExtensions.includes(ext)) {
           result.push(absolutePath);
         }
