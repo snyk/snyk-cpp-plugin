@@ -23,7 +23,9 @@ export async function find(dir: string): Promise<string[]> {
       const fileStat = await stat(absolutePath);
       if (fileStat.isDirectory()) {
         const subFiles = await find(absolutePath);
-        result.push(...subFiles);
+        for (const file of subFiles) {
+          result.push(file);
+        }
       }
       if (fileStat.isFile()) {
         const ext = extname(absolutePath);
