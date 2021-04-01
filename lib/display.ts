@@ -100,19 +100,25 @@ function displayErrors(errors: string[]): string[] {
   return result;
 }
 
+interface Result {
+  scanResult: ScanResult;
+  testResult: TestResult;
+}
 export async function display(
-  scanResults: ScanResult[],
-  testResults: TestResult[],
+  results: Result[],
   errors: string[],
   options?: Options,
 ): Promise<string> {
   try {
     const result: string[] = [];
     if (options?.debug) {
-      const fingerprintLines = displayFingerprints(scanResults);
+      const fingerprintLines = displayFingerprints(
+        results.map((i) => i.scanResult),
+      );
       result.push(...fingerprintLines);
     }
-    for (const testResult of testResults) {
+    for (const res of results) {
+      const { testResult } = res;
       const depGraph = createFromJSON(testResult.depGraphData);
       const dependencyLines = displayDependencies(depGraph);
       result.push(...dependencyLines);
