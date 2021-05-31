@@ -30,9 +30,11 @@
   },
   "dependencies": {
     "@snyk/dep-graph": "^1.19.3",
+    "bindings": "^1.5.0",
     "chalk": "^4.1.0",
     "debug": "^4.1.1",
     "hosted-git-info": "^3.0.7",
+    "node-addon-api": "^3.2.1",
     "tslib": "^2.0.0"
   },
   "devDependencies": {
