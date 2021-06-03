@@ -81,3 +81,13 @@ export interface TestResult {
   issuesData: IssuesData;
   depGraphData: DepGraphData;
 }
+
+export interface SignatureResult {
+  path: string;
+  hashes_ffm: FullFileHash[];
+}
+
+interface FullFileHash {
+  format: number;
+  data: string;
+}

@@ -29,9 +29,11 @@
     "prepare": "npm run build"
   },
   "dependencies": {
+    "@mapbox/node-pre-gyp": "^1.0.5",
     "@snyk/dep-graph": "^1.19.3",
     "chalk": "^4.1.0",
     "debug": "^4.1.1",
+    "fossid-native": "git+https://github.com/robguinness-snyk/fossid-native.git#v0.1.4",
     "hosted-git-info": "^3.0.7",
     "tslib": "^2.0.0"
   },
@@ -47,7 +49,7 @@
     "jest": "^25.5.4",
     "prettier": "^1.19.1",
     "ts-jest": "^25.5.1",
-    "ts-node": "^8.10.2",
+    "ts-node": "^10.0.0",
     "tsc-watch": "^4.2.9",
     "typescript": "^3.9.7"
   }

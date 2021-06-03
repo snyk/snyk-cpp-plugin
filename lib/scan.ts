@@ -1,17 +1,14 @@
 import * as fs from 'fs';
-import { fromUrl } from 'hosted-git-info';
 import * as path from 'path';
-import { find } from './find';
-import { getTarget } from './git';
-import { hash } from './hash';
+
+import { Facts, Options, PluginResponse, ScanResult } from './types';
+
+import { SignatureResult } from './types';
 import { debug } from './debug';
-import {
-  ScanResult,
-  Options,
-  Fingerprint,
-  Facts,
-  PluginResponse,
-} from './types';
+import { find } from './find';
+import { fromUrl } from 'hosted-git-info';
+import { getSignature } from './signatures';
+import { getTarget } from './git';
 
 export async function scan(options: Options): Promise<PluginResponse> {
   try {
@@ -24,15 +21,15 @@ export async function scan(options: Options): Promise<PluginResponse> {
     }
     const filePaths = await find(options.path);
     debug('%d files found', filePaths.length);
-    const fingerprints: Fingerprint[] = [];
+    const signatures: Promise<SignatureResult>[] = [];
     for (const filePath of filePaths) {
-      const md5 = await hash(filePath);
-      fingerprints.push({
-        filePath,
-        hash: md5,
-      });
+      // const md5 = await hash(filePath);
+      const signature = getSignature(filePath);
+      signatures.push(signature);
     }
-    const facts: Facts[] = [{ type: 'cpp-fingerprints', data: fingerprints }];
+    const allSignatures = await Promise.all(signatures);
+
+    const facts: Facts[] = [{ type: 'cpp-signatures', data: allSignatures }];
     const target = await getTarget();
     debug('target %o', target);
     const gitInfo = fromUrl(target.remoteUrl);

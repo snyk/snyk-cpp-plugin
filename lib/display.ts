@@ -1,18 +1,17 @@
 import * as chalk from 'chalk';
-import { createFromJSON, DepGraph } from '@snyk/dep-graph';
-import { debug } from './debug';
-import { ScanResult, TestResult, IssuesData, Issue, Options } from './types';
 
-function displayFingerprints(scanResults: ScanResult[]): string[] {
-  const result: string[] = [];
+import { DepGraph, createFromJSON } from '@snyk/dep-graph';
+import { Issue, IssuesData, Options, ScanResult, TestResult } from './types';
+
+import { debug } from './debug';
+
+function displaySignatures(scanResults: ScanResult[]): string[] {
+  const result: string[] = [chalk.whiteBright('Signatures')];
   for (const { facts = [] } of scanResults) {
     for (const { data = [] } of facts) {
-      for (const { filePath, hash } of data) {
-        if (filePath && hash) {
-          if (!result.length) {
-            result.push(chalk.whiteBright('Fingerprints'));
-          }
-          result.push(`${hash} ${filePath}`);
+      for (const { path, hashes_ffm } of data) {
+        if (path && hashes_ffm?.length && hashes_ffm[0].data) {
+          result.push(`${hashes_ffm[0].data} ${path}`);
         }
       }
     }
@@ -109,8 +108,8 @@ export async function display(
   try {
     const result: string[] = [];
     if (options?.debug) {
-      const fingerprintLines = displayFingerprints(scanResults);
-      result.push(...fingerprintLines);
+      const signatureLines = displaySignatures(scanResults);
+      result.push(...signatureLines);
     }
     for (const testResult of testResults) {
       const depGraph = createFromJSON(testResult.depGraphData);

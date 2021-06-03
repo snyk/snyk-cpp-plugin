@@ -1,23 +1,48 @@
 import * as path from 'path';
-import { scan, PluginResponse } from '../lib';
+
+import { PluginResponse, scan } from '../lib';
+
 import { Facts } from '../lib/types';
 
 const helloWorldFixturePath = path.join(__dirname, 'fixtures', 'hello-world');
-const helloWorldFingerprints: Facts[] = [
+const helloWorldSignatures: Facts[] = [
   {
-    type: 'cpp-fingerprints',
+    type: 'cpp-signatures',
     data: [
       {
-        filePath: path.join(helloWorldFixturePath, 'add.cpp'),
-        hash: '52d1b046047db9ea0c581cafd4c68fe5',
+        path: path.join(helloWorldFixturePath, 'add.cpp'),
+        hashes_ffm: [
+          {
+            format: 1,
+            data: 'UtGwRgR9ueoMWByv1MaP5Q',
+          },
+          {
+            format: 1,
+            data: 'DBRivtcLTzSq/G5uOyLuJg',
+          },
+        ],
       },
       {
-        filePath: path.join(helloWorldFixturePath, 'add.h'),
-        hash: 'aeca71a6e39f99a24ecf4c088eee9cb8',
+        path: path.join(helloWorldFixturePath, 'add.h'),
+        hashes_ffm: [
+          {
+            format: 1,
+            data: 'rspxpuOfmaJOz0wIju6cuA',
+          },
+        ],
       },
       {
-        filePath: path.join(helloWorldFixturePath, 'main.cpp'),
-        hash: 'ad3365b3370ef6b1c3e778f875055f19',
+        path: path.join(helloWorldFixturePath, 'main.cpp'),
+        hashes_ffm: [
+          {
+            format: 1,
+            data: 'rTNlszcO9rHD53j4dQVfGQ',
+          },
+          {
+            format: 1,
+            data: 'u1xJYWP3m8C8UIKUS02CMQ',
+          },
+        ],
       },
     ],
   },
@@ -29,7 +54,7 @@ describe('scan', () => {
     const expected: PluginResponse = {
       scanResults: [
         {
-          facts: helloWorldFingerprints,
+          facts: helloWorldSignatures,
           identity: {
             type: 'cpp',
           },
@@ -50,7 +75,7 @@ describe('scan', () => {
     const expected: PluginResponse = {
       scanResults: [
         {
-          facts: helloWorldFingerprints,
+          facts: helloWorldSignatures,
           identity: {
             type: 'cpp',
           },
