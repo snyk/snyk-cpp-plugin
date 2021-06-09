@@ -24,11 +24,13 @@ describe('hash', () => {
     try {
       await hash(filePath);
     } catch (err) {
-      expect(err).toMatchObject({
-        path: filePath,
-        code: 'ENOENT',
-        errno: -2,
-      });
+      expect(err).toEqual(
+        expect.objectContaining({
+          path: expect.any(String),
+          code: 'ENOENT',
+          errno: expect.any(Number),
+        }),
+      );
     }
   });
 });
