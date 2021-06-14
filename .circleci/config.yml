@@ -24,7 +24,9 @@ commands:
     steps:
       - run:
           name: Test
-          command: npm test
+          command: |
+            /lib/x86_64-linux-gnu/libc.so.6
+            npm test
   release:
     steps:
       - run:
