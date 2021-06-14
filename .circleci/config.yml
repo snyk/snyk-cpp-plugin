@@ -26,6 +26,7 @@ commands:
           name: Test
           command: |
             /lib/x86_64-linux-gnu/libc.so.6
+            uname -a
             npm test
   release:
     steps:
