@@ -27,6 +27,7 @@ commands:
           command: |
             /lib/x86_64-linux-gnu/libc.so.6
             uname -a
+            nm -C /home/circleci/project/node_modules/fossid-native/bin/napi-v3/fossid-native.node | grep GLIBCXX_3.4
             npm test
   release:
     steps:
