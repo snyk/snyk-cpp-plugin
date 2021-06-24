@@ -166,8 +166,8 @@ workflows:
           context: release-cross-platform
           requires:
             - Lint
-            - Windows Tests for Node << matrix.node_version >>
-            - Docker Tests for Node << matrix.node_version >>
+            - Windows Tests for Node 12
+            - Docker Tests for Node 12
           filters:
             branches:
               only:
