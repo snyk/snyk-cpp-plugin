@@ -123,7 +123,9 @@ jobs:
       - checkout
       - npmrc
       - install_deps
-      - release-cross-platform
+      - run:
+          name: Release binaries for cross-platform
+          command: release-cross-platform
 
 workflows:
   test_and_release:
