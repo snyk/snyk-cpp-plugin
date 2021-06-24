@@ -59,12 +59,14 @@ commands:
       - run:
           name: NPM version
           command: npm --version
-  release-docker:
+  release-cross-platform:
     <<: *defaults
     steps:
       - run:
-          name: Docker Release
-          command: npx semantic-release
+          name: Create Binaries
+          command: |
+            ./release-scripts/make-binaries.sh
+            ls -la ./binary-releases
 
 jobs:
   lint:
@@ -121,7 +123,7 @@ jobs:
       - checkout
       - npmrc
       - install_deps
-      - release-docker
+      - release-cross-platform
 
 workflows:
   test_and_release:
@@ -162,8 +164,8 @@ workflows:
 
       # Release
       - release:
-          name: Release for Docker
-          context: docker-release
+          name: Release for cross platform
+          context: release-cross-platform
           filters:
             branches:
               only:
