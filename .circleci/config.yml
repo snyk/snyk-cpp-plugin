@@ -112,7 +112,7 @@ jobs:
     resource_class: small
     executor:
       name: docker-node
-      node_version: 12
+      node_version: "12"
     steps:
       - checkout
       - npmrc
