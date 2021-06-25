@@ -162,8 +162,8 @@ workflows:
                 - master
 
       # Release
-      - release-cross-platform:
-          name: Release for cross platform
+      - release:
+          name: Release
           context: release-cross-platform
           requires:
             - Lint
