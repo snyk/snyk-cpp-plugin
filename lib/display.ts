@@ -3,21 +3,6 @@ import { createFromJSON, DepGraph } from '@snyk/dep-graph';
 import { debug } from './debug';
 import { ScanResult, TestResult, IssuesData, Issue, Options } from './types';
 
-import * as upath from 'upath';
-
-export function usePosixPath(scanResults: ScanResult[]): ScanResult[] {
-  return scanResults.map((r: ScanResult) => ({
-    ...r,
-    facts: r.facts.map((f) => ({
-      ...f,
-      data: f.data.map((d: any) => ({
-        ...d,
-        filePath: upath.toUnix(d.filePath),
-      })),
-    })),
-  }));
-}
-
 function displayFingerprints(scanResults: ScanResult[]): string[] {
   const result: string[] = [];
   for (const { facts = [] } of scanResults) {

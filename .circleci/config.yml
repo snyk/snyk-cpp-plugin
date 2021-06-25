@@ -1,179 +1,79 @@
 version: 2.1
 
-orbs:
-  win: circleci/windows@2.2.0
-
-defaults: &defaults
-  parameters:
-    node_version:
-      type: string
-      default: ""
-
-windows_defaults: &windows_defaults
-  environment:
-    npm_config_loglevel: silent
-  executor:
-    name: win/default
-
 executors:
   docker-node:
     parameters:
-      node_version:
+      version:
         default: "lts"
         type: string
     docker:
-      - image: cimg/node:<<parameters.node_version>>
+      - image: cimg/node:<<parameters.version>>
 
 commands:
-  # Platform-agnostic commands
   npmrc:
     steps:
       - run:
           name: Create .npmrc
           command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> .npmrc
-  install_node_npm:
-    description: Install correct Node version
-    parameters:
-      node_version:
-        type: string
-        default: ""
+  install:
     steps:
       - run:
-          name: Install correct version of Node
-          command: nvm install << parameters.node_version >>
-      - run:
-          name: Use correct version of Node
-          command: nvm use << parameters.node_version >>
-  install_deps:
-    description: Install dependencies
-    steps:
-      - run:
-          name: Install dependencies
+          name: Install
           command: npm install
-  show_node_version:
-    description: Log Node and npm version
+  test:
     steps:
       - run:
-          name: Node version
-          command: node --version
+          name: Test
+          command: npm test
+  release:
+    steps:
       - run:
-          name: NPM version
-          command: npm --version
+          name: Release
+          command: npx semantic-release
 
 jobs:
-  lint:
-    <<: *defaults
-    docker:
-      - image: circleci/node:<< parameters.node_version >>
-    steps:
-      - checkout
-      - install_deps
-      - show_node_version
-      - run:
-          name: Run lint
-          command: npm run lint
-
-  # Define Windows test
-  test-windows:
-    <<: *defaults
-    <<: *windows_defaults
-    steps:
-      - run: git config --global core.autocrlf false
-      - checkout
-      - install_node_npm:
-          node_version: << parameters.node_version >>
-      - install_deps
-      - show_node_version
-      - run:
-          name: Run tests
-          command: npm test
-
-  # Define Docker test
-  test-docker:
+  test:
     resource_class: small
     parameters:
-      node_version:
+      version:
         default: "lts"
         type: string
     executor:
       name: docker-node
-      node_version: <<parameters.node_version>>
+      version: <<parameters.version>>
     steps:
       - checkout
-      - install_deps
-      - show_node_version
-      - run:
-          name: Run tests
-          command: npm test
+      - install
+      - test
 
-  # Define release
   release:
-    <<: *defaults
     resource_class: small
     executor:
       name: docker-node
-      node_version: "12"
     steps:
       - checkout
       - npmrc
-      - install_deps
-      - show_node_version
-      - run:
-          name: Create Binaries
-          command: |
-            ./release-scripts/make-binaries.sh
-            ls -la ./binary-releases
-      - store_artifacts:
-          path: ./binary-releases
-      - run:
-          name: Validate binary release checksums
-          working_directory: ~/snyk/binary-releases
-          command: |
-            ../release-scripts/validate-checksums.sh
+      - install
+      - release
 
 workflows:
-  test_and_release:
+  test:
     jobs:
-      - lint:
-          name: Lint
-          context: nodejs-install
-          node_version: "14"
-          filters:
-            branches:
-              ignore:
-                - master
-      # Windows tests
-      - test-windows:
-          name: Windows Tests for Node << matrix.node_version >>
-          context: nodejs-install
-          requires:
-            - Lint
+      - test:
           matrix:
             parameters:
-              node_version: ["8.17.0", "10.22.0", "12.18.3", "14.8.0"]
+              version:
+                - 8.17.0
+                - 10.22.0
+                - 12.18.3
+                - 14.8.0
           filters:
             branches:
               ignore:
                 - master
-      # Docker tests
-      - test-docker:
-          name: Docker Tests for Node << matrix.node_version >>
-          requires:
-            - Lint
-          matrix:
-            parameters:
-              node_version: ["8.17.0", "10.22.0", "12.18.3", "14.8.0"]
-          filters:
-            branches:
-              ignore:
-                - master
-
-      # Release
+  release:
+    jobs:
       - release:
-          name: Release
-          context: nodejs-lib-release
-          requires:
-            - Lint
           filters:
             branches:
               only:
