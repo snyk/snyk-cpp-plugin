@@ -107,7 +107,7 @@ jobs:
           command: npm test
 
   # Define release
-  release-cross-platform:
+  release:
     <<: *defaults
     resource_class: small
     executor:
@@ -164,7 +164,7 @@ workflows:
       # Release
       - release:
           name: Release
-          context: release-cross-platform
+          context: nodejs-lib-release
           requires:
             - Lint
           filters:
