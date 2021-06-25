@@ -17,10 +17,10 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "format:check": "prettier --check \"{lib,test}/**/*.{js,ts,json,yml}\"",
-    "format": "prettier --write \"{lib,test}/**/*.{js,ts,json,yml}\"",
+    "format:check": "prettier --check '{lib,test}/**/*.{js,ts,json,yml}'",
+    "format": "prettier --write '{lib,test}/**/*.{js,ts,json,yml}'",
     "lint": "npm run format:check && npm run lint:eslint",
-    "lint:eslint": "eslint --color --cache \"lib/**/*.{js,ts}\"",
+    "lint:eslint": "eslint --color --cache 'lib/**/*.{js,ts}'",
     "test": "npm run lint && npm run test:unit",
     "test:unit": "jest --coverage",
     "test:watch": "tsc-watch --onSuccess 'npm run test:unit'",
@@ -49,7 +49,6 @@
     "ts-jest": "^25.5.1",
     "ts-node": "^8.10.2",
     "tsc-watch": "^4.2.9",
-    "typescript": "^3.9.7",
-    "upath": "^2.0.1"
+    "typescript": "^3.9.7"
   }
 }
