@@ -47,11 +47,8 @@ function displayIssues(
   const issuesCount =
     issues.length == 1 ? '1 issue' : `${issues.length} issues`;
   result.push(chalk.whiteBright('Issues'));
-  for (const { pkgName, pkgVersion, issueId, fixInfo } of issues) {
+  for (const { pkgName, pkgVersion, issueId } of issues) {
     const { title, severity } = issuesData[issueId];
-    const fix = fixInfo.nearestFixedInVersion
-      ? `fix version ${fixInfo.nearestFixedInVersion}`
-      : 'no fix available';
     let color;
     switch (severity) {
       case 'low':
@@ -67,12 +64,13 @@ function displayIssues(
         color = chalk.whiteBright;
         break;
     }
-    const issueUrl = `https://snyk.io/vuln/${issueId}`;
-    const issueText = color(`✗ ${title} [${severity}]`);
+    const issueText = color(`\n ✗ [${severity}] ${title}`);
+    const issueUrl = `https://nvd.nist.gov/vuln/detail/${issueId}`;
+    const introducedThrough = `   Introduced through: ${pkgName}@${pkgVersion}`;
+    const vulnUrl = `   URL: ${issueUrl}`;
     result.push(issueText);
-    result.push(`  ${issueUrl}`);
-    result.push(`  in ${pkgName}@${pkgVersion}`);
-    result.push(`  ${fix}`);
+    result.push(introducedThrough);
+    result.push(vulnUrl);
   }
   if (issues.length) {
     result.push('');
