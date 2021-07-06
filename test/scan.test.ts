@@ -7,7 +7,7 @@ import { Facts } from '../lib/types';
 const helloWorldFixturePath = path.join(__dirname, 'fixtures', 'hello-world');
 const helloWorldSignatures: Facts[] = [
   {
-    type: 'cpp-signatures',
+    type: 'fileSignatures',
     data: [
       {
         path: path.join(helloWorldFixturePath, 'add.cpp'),
