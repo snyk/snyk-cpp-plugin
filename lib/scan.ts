@@ -21,15 +21,17 @@ export async function scan(options: Options): Promise<PluginResponse> {
     }
     const filePaths = await find(options.path);
     debug('%d files found', filePaths.length);
-    const signatures: Promise<SignatureResult>[] = [];
+    const signatures: SignatureResult[] = [];
     for (const filePath of filePaths) {
-      // const md5 = await hash(filePath);
-      const signature = getSignature(filePath);
+      /**
+       * TODO (@snyk/tundra): apply concurrency to generate signatures
+       * for n files at the time to be resolved as chunk with Promise.all?*
+       */
+      const signature = await getSignature(filePath);
       signatures.push(signature);
     }
-    const allSignatures = await Promise.all(signatures);
 
-    const facts: Facts[] = [{ type: 'cpp-signatures', data: allSignatures }];
+    const facts: Facts[] = [{ type: 'fileSignatures', data: signatures }];
     const target = await getTarget();
     debug('target %o', target);
     const gitInfo = fromUrl(target.remoteUrl);
