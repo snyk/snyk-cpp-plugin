@@ -1,25 +1,4 @@
 import { DepGraphData } from '@snyk/dep-graph';
-
-export const SupportFileExtensions = [
-  '.c',
-  '.cc',
-  '.cpp',
-  '.cxx',
-  '.c++',
-  '.h',
-  '.hh',
-  '.hpp',
-  '.hxx',
-  '.h++',
-  '.i',
-  '.ii',
-  '.ixx',
-  '.ipp',
-  '.txx',
-  '.tpp',
-  '.tpl',
-];
-
 export interface PluginResponse {
   scanResults: ScanResult[];
 }
@@ -80,4 +59,14 @@ export interface TestResult {
   issues: Issue[];
   issuesData: IssuesData;
   depGraphData: DepGraphData;
+}
+
+export interface SignatureResult {
+  path: string;
+  hashes_ffm: FullFileHash[];
+}
+
+interface FullFileHash {
+  format: number;
+  data: string;
 }

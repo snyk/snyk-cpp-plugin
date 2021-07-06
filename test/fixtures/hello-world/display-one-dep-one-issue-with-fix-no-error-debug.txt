@@ -1,7 +1,7 @@
-[97mFingerprints[39m
-52d1b046047db9ea0c581cafd4c68fe5 test/fixtures/hello-world/add.cpp
-aeca71a6e39f99a24ecf4c088eee9cb8 test/fixtures/hello-world/add.h
-ad3365b3370ef6b1c3e778f875055f19 test/fixtures/hello-world/main.cpp
+[97mSignatures[39m
+UtGwRgR9ueoMWByv1MaP5Q test/fixtures/hello-world/add.cpp
+rspxpuOfmaJOz0wIju6cuA test/fixtures/hello-world/add.h
+rTNlszcO9rHD53j4dQVfGQ test/fixtures/hello-world/main.cpp
 
 [97mDependencies[39m
 hello-world@1.2.3

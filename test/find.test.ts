@@ -1,4 +1,5 @@
 import * as path from 'path';
+
 import { find } from '../lib/find';
 
 describe('find', () => {
@@ -9,6 +10,7 @@ describe('find', () => {
       // c* files
       path.join(fixturePath, 'test.c'),
       path.join(fixturePath, 'main.cpp'),
+      path.join(fixturePath, 'main.cc'),
       path.join(fixturePath, 'one', 'one.cc'),
       path.join(fixturePath, 'one', 'two', 'two.cxx'),
       path.join(fixturePath, 'one', 'two', 'three', 'three.c++'),
