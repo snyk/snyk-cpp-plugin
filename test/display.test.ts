@@ -1,5 +1,9 @@
-import { join } from 'path';
+import * as path from 'path';
+
+import stripAnsi from 'strip-ansi';
+
 import { display, Options, scan, ScanResult } from '../lib';
+import { usePosixPath } from '../lib/display';
 import { readFixture } from './read-fixture';
 import {
   withDepOneIssueAndFix,
@@ -8,19 +12,26 @@ import {
   noDepOrIssues,
 } from './fixtures/hello-world/test-results';
 
-const helloWorldPath = join('./', 'test', 'fixtures', 'hello-world');
+const helloWorldPath = path.join('test', 'fixtures', 'hello-world');
 
 describe('display', () => {
   it('should return expected text for one dependency, one issue with fix, no errors', async () => {
     const { scanResults } = await scan({ path: helloWorldPath });
     const errors: string[] = [];
-    const actual = await display(scanResults, withDepOneIssueAndFix, errors);
-    const expected = await readFixture(
-      'hello-world',
-      'display-one-dep-one-issue-with-fix-no-errors.txt',
+    const actual = JSON.stringify(
+      stripAnsi(await display(scanResults, withDepOneIssueAndFix, errors)),
     );
-    expect(actual).toBe(expected);
+    const expected = JSON.stringify(
+      stripAnsi(
+        await readFixture(
+          'hello-world',
+          'display-one-dep-one-issue-with-fix-no-errors.txt',
+        ),
+      ),
+    );
+    expect(actual).toEqual(expected);
   });
+
   it('should return expected text for one dependency, three issues, no errors', async () => {
     const { scanResults } = await scan({ path: helloWorldPath });
     const errors: string[] = [];
@@ -29,14 +40,15 @@ describe('display', () => {
       'hello-world',
       'display-one-dep-three-issues-no-errors.txt',
     );
-    expect(actual).toBe(expected);
+    expect(stripAnsi(actual)).toEqual(stripAnsi(expected));
   });
+
   it('should return expected text for one dependency, one issue with fix, no errors when debug true', async () => {
     const { scanResults } = await scan({ path: helloWorldPath });
     const errors: string[] = [];
     const options: Options = { path: '', debug: true };
     const actual = await display(
-      scanResults,
+      usePosixPath(scanResults),
       withDepOneIssueAndFix,
       errors,
       options,
@@ -45,8 +57,9 @@ describe('display', () => {
       'hello-world',
       'display-one-dep-one-issue-with-fix-no-error-debug.txt',
     );
-    expect(actual).toBe(expected);
+    expect(stripAnsi(actual)).toEqual(stripAnsi(expected));
   });
+
   it('should return expected text when one dependency, no issues, no errors', async () => {
     const { scanResults } = await scan({ path: helloWorldPath });
     const errors: string[] = [];
@@ -55,8 +68,9 @@ describe('display', () => {
       'hello-world',
       'display-one-dep-no-issues-no-errors.txt',
     );
-    expect(actual).toBe(expected);
+    expect(stripAnsi(actual)).toEqual(stripAnsi(expected));
   });
+
   it('should return expected text when no dependencies, no issues, no errors', async () => {
     const { scanResults } = await scan({ path: helloWorldPath });
     const errors: string[] = [];
@@ -65,8 +79,9 @@ describe('display', () => {
       'hello-world',
       'display-no-deps-no-issues-no-errors.txt',
     );
-    expect(actual).toBe(expected);
+    expect(stripAnsi(actual)).toEqual(stripAnsi(expected));
   });
+
   it('should return expected text string when no projects', async () => {
     const scanResult: ScanResult[] = [];
     const errors: string[] = [];
@@ -75,8 +90,9 @@ describe('display', () => {
       'display-no-scan-results.txt',
     );
     const actual = await display(scanResult, noDepOrIssues, errors);
-    expect(actual).toBe(expected);
+    expect(stripAnsi(actual)).toEqual(stripAnsi(expected));
   });
+
   it('should return expected text string when invalid projects', async () => {
     const errors: string[] = [];
     const expected = await readFixture(
@@ -84,8 +100,9 @@ describe('display', () => {
       'display-no-scan-results.txt',
     );
     const actual = await display([1, 2, 3] as any, noDepOrIssues, errors);
-    expect(actual).toBe(expected);
+    expect(stripAnsi(actual)).toEqual(stripAnsi(expected));
   });
+
   it('should return expected text when invalid artifacts', async () => {
     const errors: string[] = [];
     const expected = await readFixture(
@@ -97,8 +114,9 @@ describe('display', () => {
       noDepOrIssues,
       errors,
     );
-    expect(actual).toBe(expected);
+    expect(stripAnsi(actual)).toEqual(stripAnsi(expected));
   });
+
   it('should return expected text when invalid artifact data', async () => {
     const errors: string[] = [];
     const expected = await readFixture(
@@ -110,8 +128,9 @@ describe('display', () => {
       noDepOrIssues,
       errors,
     );
-    expect(actual).toBe(expected);
+    expect(stripAnsi(actual)).toEqual(stripAnsi(expected));
   });
+
   it('should return expected text for one dependency, one issue, one error', async () => {
     const { scanResults } = await scan({ path: helloWorldPath });
     const errors: string[] = [
@@ -122,8 +141,9 @@ describe('display', () => {
       'hello-world',
       'display-one-dep-one-issue-one-error.txt',
     );
-    expect(actual).toBe(expected);
+    expect(stripAnsi(actual)).toEqual(stripAnsi(expected));
   });
+
   it('should return expected text for one dependency, no issues, two errors', async () => {
     const { scanResults } = await scan({ path: helloWorldPath });
     const errors: string[] = [
@@ -135,6 +155,6 @@ describe('display', () => {
       'hello-world',
       'display-one-dep-no-issues-two-errors.txt',
     );
-    expect(actual).toBe(expected);
+    expect(stripAnsi(actual)).toEqual(stripAnsi(expected));
   });
 });
