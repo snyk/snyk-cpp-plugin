@@ -25,10 +25,10 @@ function displayDependencies(depGraph: DepGraph): string[] {
   const result: string[] = [];
   const depCount = depGraph?.getDepPkgs()?.length || 0;
   if (depCount > 0) {
-    result.push(chalk.whiteBright('Dependencies'));
+    result.push(chalk.whiteBright('Dependencies\n'));
   }
   for (const pkg of depGraph?.getDepPkgs() || []) {
-    result.push(`${pkg.name}@${pkg.version}`);
+    result.push(leftPad(`${pkg.name}@${pkg.version}`));
   }
   if (result.length) {
     result.push('');
@@ -47,8 +47,12 @@ function displayIssues(
   const issuesCount =
     issues.length == 1 ? '1 issue' : `${issues.length} issues`;
   result.push(chalk.whiteBright('Issues'));
-  for (const { pkgName, pkgVersion, issueId } of issues) {
-    const { title, severity } = issuesData[issueId];
+  for (const {
+    pkgName: name,
+    pkgVersion: version,
+    issueId: vulnId,
+  } of issues) {
+    const { title, severity } = issuesData[vulnId];
     let color;
     switch (severity) {
       case 'low':
@@ -64,17 +68,19 @@ function displayIssues(
         color = chalk.whiteBright;
         break;
     }
-    const issueText = color(`\n ✗ [${severity}] ${title}`);
-    const issueUrl = `https://nvd.nist.gov/vuln/detail/${issueId}`;
-    const introducedThrough = `   Introduced through: ${pkgName}@${pkgVersion}`;
-    const vulnUrl = `   URL: ${issueUrl}`;
-    result.push(issueText);
+    const severityAndTitle = color(`\n ✗ [${severity}] ${title}`);
+    const nvdUrl = `https://nvd.nist.gov/vuln/detail/${vulnId}`;
+    const introducedThrough = leftPad(`Introduced through: ${name}@${version}`);
+    const urlText = leftPad(`URL: ${nvdUrl}`);
+    result.push(severityAndTitle);
     result.push(introducedThrough);
-    result.push(vulnUrl);
+    result.push(urlText);
   }
+
   if (issues.length) {
     result.push('');
   }
+
   const issuesFound =
     issues.length > 0
       ? chalk.redBright(issuesCount)
@@ -127,4 +133,8 @@ export async function display(
     debug(error.message || 'Error displaying results. ' + error);
     return 'Error displaying results.';
   }
+}
+
+export function leftPad(text: string, padding: number = 4): string {
+  return padding <= 0 ? text : ' '.repeat(padding) + text;
 }
