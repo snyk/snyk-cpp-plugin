@@ -1,8 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { Facts, Options, PluginResponse, ScanResult } from './types';
-
+import { Analytics, Facts, Options, PluginResponse, ScanResult } from './types';
 import { SignatureResult } from './types';
 import { debug } from './debug';
 import { find } from './find';
@@ -12,32 +11,65 @@ import { getTarget } from './git';
 
 export async function scan(options: Options): Promise<PluginResponse> {
   try {
-    debug('options %o', options);
+    debug.enabled = !!options?.debug;
+
+    debug('options %o \n', options);
     if (!options.path) {
       throw 'invalid options no path provided.';
     }
     if (!fs.existsSync(options.path)) {
       throw `'${options.path}' does not exist.`;
     }
+    const start = Date.now();
     const filePaths = await find(options.path);
-    debug('%d files found', filePaths.length);
-    const signatures: SignatureResult[] = [];
+    debug('%d files found \n', filePaths.length);
+    let signatures: Promise<SignatureResult>[] = [];
+    let allSignatures: SignatureResult[] = [];
     for (const filePath of filePaths) {
       /**
        * TODO (@snyk/tundra): apply concurrency to generate signatures
        * for n files at the time to be resolved as chunk with Promise.all?*
        */
-      const signature = await getSignature(filePath);
+      if (signatures.length === 20) {
+        const signaturesResult = await Promise.all(signatures);
+        allSignatures = allSignatures.concat(signaturesResult);
+        signatures = [];
+      }
+
+      const signature = getSignature(filePath);
       signatures.push(signature);
     }
 
-    const facts: Facts[] = [{ type: 'fileSignatures', data: signatures }];
+    const end = Date.now();
+    const totalMilliseconds = end - start;
+
+    const totalFileSignatures = allSignatures.length;
+    const totalSecondsElapsedToGenerateFileSignatures = Math.floor(
+      totalMilliseconds / 1000,
+    );
+
+    debug(`total fileSignatures: ${totalFileSignatures} \n`);
+    debug(
+      `elapsed time in seconds to generate fileSignatures: ${totalSecondsElapsedToGenerateFileSignatures}s \n`,
+    );
+
+    const facts: Facts[] = [{ type: 'fileSignatures', data: allSignatures }];
+    const analytics: Analytics[] = [
+      {
+        name: 'fileSignaturesAnalyticsContext',
+        data: {
+          totalFileSignatures,
+          totalSecondsElapsedToGenerateFileSignatures,
+        },
+      },
+    ];
+
     const target = await getTarget();
-    debug('target %o', target);
+    debug('target %o \n', target);
     const gitInfo = fromUrl(target.remoteUrl);
     const name =
       options.projectName || gitInfo?.project || path.basename(options.path);
-    debug('name %o', name);
+    debug('name %o \n', name);
     const scanResults: ScanResult[] = [
       {
         facts,
@@ -46,6 +78,7 @@ export async function scan(options: Options): Promise<PluginResponse> {
         },
         name,
         target,
+        analytics,
       },
     ];
     return {

@@ -9,6 +9,7 @@ export interface ScanResult {
   name?: string;
   policy?: string;
   target: GitTarget;
+  analytics?: Analytics[];
 }
 
 export interface Identity {
@@ -25,6 +26,11 @@ export interface Facts {
 export interface GitTarget {
   remoteUrl: string;
   branch: string;
+}
+
+export interface Analytics {
+  name: string;
+  data: unknown;
 }
 
 export interface Fingerprint {
