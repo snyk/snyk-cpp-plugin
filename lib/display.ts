@@ -46,7 +46,11 @@ function displayIssues(
   const depCount = pkgCount == 1 ? '1 dependency' : `${pkgCount} dependencies`;
   const issuesCount =
     issues.length == 1 ? '1 issue' : `${issues.length} issues`;
-  result.push(chalk.whiteBright('Issues'));
+
+  if (pkgCount > 0 && issues.length > 0) {
+    result.push(chalk.whiteBright('Issues'));
+  }
+
   for (const {
     pkgName: name,
     pkgVersion: version,
@@ -85,7 +89,15 @@ function displayIssues(
     issues.length > 0
       ? chalk.redBright(issuesCount)
       : chalk.greenBright(issuesCount);
-  result.push(`Tested ${depCount} for known issues, found ${issuesFound}.\n`);
+
+  const identifiedUnmanagedDeps = `Tested ${depCount} for known issues, found ${issuesFound}.\n`;
+  const failedToIdentifyUnmanagedDeps = `\nCould not identify unmanaged dependencies to be tested.`;
+
+  const endlineMsg =
+    pkgCount > 0 ? identifiedUnmanagedDeps : failedToIdentifyUnmanagedDeps;
+
+  result.push(endlineMsg);
+
   return result;
 }
 
