@@ -147,6 +147,6 @@ export async function display(
   }
 }
 
-export function leftPad(text: string, padding: number = 4): string {
+export function leftPad(text: string, padding = 4): string {
   return padding <= 0 ? text : ' '.repeat(padding) + text;
 }

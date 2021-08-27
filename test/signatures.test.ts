@@ -8,23 +8,23 @@ describe('getSignature', () => {
     const filePath = path.join(fixturePath, 'example', 'main.cc');
     const expected = {
       path: filePath,
-      hashes_ffm: [
-        { format: 1, data: 'WY0eT7ZYA9PlMPjm2oSZ2g' },
-        { format: 1, data: 'uMmOIaP1JsOZUWjzZRXKyg' },
-      ],
+      hashes_ffm: [{ format: 3, data: '15b464e1ed112524ebfae35b' }],
     };
     const actual = await getSignature(filePath);
     expect(actual).toStrictEqual(expected);
   });
 
-  it('should return a correct result for empty file', async () => {
+  it('should return null for empty file', async () => {
     const fixturePath = path.join(__dirname, 'fixtures');
     const filePath = path.join(fixturePath, 'empty', '.keep');
-    const expected = {
-      path: filePath,
-      ignore_reason: 'skipping empty file',
-    };
     const actual = await getSignature(filePath);
-    expect(actual).toStrictEqual(expected);
+    expect(actual).toStrictEqual(null);
+  });
+
+  it('binaryfile', async () => {
+    const fixturePath = path.join(__dirname, 'fixtures');
+    const filePath = path.join(fixturePath, 'rob.jpg');
+    const actual = await getSignature(filePath);
+    expect(actual).toStrictEqual(null);
   });
 });

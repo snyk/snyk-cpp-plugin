@@ -9,6 +9,18 @@ import { fromUrl } from 'hosted-git-info';
 import { getSignature } from './signatures';
 import { getTarget } from './git';
 
+const processSignatures = async (
+  signatures: Promise<SignatureResult | null>[],
+  allSignatures: SignatureResult[],
+) => {
+  const signaturesResult = await Promise.all(signatures);
+  const signaturesFiltered = <SignatureResult[]>(
+    signaturesResult.filter((signature) => !!signature)
+  );
+  allSignatures.push(...signaturesFiltered);
+  signatures = [];
+};
+
 export async function scan(options: Options): Promise<PluginResponse> {
   try {
     debug.enabled = !!options?.debug;
@@ -23,21 +35,19 @@ export async function scan(options: Options): Promise<PluginResponse> {
     const start = Date.now();
     const filePaths = await find(options.path);
     debug('%d files found \n', filePaths.length);
-    let signatures: Promise<SignatureResult>[] = [];
-    let allSignatures: SignatureResult[] = [];
+    const signatures: Promise<SignatureResult | null>[] = [];
+    const allSignatures: SignatureResult[] = [];
+    const signatureConcurrency = 20;
     for (const filePath of filePaths) {
-      /**
-       * TODO (@snyk/tundra): apply concurrency to generate signatures
-       * for n files at the time to be resolved as chunk with Promise.all?*
-       */
-      if (signatures.length === 20) {
-        const signaturesResult = await Promise.all(signatures);
-        allSignatures = allSignatures.concat(signaturesResult);
-        signatures = [];
-      }
-
       const signature = getSignature(filePath);
       signatures.push(signature);
+      if (signatures.length === signatureConcurrency) {
+        await processSignatures(signatures, allSignatures);
+      }
+    }
+
+    if (signatures.length > 0) {
+      await processSignatures(signatures, allSignatures);
     }
 
     const end = Date.now();
