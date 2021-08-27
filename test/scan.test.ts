@@ -1,27 +1,46 @@
 import * as path from 'path';
-import { scan, PluginResponse } from '../lib';
+
+import { PluginResponse, scan } from '../lib';
+
 import { Facts } from '../lib/types';
 
 const helloWorldFixturePath = path.join(__dirname, 'fixtures', 'hello-world');
-const helloWorldFingerprints: Facts[] = [
+const helloWorldSignatures: Facts[] = [
   {
-    type: 'cpp-fingerprints',
+    type: 'fileSignatures',
     data: [
       {
-        filePath: path.join(helloWorldFixturePath, 'add.cpp'),
-        hash: '52d1b046047db9ea0c581cafd4c68fe5',
+        path: path.join(helloWorldFixturePath, 'add.cpp'),
+        hashes_ffm: [
+          {
+            format: 1,
+            data: 'UtGwRgR9ueoMWByv1MaP5Q',
+          },
+        ],
       },
       {
-        filePath: path.join(helloWorldFixturePath, 'add.h'),
-        hash: 'aeca71a6e39f99a24ecf4c088eee9cb8',
+        path: path.join(helloWorldFixturePath, 'add.h'),
+        hashes_ffm: [
+          {
+            format: 1,
+            data: 'rspxpuOfmaJOz0wIju6cuA',
+          },
+        ],
       },
       {
-        filePath: path.join(helloWorldFixturePath, 'main.cpp'),
-        hash: 'ad3365b3370ef6b1c3e778f875055f19',
+        path: path.join(helloWorldFixturePath, 'main.cpp'),
+        hashes_ffm: [
+          {
+            format: 1,
+            data: 'rTNlszcO9rHD53j4dQVfGQ',
+          },
+        ],
       },
     ],
   },
 ];
+
+const bigFixturePath = path.join(__dirname, 'fixtures', 'big-fixture');
 
 describe('scan', () => {
   it('should produce scanned projects', async () => {
@@ -29,7 +48,7 @@ describe('scan', () => {
     const expected: PluginResponse = {
       scanResults: [
         {
-          facts: helloWorldFingerprints,
+          facts: helloWorldSignatures,
           identity: {
             type: 'cpp',
           },
@@ -44,13 +63,19 @@ describe('scan', () => {
     expect(actual).toEqual(expected);
   });
 
+  it('should produce correct number of signatures for large project', async () => {
+    const actual = await scan({ path: bigFixturePath });
+    expect(actual.scanResults).toBeDefined();
+    expect(actual.scanResults[0].facts[0].data.length).toEqual(21);
+  });
+
   it('should produce scanned projects with project name option', async () => {
     const fixturePath = path.join(__dirname, 'fixtures', 'hello-world');
     const actual = await scan({ path: fixturePath, projectName: 'my-app' });
     const expected: PluginResponse = {
       scanResults: [
         {
-          facts: helloWorldFingerprints,
+          facts: helloWorldSignatures,
           identity: {
             type: 'cpp',
           },

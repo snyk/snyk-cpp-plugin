@@ -1,4 +1,5 @@
 import * as path from 'path';
+
 import { find } from '../lib/find';
 
 describe('find', () => {
@@ -6,9 +7,12 @@ describe('find', () => {
     const fixturePath = path.join(__dirname, 'fixtures', 'example');
     const actual = await find(fixturePath);
     const expected = [
+      // md file
+      path.join(fixturePath, 'README.md'),
       // c* files
       path.join(fixturePath, 'test.c'),
       path.join(fixturePath, 'main.cpp'),
+      path.join(fixturePath, 'main.cc'),
       path.join(fixturePath, 'one', 'one.cc'),
       path.join(fixturePath, 'one', 'two', 'two.cxx'),
       path.join(fixturePath, 'one', 'two', 'three', 'three.c++'),
@@ -29,13 +33,6 @@ describe('find', () => {
       path.join(fixturePath, 'templates', 'sub', 'test.tpl'),
     ];
     expect(actual.sort()).toEqual(expected.sort());
-  });
-
-  it('should produce an empty list when directory has no support files in', async () => {
-    const fixturePath = path.join(__dirname, 'fixtures', 'empty');
-    const actual = await find(fixturePath);
-    const expected: string[] = [];
-    expect(actual).toEqual(expected);
   });
 
   it('should produce an empty list when file path is invalid', async () => {
@@ -61,12 +58,5 @@ describe('find', () => {
     } catch (err) {
       expect(err).toEqual(expected);
     }
-  });
-
-  it('should handle broken files and continue to find other files', async () => {
-    const fixturePath = path.join(__dirname, 'fixtures', 'handle-broken');
-    const actual = await find(fixturePath);
-    const expected: string[] = [path.join(fixturePath, 'main.cpp')];
-    expect(actual).toEqual(expected);
   });
 });

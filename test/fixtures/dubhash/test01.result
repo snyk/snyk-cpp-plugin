@@ -1,0 +1,17 @@
+{
+  "path": "test01",
+  "hashes_ffm": [
+    {
+      "format": 1,
+      "data": "EQg6H/stTYlTTdj7pgxZyw"
+    },
+    {
+      "format": 1,
+      "data": "p3vWq80izGXx0MYbu1pKZg"
+    },
+    {
+      "format": 3,
+      "data": "d41d8cd98f00b204e9800998"
+    }
+  ]
+}
