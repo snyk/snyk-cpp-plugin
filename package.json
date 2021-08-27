@@ -33,7 +33,7 @@
     "@snyk/dep-graph": "^1.19.3",
     "chalk": "^4.1.0",
     "debug": "^4.1.1",
-    "fossid-native": "git+https://github.com/robguinness-snyk/fossid-native.git#v0.1.6",
+    "fossid-native": "git+https://github.com/snyk/file-signatures.git#v0.1.6",
     "hosted-git-info": "^3.0.7",
     "tslib": "^2.0.0"
   },
