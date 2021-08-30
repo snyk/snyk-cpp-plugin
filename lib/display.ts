@@ -1,7 +1,14 @@
 import * as chalk from 'chalk';
 
 import { DepGraph, createFromJSON } from '@snyk/dep-graph';
-import { Issue, IssuesData, Options, ScanResult, TestResult } from './types';
+import {
+  DepsFilePaths,
+  Issue,
+  IssuesData,
+  Options,
+  ScanResult,
+  TestResult,
+} from './types';
 
 import { debug } from './debug';
 
@@ -21,15 +28,136 @@ function displaySignatures(scanResults: ScanResult[]): string[] {
   }
   return result;
 }
+
+function findDependencyLines(
+  depGraph: DepGraph,
+  options: Options | undefined,
+  depsFilePaths?: DepsFilePaths,
+) {
+  const showDepsFilePaths = (options && options['print-dep-paths']) || false;
+  const isAllowedToShowDependenciesWithFilePaths =
+    showDepsFilePaths && depsFilePaths && Object.keys(depsFilePaths).length > 0;
+
+  if (isAllowedToShowDependenciesWithFilePaths) {
+    return displayDependenciesWithFilePaths(depGraph, depsFilePaths);
+  }
+
+  const isAllowedToShowDependencies =
+    (options && options['print-deps']) || false;
+
+  const emptyDependencySection = '\n';
+
+  return isAllowedToShowDependencies
+    ? displayDependencies(depGraph)
+    : [emptyDependencySection];
+}
+
+export async function display(
+  scanResults: ScanResult[],
+  testResults: TestResult[],
+  errors: string[],
+  options?: Options,
+): Promise<string> {
+  try {
+    const result: string[] = [];
+    if (options?.debug) {
+      const signatureLines = displaySignatures(scanResults);
+      result.push(...signatureLines);
+    }
+    for (const testResult of testResults) {
+      const depGraph = createFromJSON(testResult.depGraphData);
+      const [dependencySection, issuesSection] = selectDisplayStrategy(
+        options,
+        depGraph,
+        testResult,
+      );
+
+      result.push(...dependencySection, ...issuesSection);
+    }
+    const errorLines = displayErrors(errors);
+    result.push(...errorLines);
+    return result.join('\n');
+  } catch (error) {
+    debug(error.message || 'Error displaying results. ' + error);
+    return 'Error displaying results.';
+  }
+}
+
+export function leftPad(text: string, padding: number = 4): string {
+  return padding <= 0 ? text : ' '.repeat(padding) + text;
+}
+
+function selectDisplayStrategy(
+  options: Options | undefined,
+  depGraph: DepGraph,
+  testResult: TestResult,
+) {
+  const { depsFilePaths, issues, issuesData } = testResult;
+  const dependencySection = findDependencyLines(
+    depGraph,
+    options,
+    depsFilePaths,
+  );
+  const issuesSection = displayIssues(depGraph, issues, issuesData);
+  return [dependencySection, issuesSection];
+}
+
 function displayDependencies(depGraph: DepGraph): string[] {
   const result: string[] = [];
   const depCount = depGraph?.getDepPkgs()?.length || 0;
   if (depCount > 0) {
-    result.push(chalk.whiteBright('Dependencies\n'));
+    result.push(chalk.whiteBright('\nDependencies:\n'));
   }
+
   for (const pkg of depGraph?.getDepPkgs() || []) {
-    result.push(leftPad(`${pkg.name}@${pkg.version}`));
+    result.push(leftPad(`${pkg.name}@${pkg.version}`, 2));
   }
+
+  if (result.length) {
+    result.push('');
+  }
+  return result;
+}
+
+function displayDependenciesWithFilePaths(
+  depGraph: DepGraph,
+  depsFilePaths?: DepsFilePaths,
+): string[] {
+  const result: string[] = [];
+  const depCount = depGraph?.getDepPkgs()?.length || 0;
+  if (depCount > 0) {
+    result.push(chalk.whiteBright('\nDependencies:'));
+  }
+  const maxFilePathsToBeDisplayed = 3;
+  for (const pkg of depGraph?.getDepPkgs() || []) {
+    const pkgId = `${pkg.name}@${pkg.version}`;
+
+    result.push(`\n${leftPad(pkgId, 2)}`);
+
+    if (depsFilePaths && depsFilePaths[pkgId]) {
+      result.push(`${leftPad('matching files:', 2)}`);
+      const filePathsToDisplay = depsFilePaths[pkgId].slice(
+        0,
+        maxFilePathsToBeDisplayed,
+      );
+
+      for (const filePathToDisplay of filePathsToDisplay) {
+        result.push(leftPad(`- ${filePathToDisplay}`, 4));
+      }
+
+      const hasToHideAndSayDepsFilePathsCount = depsFilePaths[pkgId].length > 3;
+      if (hasToHideAndSayDepsFilePathsCount) {
+        result.push(
+          leftPad(
+            `... and ${depsFilePaths[pkgId].length -
+              maxFilePathsToBeDisplayed} more files`,
+            4,
+          ),
+        );
+      }
+    }
+  }
+
   if (result.length) {
     result.push('');
   }
@@ -48,7 +176,7 @@ function displayIssues(
     issues.length == 1 ? '1 issue' : `${issues.length} issues`;
 
   if (pkgCount > 0 && issues.length > 0) {
-    result.push(chalk.whiteBright('Issues'));
+    result.push(chalk.whiteBright('Issues:'));
   }
 
   for (const {
@@ -113,40 +241,4 @@ function displayErrors(errors: string[]): string[] {
     result.push('');
   }
   return result;
-}
-
-export async function display(
-  scanResults: ScanResult[],
-  testResults: TestResult[],
-  errors: string[],
-  options?: Options,
-): Promise<string> {
-  try {
-    const result: string[] = [];
-    if (options?.debug) {
-      const signatureLines = displaySignatures(scanResults);
-      result.push(...signatureLines);
-    }
-    for (const testResult of testResults) {
-      const depGraph = createFromJSON(testResult.depGraphData);
-      const dependencyLines = displayDependencies(depGraph);
-      result.push(...dependencyLines);
-      const issueLines = displayIssues(
-        depGraph,
-        testResult.issues,
-        testResult.issuesData,
-      );
-      result.push(...issueLines);
-    }
-    const errorLines = displayErrors(errors);
-    result.push(...errorLines);
-    return result.join('\n');
-  } catch (error) {
-    debug(error.message || 'Error displaying results. ' + error);
-    return 'Error displaying results.';
-  }
-}
-
-export function leftPad(text: string, padding: number = 4): string {
-  return padding <= 0 ? text : ' '.repeat(padding) + text;
 }
