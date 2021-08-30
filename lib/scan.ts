@@ -25,19 +25,22 @@ export async function scan(options: Options): Promise<PluginResponse> {
     debug('%d files found \n', filePaths.length);
     let signatures: Promise<SignatureResult>[] = [];
     let allSignatures: SignatureResult[] = [];
+
+    const signatureConcurrency = 20;
     for (const filePath of filePaths) {
-      /**
-       * TODO (@snyk/tundra): apply concurrency to generate signatures
-       * for n files at the time to be resolved as chunk with Promise.all?*
-       */
-      if (signatures.length === 20) {
+      const signature = getSignature(filePath);
+      signatures.push(signature);
+      if (signatures.length === signatureConcurrency) {
         const signaturesResult = await Promise.all(signatures);
         allSignatures = allSignatures.concat(signaturesResult);
         signatures = [];
       }
+    }
 
-      const signature = getSignature(filePath);
-      signatures.push(signature);
+    if (signatures.length > 0) {
+      const signaturesResult = await Promise.all(signatures);
+      allSignatures = allSignatures.concat(signaturesResult);
+      signatures = [];
     }
 
     const end = Date.now();
