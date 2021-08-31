@@ -9,7 +9,7 @@
   "author": "snyk.io",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=8"
+    "node": ">=10"
   },
   "files": [
     "dist"
@@ -29,19 +29,18 @@
     "prepare": "npm run build"
   },
   "dependencies": {
-    "@mapbox/node-pre-gyp": "^1.0.5",
     "@snyk/dep-graph": "^1.19.3",
     "chalk": "^4.1.0",
     "debug": "^4.1.1",
-    "fossid-native": "git+https://github.com/snyk/file-signatures.git#v0.1.6",
     "hosted-git-info": "^3.0.7",
-    "tslib": "^2.0.0"
+    "tslib": "^2.0.0",
+    "xxhash": "^0.3.0"
   },
   "devDependencies": {
     "@types/debug": "^4.1.5",
     "@types/hosted-git-info": "^3.0.1",
     "@types/jest": "^25.2.3",
-    "@types/node": "^8.10.62",
+    "@types/node": "^10.17.60",
     "@typescript-eslint/eslint-plugin": "^3.8.0",
     "@typescript-eslint/parser": "^3.8.0",
     "eslint": "^6.8.0",
