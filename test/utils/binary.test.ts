@@ -1,6 +1,6 @@
 import { isBinary } from '../../lib/utils/binary';
 import * as fs from 'fs';
-import * as path from 'path'; 
+import * as path from 'path';
 
 describe('isBinary', () => {
   it('should return true for binary file', async () => {
