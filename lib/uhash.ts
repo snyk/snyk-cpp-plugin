@@ -1,5 +1,5 @@
 // This module implements the uhash specification (v1.0) described in docs/uhash1-0
-import * as xxhash from 'xxhash';
+// import * as xxhash from 'xxhash';
 import * as crypto from 'crypto';
 import { SignatureResult } from './types';
 import { isBinary } from './utils/binary';
@@ -32,7 +32,8 @@ const getUhashDigest = (fileContents: Buffer, isBinary: boolean): string => {
     const hash = crypto.createHash(hashAlgorithm).update(file);
     return hash.digest('hex');
   } else {
-    return xxhash.hash64(fileContents, 0xcafebabe).digest();
+    // return xxhash.hash64(fileContents, 0xcafebabe).digest();
+    return '';
   }
 };
 
