@@ -14,5 +14,6 @@
     "noImplicitAny": true,
     "noFallthroughCasesInSwitch": true,
   },
-  "include": ["./lib/**/*", "./*.d.ts"]
+  "include": ["./lib/**/*", "./*.d.ts"],
+  "ts-node": {  "files": true }
 }
