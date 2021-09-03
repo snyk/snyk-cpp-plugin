@@ -23,7 +23,7 @@ describe('getUhashSignature', () => {
     expect(actual).toStrictEqual(expected);
   });
 
-  it('returns correct SignatureResult for text file', async () => {
+  it.only('returns correct SignatureResult for text file', async () => {
     const fixturePath = path.join(__dirname, 'fixtures');
     const filePath = path.join(fixturePath, 'hello-world', 'add.cpp');
     const fileContents = await readFile(filePath);
