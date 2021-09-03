@@ -11,4 +11,5 @@ yarn.lock
 .dccache
 build
 .vscode
-benchmarks
+benchmarks/opencv
+benchmarks/c-project

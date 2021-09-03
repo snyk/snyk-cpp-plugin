@@ -1,0 +1,3 @@
+# Benchmarks
+
+Just a warning. The code in this directory is still messy, and some of it is not producing coherent benchmarks. In particular, I discovered an issue that made some benchmarks totally senseless, and I haven't had time to fix it. The problem is that the benchmark modified the data stored in memory, so when comparing two different "runs", you are not actually comparing on the same data. This is fixed up in benchmarks/whitespaceRemovalMTCProj.ts.
