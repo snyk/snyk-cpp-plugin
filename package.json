@@ -26,13 +26,17 @@
     "test:watch": "tsc-watch --onSuccess 'npm run test:unit'",
     "build": "tsc",
     "build-watch": "tsc -w",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "script": "ts-node --script-mode benchmarks/whitespaceRemovalMTCProj.ts"
   },
   "dependencies": {
     "@snyk/dep-graph": "^1.19.3",
+    "buffer-replace": "^1.0.0",
     "chalk": "^4.1.0",
     "debug": "^4.1.1",
+    "deepcopy": "^2.1.0",
     "hosted-git-info": "^3.0.7",
+    "node-worker-threads-pool": "^1.5.0",
     "tslib": "^2.0.0",
     "xxhash": "^0.3.0"
   },
