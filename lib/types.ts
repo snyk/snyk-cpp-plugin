@@ -42,6 +42,8 @@ export interface Options {
   path: string;
   debug?: boolean;
   projectName?: string;
+  'print-deps'?: boolean;
+  'print-dep-paths'?: boolean;
 }
 
 export interface Issue {
@@ -51,6 +53,10 @@ export interface Issue {
   fixInfo: {
     nearestFixedInVersion?: string;
   };
+}
+
+export interface DepsFilePaths {
+  [pkgKey: string]: string[];
 }
 
 export interface IssuesData {
@@ -65,6 +71,7 @@ export interface TestResult {
   issues: Issue[];
   issuesData: IssuesData;
   depGraphData: DepGraphData;
+  depsFilePaths?: DepsFilePaths;
 }
 
 export interface SignatureResult {

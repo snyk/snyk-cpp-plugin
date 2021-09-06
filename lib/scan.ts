@@ -43,6 +43,9 @@ export async function scan(options: Options): Promise<PluginResponse> {
       signatures.push(signature);
       if (signatures.length === signatureConcurrency) {
         await processSignatures(signatures, allSignatures);
+        const signaturesResult = await Promise.all(signatures);
+        allSignatures = allSignatures.concat(signaturesResult);
+        signatures = [];
       }
     }
 
