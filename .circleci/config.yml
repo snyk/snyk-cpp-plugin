@@ -8,11 +8,18 @@ executors:
     macos:
       xcode: 11.3.0
   windows: win/default
+  docker-node:
+    parameters:
+      version:
+        default: "lts"
+        type: string
+    docker:
+      - image: cimg/node:<<parameters.version>>
 
 
 orbs:
   win: circleci/windows@2.4.0
-  node: circleci/node@4.5.1
+  node: circleci/node@4.7.0
 
 commands:
   npmrc:
@@ -45,8 +52,8 @@ commands:
       - when:
           condition:
             or:
-              - equal: [ *macos-executor, << parameters.os >> ]
-              - equal: [ *linux-executor, << parameters.os >> ]
+              - equal: [*macos-executor, << parameters.os >>]
+              - equal: [*linux-executor, << parameters.os >>]
           steps:
             - node/install:
                 node-version: << parameters.node_version >>
@@ -54,8 +61,8 @@ commands:
       - unless:
           condition:
             or:
-              - equal: [ *macos-executor, << parameters.os >> ]
-              - equal: [ *linux-executor, << parameters.os >> ]
+              - equal: [*macos-executor, << parameters.os >>]
+              - equal: [*linux-executor, << parameters.os >>]
           steps:
             - run:
                 name: Install Node.js << parameters.node_version >>
@@ -98,8 +105,8 @@ jobs:
 
   release:
     resource_class: small
-    docker:
-      - image: cimg/node:14
+    executor:
+      name: docker-node
     steps:
       - checkout
       - npmrc
@@ -114,7 +121,7 @@ workflows:
       - lint:
           name: lint
           context: nodejs-install
-          node_version: "14"
+          node_version: "10"
           filters:
             branches:
               ignore:
