@@ -16,7 +16,7 @@ enum LineEndingFormat {
 export const getDubHashSignature = (
   filePath: string,
   fileContents: Buffer,
-  getAltHash = false
+  getAltHash = false,
 ): SignatureResult | null => {
   // Unless getAltHash is true, we only need a single hash, AKA the "half double hash".
   if (!getAltHash) {
@@ -159,7 +159,8 @@ const transformWindowsToLinux = (fileContents: Buffer): Buffer => {
       continue;
     }
     // else: write byte
-    if (readIndex !== writeIndex) fileContents[writeIndex] = fileContents[readIndex];
+    if (readIndex !== writeIndex)
+      fileContents[writeIndex] = fileContents[readIndex];
     writeIndex++;
   }
   return fileContents.slice(0, writeIndex);

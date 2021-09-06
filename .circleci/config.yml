@@ -1,13 +1,18 @@
 version: 2.1
 
 executors:
-  docker-node:
-    parameters:
-      version:
-        default: "lts"
-        type: string
+  linux: &linux-executor
     docker:
-      - image: cimg/node:<<parameters.version>>
+      - image: cimg/base:2020.01
+  macos: &macos-executor
+    macos:
+      xcode: 11.3.0
+  windows: win/default
+
+
+orbs:
+  win: circleci/windows@2.4.0
+  node: circleci/node@4.5.1
 
 commands:
   npmrc:
@@ -15,69 +20,118 @@ commands:
       - run:
           name: Create .npmrc
           command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> .npmrc
-  install:
+
+  setup_git:
     steps:
       - run:
-          name: Install
+          name: "Setup git environment"
+          command: git config --global core.autocrlf false
+
+  install_deps:
+    description: Install dependencies
+    steps:
+      - run:
+          name: Install dependencies
           command: npm install
-  test:
+
+  install_node:
+    description: Install nodejs
+    parameters:
+      os:
+        type: executor
+      node_version:
+        type: string
     steps:
+      - when:
+          condition:
+            or:
+              - equal: [ *macos-executor, << parameters.os >> ]
+              - equal: [ *linux-executor, << parameters.os >> ]
+          steps:
+            - node/install:
+                node-version: << parameters.node_version >>
+
+      - unless:
+          condition:
+            or:
+              - equal: [ *macos-executor, << parameters.os >> ]
+              - equal: [ *linux-executor, << parameters.os >> ]
+          steps:
+            - run:
+                name: Install Node.js << parameters.node_version >>
+                command: nvm install << parameters.node_version >>
+            - run:
+                name: Use Node.js << parameters.node_version >>
+                command: nvm use << parameters.node_version >>
+
+jobs:
+  lint:
+    parameters:
+      node_version:
+        type: string
+    docker:
+      - image: circleci/node:<< parameters.node_version >>
+    steps:
+      - checkout
+      - install_deps
       - run:
-          name: Test
-          command: |
-            /lib/x86_64-linux-gnu/libc.so.6
-            uname -a
-            nm -C /home/circleci/project/node_modules/fossid-native/bin/napi-v3/fossid-native.node | grep GLIBCXX_3.4
-            npm test
-  release:
+          name: Run lint
+          command: npm run lint
+
+  test:
+    parameters:
+      os:
+        type: executor
+      node_version:
+        type: string
+    executor: << parameters.os >>
     steps:
+      - setup_git
+      - install_node:
+          os: << parameters.os >>
+          node_version: << parameters.node_version >>
+      - checkout
+      - install_deps
+      - run:
+          name: Run tests
+          command: npm test
+
+  release:
+    resource_class: small
+    docker:
+      - image: cimg/node:14
+    steps:
+      - checkout
+      - npmrc
+      - install_deps
       - run:
           name: Release
           command: npx semantic-release
 
-jobs:
-  test:
-    resource_class: small
-    parameters:
-      version:
-        default: "lts"
-        type: string
-    executor:
-      name: docker-node
-      version: <<parameters.version>>
-    steps:
-      - checkout
-      - install
-      - test
-
-  release:
-    resource_class: small
-    executor:
-      name: docker-node
-    steps:
-      - checkout
-      - npmrc
-      - install
-      - release
-
 workflows:
-  test:
+  test_and_release:
     jobs:
-      - test:
-          matrix:
-            parameters:
-              version:
-                - 8.17.0
-                - 10.22.0
-                - 12.18.3
-                - 14.8.0
+      - lint:
+          name: lint
+          context: nodejs-install
+          node_version: "14"
           filters:
             branches:
               ignore:
                 - master
-  release:
-    jobs:
+
+      - test:
+          matrix:
+            parameters:
+              os: [linux, macos, windows]
+              node_version: ["10.22", "12.18", "14.8"]
+
       - release:
+          name: Release
+          context: nodejs-lib-release
+          requires:
+            - lint
+            - test
           filters:
             branches:
               only:
