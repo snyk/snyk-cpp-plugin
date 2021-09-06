@@ -2,8 +2,7 @@ import * as path from 'path';
 
 import stripAnsi from 'strip-ansi';
 
-import { display, Options, scan, ScanResult } from '../lib';
-import { usePosixPath } from '../lib/display';
+import { display, scan, ScanResult } from '../lib';
 import { readFixture } from './read-fixture';
 import {
   withDepOneIssueAndFix,
@@ -15,23 +14,6 @@ import {
 const helloWorldPath = path.join('test', 'fixtures', 'hello-world');
 
 describe('display', () => {
-  it('should return expected text for one dependency, one issue with fix, no errors', async () => {
-    const { scanResults } = await scan({ path: helloWorldPath });
-    const errors: string[] = [];
-    const actual = JSON.stringify(
-      stripAnsi(await display(scanResults, withDepOneIssueAndFix, errors)),
-    );
-    const expected = JSON.stringify(
-      stripAnsi(
-        await readFixture(
-          'hello-world',
-          'display-one-dep-one-issue-with-fix-no-errors.txt',
-        ),
-      ),
-    );
-    expect(actual).toEqual(expected);
-  });
-
   it('should return expected text for one dependency, three issues, no errors', async () => {
     const { scanResults } = await scan({ path: helloWorldPath });
     const errors: string[] = [];
@@ -39,23 +21,6 @@ describe('display', () => {
     const expected = await readFixture(
       'hello-world',
       'display-one-dep-three-issues-no-errors.txt',
-    );
-    expect(stripAnsi(actual)).toEqual(stripAnsi(expected));
-  });
-
-  it('should return expected text for one dependency, one issue with fix, no errors when debug true', async () => {
-    const { scanResults } = await scan({ path: helloWorldPath });
-    const errors: string[] = [];
-    const options: Options = { path: '', debug: true };
-    const actual = await display(
-      usePosixPath(scanResults),
-      withDepOneIssueAndFix,
-      errors,
-      options,
-    );
-    const expected = await readFixture(
-      'hello-world',
-      'display-one-dep-one-issue-with-fix-no-error-debug.txt',
     );
     expect(stripAnsi(actual)).toEqual(stripAnsi(expected));
   });
