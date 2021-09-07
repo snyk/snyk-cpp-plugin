@@ -2,17 +2,17 @@
 hello-world@1.2.3
 
 [97mIssues[39m
-[91m✗ Information Exposure [high][39m
-  https://snyk.io/vuln/cpp:hello-world:123
-  in hello-world@1.2.3
-  no fix available
-[93m✗ Use of Insufficiently Random Values [medium][39m
-  https://snyk.io/vuln/cpp:hello-world:456
-  in hello-world@1.2.3
-  no fix available
-[94m✗ Missing Encryption of Sensitive Data [low][39m
-  https://snyk.io/vuln/cpp:hello-world:789
-  in hello-world@1.2.3
-  no fix available
+[91m[39m
+[91m ✗ [high] Information Exposure[39m
+ Introduced through: hello-world@1.2.3
+ URL: https://nvd.nist.gov/vuln/detail/cpp:hello-world:123
+[93m[39m
+[93m ✗ [medium] Use of Insufficiently Random Values[39m
+ Introduced through: hello-world@1.2.3
+ URL: https://nvd.nist.gov/vuln/detail/cpp:hello-world:456
+[94m[39m
+[94m ✗ [low] Missing Encryption of Sensitive Data[39m
+ Introduced through: hello-world@1.2.3
+ URL: https://nvd.nist.gov/vuln/detail/cpp:hello-world:789
 
 Tested 1 dependency for known issues, found [91m3 issues[39m.
