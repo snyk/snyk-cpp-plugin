@@ -9,7 +9,7 @@ import {
   withDepThreeIssues,
   withDepNoIssues,
   noDepOrIssues,
-} from './fixtures/hello-world/test-results';
+} from './fixtures/hello-world-display/test-results';
 
 const helloWorldPath = path.join('test', 'fixtures', 'hello-world');
 
@@ -19,7 +19,7 @@ describe('display', () => {
     const errors: string[] = [];
     const actual = await display(scanResults, withDepThreeIssues, errors);
     const expected = await readFixture(
-      'hello-world',
+      'hello-world-display',
       'display-one-dep-three-issues-no-errors.txt',
     );
     expect(stripAnsi(actual)).toEqual(stripAnsi(expected));
@@ -30,7 +30,7 @@ describe('display', () => {
     const errors: string[] = [];
     const actual = await display(scanResults, withDepNoIssues, errors);
     const expected = await readFixture(
-      'hello-world',
+      'hello-world-display',
       'display-one-dep-no-issues-no-errors.txt',
     );
     expect(stripAnsi(actual)).toEqual(stripAnsi(expected));
@@ -41,7 +41,7 @@ describe('display', () => {
     const errors: string[] = [];
     const actual = await display(scanResults, noDepOrIssues, errors);
     const expected = await readFixture(
-      'hello-world',
+      'hello-world-display',
       'display-no-deps-no-issues-no-errors.txt',
     );
     expect(stripAnsi(actual)).toEqual(stripAnsi(expected));
@@ -51,7 +51,7 @@ describe('display', () => {
     const scanResult: ScanResult[] = [];
     const errors: string[] = [];
     const expected = await readFixture(
-      'hello-world',
+      'hello-world-display',
       'display-no-scan-results.txt',
     );
     const actual = await display(scanResult, noDepOrIssues, errors);
@@ -61,7 +61,7 @@ describe('display', () => {
   it('should return expected text string when invalid projects', async () => {
     const errors: string[] = [];
     const expected = await readFixture(
-      'hello-world',
+      'hello-world-display',
       'display-no-scan-results.txt',
     );
     const actual = await display([1, 2, 3] as any, noDepOrIssues, errors);
@@ -71,7 +71,7 @@ describe('display', () => {
   it('should return expected text when invalid artifacts', async () => {
     const errors: string[] = [];
     const expected = await readFixture(
-      'hello-world',
+      'hello-world-display',
       'display-no-scan-results.txt',
     );
     const actual = await display(
@@ -85,7 +85,7 @@ describe('display', () => {
   it('should return expected text when invalid artifact data', async () => {
     const errors: string[] = [];
     const expected = await readFixture(
-      'hello-world',
+      'hello-world-display',
       'display-no-scan-results.txt',
     );
     const actual = await display(
@@ -103,7 +103,7 @@ describe('display', () => {
     ];
     const actual = await display(scanResults, withDepOneIssueAndFix, errors);
     const expected = await readFixture(
-      'hello-world',
+      'hello-world-display',
       'display-one-dep-one-issue-one-error.txt',
     );
     expect(stripAnsi(actual)).toEqual(stripAnsi(expected));
@@ -117,7 +117,7 @@ describe('display', () => {
     ];
     const actual = await display(scanResults, withDepNoIssues, errors);
     const expected = await readFixture(
-      'hello-world',
+      'hello-world-display',
       'display-one-dep-no-issues-two-errors.txt',
     );
     expect(stripAnsi(actual)).toEqual(stripAnsi(expected));

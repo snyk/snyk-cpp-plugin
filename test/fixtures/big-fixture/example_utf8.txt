@@ -1,0 +1,9 @@
+this should be detected as utf-8
+私はガ
+ಬಾ
+берегу
+μου
+klâwen
+ᚠᛇᚻ
+åäö
+abc

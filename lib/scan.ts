@@ -1,44 +1,61 @@
 import * as fs from 'fs';
-import { fromUrl } from 'hosted-git-info';
 import * as path from 'path';
-import { find } from './find';
-import { getTarget } from './git';
-import { hash } from './hash';
+import * as pMap from 'p-map';
+
+import { Facts, Options, PluginResponse, ScanResult } from './types';
+import { SignatureResult } from './types';
 import { debug } from './debug';
-import {
-  ScanResult,
-  Options,
-  Fingerprint,
-  Facts,
-  PluginResponse,
-} from './types';
+import { find } from './find';
+import { fromUrl } from 'hosted-git-info';
+import { getSignature } from './signatures';
+import { getTarget } from './git';
 
 export async function scan(options: Options): Promise<PluginResponse> {
   try {
-    debug('options %o', options);
+    debug.enabled = !!options?.debug;
+
+    debug('options %o \n', options);
     if (!options.path) {
       throw 'invalid options no path provided.';
     }
     if (!fs.existsSync(options.path)) {
       throw `'${options.path}' does not exist.`;
     }
+    const start = Date.now();
     const filePaths = await find(options.path);
-    debug('%d files found', filePaths.length);
-    const fingerprints: Fingerprint[] = [];
-    for (const filePath of filePaths) {
-      const md5 = await hash(filePath);
-      fingerprints.push({
-        filePath,
-        hash: md5,
-      });
-    }
-    const facts: Facts[] = [{ type: 'cpp-fingerprints', data: fingerprints }];
+    debug('%d files found \n', filePaths.length);
+    const allSignatures: (SignatureResult | null)[] = await pMap(
+      filePaths,
+      getSignature,
+      { concurrency: 20 },
+    );
+    const filteredSignatures: SignatureResult[] = allSignatures.filter((s) => {
+      return s !== null;
+    }) as SignatureResult[];
+
+    const end = Date.now();
+    const totalMilliseconds = end - start;
+
+    const totalFileSignatures = allSignatures.length;
+    const totalSecondsElapsedToGenerateFileSignatures = Math.floor(
+      totalMilliseconds / 1000,
+    );
+
+    debug(`total fileSignatures: ${totalFileSignatures} \n`);
+    debug(
+      `elapsed time in seconds to generate fileSignatures: ${totalSecondsElapsedToGenerateFileSignatures}s \n`,
+    );
+
+    const facts: Facts[] = [
+      { type: 'fileSignatures', data: filteredSignatures },
+    ];
+
     const target = await getTarget();
-    debug('target %o', target);
+    debug('target %o \n', target);
     const gitInfo = fromUrl(target.remoteUrl);
     const name =
       options.projectName || gitInfo?.project || path.basename(options.path);
-    debug('name %o', name);
+    debug('name %o \n', name);
     const scanResults: ScanResult[] = [
       {
         facts,

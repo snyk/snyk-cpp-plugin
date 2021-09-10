@@ -1,7 +1,6 @@
 import * as fs from 'fs';
-import { join, extname } from 'path';
+import { join } from 'path';
 import { promisify } from 'util';
-import { SupportFileExtensions } from './types';
 import { debug } from './debug';
 
 const readdir = promisify(fs.readdir);
@@ -28,10 +27,7 @@ export async function find(dir: string): Promise<string[]> {
         }
       }
       if (fileStat.isFile()) {
-        const ext = extname(absolutePath);
-        if (SupportFileExtensions.includes(ext)) {
-          result.push(absolutePath);
-        }
+        result.push(absolutePath);
       }
     } catch (error) {
       debug(error.message || `Error reading file ${relativePath}. ${error}`);

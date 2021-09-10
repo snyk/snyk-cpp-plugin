@@ -1,33 +1,15 @@
 import * as chalk from 'chalk';
-import { createFromJSON, DepGraph } from '@snyk/dep-graph';
 import { debug } from './debug';
-import { ScanResult, TestResult, IssuesData, Issue, Options } from './types';
+import { DepGraph, createFromJSON } from '@snyk/dep-graph';
+import { Issue, IssuesData, Options, ScanResult, TestResult } from './types';
 
-import * as upath from 'upath';
-
-export function usePosixPath(scanResults: ScanResult[]): ScanResult[] {
-  return scanResults.map((r: ScanResult) => ({
-    ...r,
-    facts: r.facts.map((f) => ({
-      ...f,
-      data: f.data.map((d: any) => ({
-        ...d,
-        filePath: upath.toUnix(d.filePath),
-      })),
-    })),
-  }));
-}
-
-function displayFingerprints(scanResults: ScanResult[]): string[] {
-  const result: string[] = [];
+function displaySignatures(scanResults: ScanResult[]): string[] {
+  const result: string[] = [chalk.whiteBright('Signatures')];
   for (const { facts = [] } of scanResults) {
     for (const { data = [] } of facts) {
-      for (const { filePath, hash } of data) {
-        if (filePath && hash) {
-          if (!result.length) {
-            result.push(chalk.whiteBright('Fingerprints'));
-          }
-          result.push(`${hash} ${filePath}`);
+      for (const { path, hashes_ffm } of data) {
+        if (path && hashes_ffm?.length && hashes_ffm[0].data) {
+          result.push(`${hashes_ffm[0].data} ${path}`);
         }
       }
     }
@@ -37,6 +19,7 @@ function displayFingerprints(scanResults: ScanResult[]): string[] {
   }
   return result;
 }
+
 function displayDependencies(depGraph: DepGraph): string[] {
   const result: string[] = [];
   const depCount = depGraph?.getDepPkgs()?.length || 0;
@@ -123,7 +106,7 @@ export async function display(
   try {
     const result: string[] = [];
     if (options?.debug) {
-      const fingerprintLines = displayFingerprints(scanResults);
+      const fingerprintLines = displaySignatures(scanResults);
       result.push(...fingerprintLines);
     }
     for (const testResult of testResults) {

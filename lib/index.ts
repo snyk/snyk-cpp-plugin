@@ -6,7 +6,6 @@ import {
   Options,
   TestResult,
   ScanResult,
-  SupportFileExtensions,
 } from './types';
 
 export {
@@ -15,7 +14,6 @@ export {
   Options,
   TestResult,
   ScanResult,
-  SupportFileExtensions,
   display,
   scan,
 };
