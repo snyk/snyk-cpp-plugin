@@ -57,6 +57,15 @@ describe('scan', () => {
             remoteUrl: expect.any(String),
             branch: expect.any(String),
           },
+          analytics: [
+            {
+              data: {
+                totalFileSignatures: 3,
+                totalSecondsElapsedToGenerateFileSignatures: expect.any(Number),
+              },
+              name: 'fileSignaturesAnalyticsContext',
+            },
+          ],
         },
       ],
     };
@@ -84,6 +93,15 @@ describe('scan', () => {
             remoteUrl: expect.any(String),
             branch: expect.any(String),
           },
+          analytics: [
+            {
+              data: {
+                totalFileSignatures: 3,
+                totalSecondsElapsedToGenerateFileSignatures: expect.any(Number),
+              },
+              name: 'fileSignaturesAnalyticsContext',
+            },
+          ],
         },
       ],
     };
