@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as pMap from 'p-map';
 
-import { Facts, Options, PluginResponse, ScanResult } from './types';
+import { Analytics, Facts, Options, PluginResponse, ScanResult } from './types';
 import { SignatureResult } from './types';
 import { debug } from './debug';
 import { find } from './find';
@@ -50,6 +50,16 @@ export async function scan(options: Options): Promise<PluginResponse> {
       { type: 'fileSignatures', data: filteredSignatures },
     ];
 
+    const analytics: Analytics[] = [
+      {
+        name: 'fileSignaturesAnalyticsContext',
+        data: {
+          totalFileSignatures,
+          totalSecondsElapsedToGenerateFileSignatures,
+        },
+      },
+    ];
+
     const target = await getTarget();
     debug('target %o \n', target);
     const gitInfo = fromUrl(target.remoteUrl);
@@ -64,6 +74,7 @@ export async function scan(options: Options): Promise<PluginResponse> {
         },
         name,
         target,
+        analytics,
       },
     ];
     return {

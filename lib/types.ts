@@ -9,8 +9,13 @@ export interface ScanResult {
   name?: string;
   policy?: string;
   target: GitTarget;
+  analytics?: Analytics[];
 }
 
+export interface Analytics {
+  name: string;
+  data: unknown;
+}
 export interface Identity {
   type: string;
   targetFile?: string;
