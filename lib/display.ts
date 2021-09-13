@@ -24,10 +24,10 @@ function displayDependencies(depGraph: DepGraph): string[] {
   const result: string[] = [];
   const depCount = depGraph?.getDepPkgs()?.length || 0;
   if (depCount > 0) {
-    result.push(chalk.whiteBright('Dependencies'));
+    result.push(chalk.whiteBright('Dependencies\n'));
   }
   for (const pkg of depGraph?.getDepPkgs() || []) {
-    result.push(`${pkg.name}@${pkg.version}`);
+    result.push(leftPad(`${pkg.name}@${pkg.version}`));
   }
   if (result.length) {
     result.push('');
@@ -45,41 +45,54 @@ function displayIssues(
   const depCount = pkgCount == 1 ? '1 dependency' : `${pkgCount} dependencies`;
   const issuesCount =
     issues.length == 1 ? '1 issue' : `${issues.length} issues`;
-  result.push(chalk.whiteBright('Issues'));
-  for (const { pkgName, pkgVersion, issueId } of issues) {
-    const { title, severity } = issuesData[issueId];
 
-    let color;
-    switch (severity) {
-      case 'low':
-        color = chalk.blueBright;
-        break;
-      case 'medium':
-        color = chalk.yellowBright;
-        break;
-      case 'high':
-        color = chalk.redBright;
-        break;
-      default:
-        color = chalk.whiteBright;
-        break;
+  const hasIssues = issues.length > 0;
+  if (hasIssues) {
+    result.push(chalk.whiteBright('Issues'));
+    for (const {
+      pkgName: name,
+      pkgVersion: version,
+      issueId: vulnId,
+    } of issues) {
+      const { title, severity } = issuesData[vulnId];
+      let color;
+      switch (severity) {
+        case 'low':
+          color = chalk.blueBright;
+          break;
+        case 'medium':
+          color = chalk.yellowBright;
+          break;
+        case 'high':
+          color = chalk.redBright;
+          break;
+        default:
+          color = chalk.whiteBright;
+          break;
+      }
+      const severityAndTitle = color(`\n ✗ [${severity}] ${title}`);
+      const nvdUrl = `https://nvd.nist.gov/vuln/detail/${vulnId}`;
+      const introducedThrough = leftPad(
+        `Introduced through: ${name}@${version}`,
+      );
+      const urlText = leftPad(`URL: ${nvdUrl}`);
+      result.push(severityAndTitle);
+      result.push(introducedThrough);
+      result.push(urlText);
     }
-    const issueText = color(`\n ✗ [${severity}] ${title}`);
-    const issueUrl = `https://nvd.nist.gov/vuln/detail/${issueId}`;
-    const introducedThrough = ` Introduced through: ${pkgName}@${pkgVersion}`;
-    const vulnUrl = ` URL: ${issueUrl}`;
-    result.push(issueText);
-    result.push(introducedThrough);
-    result.push(vulnUrl);
-  }
-  if (issues.length) {
     result.push('');
   }
-  const issuesFound =
-    issues.length > 0
-      ? chalk.redBright(issuesCount)
-      : chalk.greenBright(issuesCount);
-  result.push(`Tested ${depCount} for known issues, found ${issuesFound}.\n`);
+
+  const issuesFound = hasIssues
+    ? chalk.redBright(issuesCount)
+    : chalk.greenBright(issuesCount);
+
+  const identifiedUnmanagedDeps = `Tested ${depCount} for known issues, found ${issuesFound}.\n`;
+  const failedToIdentifyUnmanagedDeps = `\nCould not identify unmanaged dependencies to be tested.`;
+  const endlineMsg =
+    pkgCount > 0 ? identifiedUnmanagedDeps : failedToIdentifyUnmanagedDeps;
+
+  result.push(endlineMsg);
   return result;
 }
 
@@ -106,8 +119,8 @@ export async function display(
   try {
     const result: string[] = [];
     if (options?.debug) {
-      const fingerprintLines = displaySignatures(scanResults);
-      result.push(...fingerprintLines);
+      const signatureLines = displaySignatures(scanResults);
+      result.push(...signatureLines);
     }
     for (const testResult of testResults) {
       const depGraph = createFromJSON(testResult.depGraphData);
@@ -127,4 +140,8 @@ export async function display(
     debug(error.message || 'Error displaying results. ' + error);
     return 'Error displaying results.';
   }
+}
+
+export function leftPad(text: string, padding = 4): string {
+  return padding <= 0 ? text : ' '.repeat(padding) + text;
 }

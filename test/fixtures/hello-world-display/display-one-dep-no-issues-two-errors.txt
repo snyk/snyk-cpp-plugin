@@ -1,7 +1,7 @@
 [97mDependencies[39m
-hello-world@1.2.3
+[97m[39m
+    hello-world@1.2.3
 
-[97mIssues[39m
 Tested 1 dependency for known issues, found [92m0 issues[39m.
 
 [91mErrors[39m

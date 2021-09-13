@@ -1,2 +1,2 @@
-[97mIssues[39m
-Tested 0 dependencies for known issues, found [92m0 issues[39m.
+
+Could not identify unmanaged dependencies to be tested.
