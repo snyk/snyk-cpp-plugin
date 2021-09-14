@@ -1,8 +1,5 @@
-[97mDependencies[39m
-[97m[39m
-    hello-world@1.2.3
 
-[97mIssues[39m
+[97mIssues:[39m
 [91m[39m
 [91m ✗ [high] Information Exposure[39m
     Introduced through: hello-world@1.2.3

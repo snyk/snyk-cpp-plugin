@@ -1,4 +1,4 @@
-import { display } from './display';
+import { display } from './display/';
 import { scan } from './scan';
 import {
   PluginResponse,
