@@ -12,6 +12,10 @@ export interface ScanResult {
   analytics?: Analytics[];
 }
 
+export interface DepsFilePaths {
+  [pkgKey: string]: string[];
+}
+
 export interface Analytics {
   name: string;
   data: unknown;
@@ -41,6 +45,8 @@ export interface Options {
   path: string;
   debug?: boolean;
   projectName?: string;
+  'print-deps'?: boolean;
+  'print-dep-paths'?: boolean;
 }
 
 export interface Issue {
@@ -64,6 +70,7 @@ export interface TestResult {
   issues: Issue[];
   issuesData: IssuesData;
   depGraphData: DepGraphData;
+  depsFilePaths?: DepsFilePaths;
 }
 
 export interface SignatureResult {

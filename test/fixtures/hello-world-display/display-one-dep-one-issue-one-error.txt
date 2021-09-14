@@ -1,8 +1,5 @@
-[97mDependencies[39m
-[97m[39m
-    hello-world@1.2.3
 
-[97mIssues[39m
+[97mIssues:[39m
 [93m[39m
 [93m ✗ [medium] Cross-site Scripting (XSS)[39m
     Introduced through: hello-world@1.2.3
