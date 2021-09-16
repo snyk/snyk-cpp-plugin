@@ -7,7 +7,7 @@ const { readFile } = promises;
 describe('getDubHashSignature', () => {
   it('returns correct SignatureResult for binary file', async () => {
     const fixturePath = path.join(__dirname, 'fixtures');
-    const filePath = path.join(fixturePath, 'dubhash', 'test02');
+    const filePath = path.join(fixturePath, 'dubhash-uhash', 'test02');
     const fileContents = await readFile(filePath);
     const expected: SignatureResult = {
       path: filePath,
@@ -25,7 +25,7 @@ describe('getDubHashSignature', () => {
 
   it('returns correct SignatureResult for text file - both hashes', async () => {
     const fixturePath = path.join(__dirname, 'fixtures');
-    const filePath = path.join(fixturePath, 'dubhash', 'test00');
+    const filePath = path.join(fixturePath, 'dubhash-uhash', 'test00');
     const fileContents = await readFile(filePath);
     const expected: SignatureResult = {
       path: filePath,
@@ -47,7 +47,7 @@ describe('getDubHashSignature', () => {
 
   it('returns correct SignatureResult for text file - single hash', async () => {
     const fixturePath = path.join(__dirname, 'fixtures');
-    const filePath = path.join(fixturePath, 'dubhash', 'test00');
+    const filePath = path.join(fixturePath, 'dubhash-uhash', 'test00');
     const fileContents = await readFile(filePath);
     const expected: SignatureResult = {
       path: filePath,
@@ -65,7 +65,7 @@ describe('getDubHashSignature', () => {
 
   it('returns correct SignatureResult for text file formatted with Windows line endings - both hashes', async () => {
     const fixturePath = path.join(__dirname, 'fixtures');
-    const filePath = path.join(fixturePath, 'dubhash', 'config.bat');
+    const filePath = path.join(fixturePath, 'dubhash-uhash', 'config.bat');
     const fileContents = await readFile(filePath);
     const expected: SignatureResult = {
       path: filePath,
@@ -86,7 +86,7 @@ describe('getDubHashSignature', () => {
 
   it('returns correct SignatureResult for text file with only whitespace - both hashes', async () => {
     const fixturePath = path.join(__dirname, 'fixtures');
-    const filePath = path.join(fixturePath, 'dubhash', 'test01');
+    const filePath = path.join(fixturePath, 'dubhash-uhash', 'test01');
     const fileContents = await readFile(filePath);
     const expected: SignatureResult = {
       path: filePath,

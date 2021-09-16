@@ -1,13 +1,12 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import * as pMap from 'p-map';
 
 import { Analytics, Facts, Options, PluginResponse, ScanResult } from './types';
 import { SignatureResult } from './types';
 import { debug } from './debug';
 import { find } from './find';
 import { fromUrl } from 'hosted-git-info';
-import { getSignature } from './signatures';
+import { getSignaturesByAlgorithm } from './signatures';
 import { getTarget } from './git';
 
 export async function scan(options: Options): Promise<PluginResponse> {
@@ -24,11 +23,11 @@ export async function scan(options: Options): Promise<PluginResponse> {
     const start = Date.now();
     const filePaths = await find(options.path);
     debug('%d files found \n', filePaths.length);
-    const allSignatures: (SignatureResult | null)[] = await pMap(
+
+    const allSignatures: (SignatureResult | null)[] = await getSignaturesByAlgorithm(
       filePaths,
-      getSignature,
-      { concurrency: 20 },
     );
+
     const filteredSignatures: SignatureResult[] = allSignatures.filter((s) => {
       return s !== null;
     }) as SignatureResult[];
