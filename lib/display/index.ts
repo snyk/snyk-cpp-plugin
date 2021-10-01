@@ -1,3 +1,4 @@
+import * as chalk from 'chalk';
 import { debug } from '../debug';
 import { createFromJSON } from '@snyk/dep-graph';
 import { Options, ScanResult, TestResult } from '../types';
@@ -15,6 +16,10 @@ export async function display(
 ): Promise<string> {
   try {
     const result: string[] = [];
+    if (options?.path) {
+      const prefix = chalk.bold.white(`\nTesting ${options.path}...\n`);
+      result.push(prefix);
+    }
     if (options?.debug) {
       const signatureLines = displaySignatures(scanResults);
       result.push(...signatureLines);

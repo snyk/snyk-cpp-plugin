@@ -122,4 +122,21 @@ describe('display', () => {
     );
     expect(stripAnsi(actual)).toEqual(stripAnsi(expected));
   });
+
+  it('should show test path in output if path present', async () => {
+    const { scanResults } = await scan({ path: helloWorldPath });
+    const errors: string[] = [];
+    const options = { path: '/path/to/project' };
+    const actual = await display(
+      scanResults,
+      withDepOneIssueAndFix,
+      errors,
+      options,
+    );
+    const expected = await readFixture(
+      'hello-world-display',
+      'display-testing-file-path.txt',
+    );
+    expect(stripAnsi(actual)).toEqual(expected);
+  });
 });
