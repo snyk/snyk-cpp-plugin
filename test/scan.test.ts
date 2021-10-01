@@ -112,7 +112,7 @@ describe('scan', () => {
     expect.assertions(1);
     const filePath = 'does/not/exist';
     const expected = new Error(
-      `Could not scan C/C++ project, 'does/not/exist' does not exist.`,
+      `Could not scan C/C++ project: 'does/not/exist' does not exist.`,
     );
     try {
       await scan({ path: filePath });
@@ -124,7 +124,7 @@ describe('scan', () => {
   it('should throw exception when invalid options', async () => {
     expect.assertions(1);
     const expected = new Error(
-      `Could not scan C/C++ project, invalid options no path provided.`,
+      `Could not scan C/C++ project: invalid options: no path provided.`,
     );
     try {
       await scan({} as any);
