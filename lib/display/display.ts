@@ -8,7 +8,7 @@ import {
   ScanResult,
   TestResult,
 } from '../types';
-import { getColorBySeverity, leftPad } from './common';
+import { capitalize, getColorBySeverity, leftPad } from './common';
 
 export function displaySignatures(scanResults: ScanResult[]): string[] {
   const result: string[] = [chalk.whiteBright('Signatures')];
@@ -171,7 +171,7 @@ export function displayIssues(
     } of issues) {
       const { title, severity } = issuesData[vulnId];
       const color = getColorBySeverity(severity);
-      const severityAndTitle = color(`\n ✗ [${severity}] ${title}`);
+      const severityAndTitle = color(`\n ✗ [${capitalize(severity)}] ${title}`);
       const nvdUrl = `https://nvd.nist.gov/vuln/detail/${vulnId}`;
       const introducedThrough = leftPad(
         `Introduced through: ${name}@${version}`,
