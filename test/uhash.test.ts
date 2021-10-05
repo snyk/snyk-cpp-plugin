@@ -75,4 +75,22 @@ describe('getUhashSignature', () => {
     expect(actual?.hashes_ffm[0].data.length).toEqual(24);
     expect(actual).toStrictEqual(expected);
   });
+
+  it('returns correct SignatureResult for text file containing a UTF-8 BOM', async () => {
+    const fixturePath = path.join(__dirname, 'fixtures');
+    const filePath = path.join(fixturePath, 'dubhash-uhash', 'test03');
+    const fileContents = await readFile(filePath);
+    const expected: SignatureResult = {
+      path: filePath,
+      hashes_ffm: [
+        {
+          format: 3,
+          data: 'd41d8cd98f00b204e9800998',
+        },
+      ],
+    };
+    const actual = getUhashSignature(filePath, fileContents);
+    expect(actual.hashes_ffm[0].data.length).toEqual(24);
+    expect(actual).toStrictEqual(expected);
+  });
 });
