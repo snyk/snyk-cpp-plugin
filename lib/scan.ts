@@ -15,7 +15,7 @@ export async function scan(options: Options): Promise<PluginResponse> {
 
     debug('options %o \n', options);
     if (!options.path) {
-      throw 'invalid options no path provided.';
+      throw 'invalid options: no path provided.';
     }
     if (!fs.existsSync(options.path)) {
       throw `'${options.path}' does not exist.`;
@@ -80,6 +80,6 @@ export async function scan(options: Options): Promise<PluginResponse> {
       scanResults,
     };
   } catch (error) {
-    throw new Error(`Could not scan C/C++ project, ${error}`);
+    throw new Error(`Could not scan C/C++ project: ${error}`);
   }
 }
