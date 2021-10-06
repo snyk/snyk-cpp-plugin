@@ -10,6 +10,7 @@ import { getSignaturesByAlgorithm } from './signatures';
 import { getTarget } from './git';
 
 export async function scan(options: Options): Promise<PluginResponse> {
+  debug('Using local build...\n');
   try {
     debug.enabled = !!options?.debug;
 
@@ -42,8 +43,10 @@ export async function scan(options: Options): Promise<PluginResponse> {
 
     debug(`total fileSignatures: ${totalFileSignatures} \n`);
     debug(
-      `elapsed time in seconds to generate fileSignatures: ${totalSecondsElapsedToGenerateFileSignatures}s \n`,
+      `elapsed time in ms to generate fileSignatures: ${totalMilliseconds}ms \n`,
     );
+    debug('Exiting...\n');
+    process.exit();
 
     const facts: Facts[] = [
       { type: 'fileSignatures', data: filteredSignatures },
