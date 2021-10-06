@@ -1,14 +1,17 @@
 import { find } from '../lib/find';
 import { join } from 'path';
 import { promises } from 'fs';
-import { removeWhitespaceBytewise3, removeWhitespaceBytewise5 } from '../lib/uhash';
+const deepcopy = require('deepcopy');
+import { removeWhitespaceBytewise3, removeWhitespaceBytewise6 } from '../lib/uhash';
 import { isBinary } from '../lib/utils/binary';
 
 const { readFile } = promises;
 
+const PROJECT = 'c-project';
+
 const main = async () => {
   let filePaths: string[] = [];
-  const fixturePath = join(__dirname, 'c-project');
+  const fixturePath = join(__dirname, PROJECT);
   try {
     filePaths = await find(fixturePath);
   } catch (err) {
@@ -20,20 +23,25 @@ const main = async () => {
     fileBuffers.push(await readFile(filePath));
   }
 
-  console.log('removing whitespace using for loop over UintArray8...');
+  console.log('making another copy...');
+  let fileBuffersCopy = deepcopy(fileBuffers);
+
+  console.log('removing whitespace - slice version...');
   const startTime = new Date().getTime();
-  for (const buffer of fileBuffers) {
+  for (const buffer of fileBuffersCopy) {
     if (isBinary(buffer)) continue;
-    removeWhitespaceBytewise5(buffer);
+    removeWhitespaceBytewise6(buffer);
   }
   const elapsedTime = new Date().getTime() - startTime;
   console.log('Took ', elapsedTime, 'ms.');
 
-  // console.log('removing whitespace using for loop over Buffer...');
-  // jobs.splice(0,jobs.length);
-  console.log('removing whitespace using for loop over Buffer...');
+
+  console.log('making another copy...');
+  fileBuffersCopy = deepcopy(fileBuffers);
+
+  console.log('removing whitespace - subarray version...');
   const startTime2 = new Date().getTime();
-  for (const buffer of fileBuffers) {
+  for (const buffer of fileBuffersCopy) {
     if (isBinary(buffer)) continue;
     removeWhitespaceBytewise3(buffer);
   }

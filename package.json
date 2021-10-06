@@ -27,7 +27,7 @@
     "build": "tsc",
     "build-watch": "tsc -w",
     "prepare": "npm run build",
-    "script": "ts-node --script-mode benchmarks/whitespaceRemovalMTCProj.ts"
+    "script": "ts-node --script-mode benchmarks/whitespaceRemovalSTCProj.ts"
   },
   "dependencies": {
     "@snyk/dep-graph": "^1.19.3",
