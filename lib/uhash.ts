@@ -43,19 +43,26 @@ function isUtf8BomPresent(fileBuffer: Buffer): boolean {
   return Utf8Bom.compare(fileBuffer.subarray(0, 3)) === 0;
 }
 
+function includeChar(c: number): boolean {
+  return (
+    c > 0x20 ||
+    (c != 0x20 && c != 0x0d && c != 0x0a && c != 0x09 && c != 0x0b && c != 0x0c)
+  );
+}
+
 function removeWhitespaceBytewise(
   fileBuffer: Buffer,
   startingIndex: number,
 ): Buffer {
-  const BYTES_TO_REMOVE = new Uint8Array([0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x20]);
   let writeIndex = 0;
   for (
     let readIndex = startingIndex;
     readIndex < fileBuffer.length;
     readIndex++
   ) {
-    if (!BYTES_TO_REMOVE.includes(fileBuffer[readIndex])) {
-      fileBuffer[writeIndex] = fileBuffer[readIndex];
+    const c = fileBuffer[readIndex];
+    if (includeChar(c)) {
+      fileBuffer[writeIndex] = c;
       writeIndex++;
     }
   }
