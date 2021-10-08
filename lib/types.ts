@@ -49,7 +49,7 @@ export interface Options {
   'print-dep-paths'?: boolean;
 }
 
-export type SignatureHashAlgorithm = 'dubhash' | 'uhash';
+export type SignatureFormat = 'dubhash' | 'uhash';
 export interface Issue {
   pkgName: string;
   pkgVersion?: string;

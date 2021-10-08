@@ -1,6 +1,6 @@
 import * as path from 'path';
 import { getSignaturesByAlgorithm } from '../lib/signatures';
-import { SignatureHashAlgorithm } from '../lib/types';
+import { SignatureFormat } from '../lib/types';
 
 describe('getSignature', () => {
   it('should return a correct scan result - dubhash', async () => {
@@ -75,7 +75,7 @@ describe('getSignature', () => {
     const fixturePath = path.join(__dirname, 'fixtures');
     const filePath = 'dog.jpg';
     const expected = new Error('Unsupported hashType non-existing-hash-type');
-    const invalidHashAlgorithmType = 'non-existing-hash-type' as SignatureHashAlgorithm;
+    const invalidHashAlgorithmType = 'non-existing-hash-type' as SignatureFormat;
     expect(
       async () =>
         await getSignaturesByAlgorithm(
