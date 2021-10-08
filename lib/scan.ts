@@ -25,6 +25,7 @@ export async function scan(options: Options): Promise<PluginResponse> {
     debug('%d files found \n', filePaths.length);
 
     const allSignatures: (SignatureResult | null)[] = await getSignaturesByAlgorithm(
+      options.path,
       filePaths,
     );
 
@@ -76,6 +77,7 @@ export async function scan(options: Options): Promise<PluginResponse> {
         analytics,
       },
     ];
+
     return {
       scanResults,
     };
