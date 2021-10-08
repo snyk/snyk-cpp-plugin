@@ -10,7 +10,7 @@ const helloWorldSignatures: Facts[] = [
     type: 'fileSignatures',
     data: [
       {
-        path: path.join(helloWorldFixturePath, 'add.cpp'),
+        path: 'add.cpp',
         hashes_ffm: [
           {
             format: 1,
@@ -19,7 +19,7 @@ const helloWorldSignatures: Facts[] = [
         ],
       },
       {
-        path: path.join(helloWorldFixturePath, 'add.h'),
+        path: 'add.h',
         hashes_ffm: [
           {
             format: 1,
@@ -28,7 +28,7 @@ const helloWorldSignatures: Facts[] = [
         ],
       },
       {
-        path: path.join(helloWorldFixturePath, 'main.cpp'),
+        path: 'main.cpp',
         hashes_ffm: [
           {
             format: 1,
