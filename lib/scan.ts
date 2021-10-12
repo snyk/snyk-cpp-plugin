@@ -17,9 +17,11 @@ export async function scan(options: Options): Promise<PluginResponse> {
     if (!options.path) {
       throw 'invalid options: no path provided.';
     }
+
     if (!fs.existsSync(options.path)) {
       throw `'${options.path}' does not exist.`;
     }
+
     const start = Date.now();
     const filePaths = await find(options.path);
     debug('%d files found \n', filePaths.length);
@@ -31,6 +33,10 @@ export async function scan(options: Options): Promise<PluginResponse> {
     const filteredSignatures: SignatureResult[] = allSignatures.filter((s) => {
       return s !== null;
     }) as SignatureResult[];
+
+    filteredSignatures.forEach((s) => {
+      s.path = path.relative(options.path, s.path);
+    });
 
     const end = Date.now();
     const totalMilliseconds = end - start;
@@ -76,6 +82,7 @@ export async function scan(options: Options): Promise<PluginResponse> {
         analytics,
       },
     ];
+
     return {
       scanResults,
     };
