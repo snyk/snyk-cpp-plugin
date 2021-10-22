@@ -23,8 +23,9 @@ export async function scan(options: Options): Promise<PluginResponse> {
     }
 
     const start = Date.now();
-    const filePaths = await find(options.path);
-    debug('%d files found \n', filePaths.length);
+    const { filePaths, skippedFiles } = await find(options.path);
+    debug('%d files found \n', filePaths.length + skippedFiles.length);
+    debug('%d files skipped \n', skippedFiles.length);
 
     const allSignatures: (SignatureResult | null)[] = await getSignaturesByAlgorithm(
       filePaths,

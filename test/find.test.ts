@@ -32,7 +32,7 @@ describe('find', () => {
       path.join(fixturePath, 'templates', 'test.tpp'),
       path.join(fixturePath, 'templates', 'sub', 'test.tpl'),
     ];
-    expect(actual.sort()).toEqual(expected.sort());
+    expect(actual.filePaths.sort()).toEqual(expected.sort());
   });
 
   it('should produce an empty list when file path is invalid', async () => {
