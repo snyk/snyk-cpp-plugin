@@ -47,6 +47,7 @@ export interface Options {
   projectName?: string;
   'print-deps'?: boolean;
   'print-dep-paths'?: boolean;
+  'print-skipped-unmanaged-files'?: boolean;
 }
 
 export type SignatureHashAlgorithm = 'dubhash' | 'uhash';

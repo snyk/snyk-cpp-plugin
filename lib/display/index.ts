@@ -4,6 +4,7 @@ import { createFromJSON } from '@snyk/dep-graph';
 import { Options, ScanResult, TestResult } from '../types';
 import {
   displaySignatures,
+  displaySkippedFiles,
   selectDisplayStrategy,
   displayErrors,
 } from './display';
@@ -24,6 +25,10 @@ export async function display(
       const signatureLines = displaySignatures(scanResults);
       result.push(...signatureLines);
     }
+
+    const skippedFilesLines = displaySkippedFiles(scanResults, options);
+    result.push(...skippedFilesLines);
+
     for (const testResult of testResults) {
       const depGraph = createFromJSON(testResult.depGraphData);
       const [dependencySection, issuesSection] = selectDisplayStrategy(

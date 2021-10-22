@@ -39,6 +39,10 @@ export async function scan(options: Options): Promise<PluginResponse> {
       s.path = path.relative(options.path, s.path);
     });
 
+    skippedFiles.forEach((f) => {
+      f.path = path.relative(options.path, f.path);
+    });
+
     const end = Date.now();
     const totalMilliseconds = end - start;
 
@@ -54,6 +58,7 @@ export async function scan(options: Options): Promise<PluginResponse> {
 
     const facts: Facts[] = [
       { type: 'fileSignatures', data: filteredSignatures },
+      { type: 'skippedFiles', data: skippedFiles },
     ];
 
     const analytics: Analytics[] = [

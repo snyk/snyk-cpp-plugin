@@ -27,6 +27,42 @@ export function displaySignatures(scanResults: ScanResult[]): string[] {
   return result;
 }
 
+export function displaySkippedFiles(
+  scanResults: ScanResult[],
+  options?: Options,
+): string[] {
+  const showSkippedPaths =
+    (options && options['print-skipped-unmanaged-files']) || false;
+
+  if (!showSkippedPaths || scanResults.length == 0) {
+    return [];
+  }
+
+  const result: string[] = [chalk.whiteBright('Skipped files:\n')];
+
+  const resultsToList = scanResults.slice(0, 10);
+
+  for (const { facts = [] } of resultsToList) {
+    for (const { data = [], type = '' } of facts) {
+      if (type !== 'skippedFiles') {
+        continue;
+      }
+
+      for (const file of data) {
+        result.push(leftPad(`- ${file.path} - ${file.reason}`, 2));
+      }
+    }
+  }
+
+  const remainingResultsCount = scanResults.length - resultsToList.length;
+
+  if (remainingResultsCount > 0) {
+    result.push(leftPad(`... and ${remainingResultsCount} more files`, 2));
+  }
+
+  return result;
+}
+
 function findDependencyLines(
   depGraph: DepGraph,
   options: Options | undefined,
@@ -56,12 +92,15 @@ export function selectDisplayStrategy(
   testResult: TestResult,
 ) {
   const { depsFilePaths, issues, issuesData } = testResult;
+
   const dependencySection = findDependencyLines(
     depGraph,
     options,
     depsFilePaths,
   );
+
   const issuesSection = displayIssues(depGraph, issues, issuesData);
+
   return [dependencySection, issuesSection];
 }
 

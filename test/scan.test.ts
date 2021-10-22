@@ -38,6 +38,10 @@ const helloWorldSignatures: Facts[] = [
       },
     ],
   },
+  {
+    data: [],
+    type: 'skippedFiles',
+  },
 ];
 
 const bigFixturePath = path.join(__dirname, 'fixtures', 'big-fixture');
