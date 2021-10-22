@@ -1,11 +1,26 @@
-import * as path from 'path';
+import { Stats } from 'fs';
 
-import { find } from '../lib/find';
+import * as path from 'path';
+import * as findModule from '../lib/find';
 
 describe('find', () => {
+  it('find should throw if dirStat is not a directory', async () => {
+    const statSpy = jest.spyOn(findModule, 'stat');
+    const statIsNotDirectory = {
+      isFile: () => true,
+      isDirectory: () => false,
+      size: 0,
+    } as Stats;
+
+    statSpy.mockResolvedValueOnce(statIsNotDirectory);
+    await expect(findModule.find('workspace')).rejects.toThrow(
+      'workspace is not a directory',
+    );
+  });
+
   it('should produce list of files found in directory', async () => {
     const fixturePath = path.join(__dirname, 'fixtures', 'example');
-    const actual = await find(fixturePath);
+    const actual = await findModule.find(fixturePath);
     const expected = [
       // md file
       path.join(fixturePath, 'README.md'),
@@ -38,7 +53,7 @@ describe('find', () => {
   it('should produce an empty list when file path is invalid', async () => {
     const filePath = 'path/does/not/exist';
     try {
-      await find(filePath);
+      await findModule.find(filePath);
     } catch (err) {
       expect(err).toEqual(
         expect.objectContaining({
@@ -54,7 +69,7 @@ describe('find', () => {
     const fixturePath = path.join(__dirname, 'fixtures', 'example', 'main.cpp');
     const expected = new Error(`${fixturePath} is not a directory`);
     try {
-      await find(fixturePath);
+      await findModule.find(fixturePath);
     } catch (err) {
       expect(err).toEqual(expected);
     }

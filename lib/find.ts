@@ -1,36 +1,45 @@
 import * as fs from 'fs';
 import { join } from 'path';
 import { promisify } from 'util';
+import { MAX_SUPPORTED_FILE_SIZE } from './common';
 import { debug } from './debug';
 
 const readdir = promisify(fs.readdir);
-const stat = promisify(fs.stat);
+export const stat = promisify(fs.stat);
 
 export async function find(dir: string): Promise<string[]> {
-  const result: string[] = [];
-
   const dirStat = await stat(dir);
   if (!dirStat.isDirectory()) {
     throw new Error(`${dir} is not a directory`);
   }
 
   const paths = await readdir(dir);
-
+  const absolutePaths: string[] = [];
   for (const relativePath of paths) {
-    const absolutePath = join(dir, relativePath);
+    absolutePaths.push(join(dir, relativePath));
+  }
+
+  return await extractFilePaths(absolutePaths);
+}
+
+export async function extractFilePaths(
+  absolutePaths: string[],
+): Promise<string[]> {
+  const result: string[] = [];
+  for (const absolutePath of absolutePaths) {
     try {
-      const fileStat = await stat(absolutePath);
-      if (fileStat.isDirectory()) {
+      const fileStats = await stat(absolutePath);
+      if (fileStats.isDirectory()) {
         const subFiles = await find(absolutePath);
-        for (const file of subFiles) {
-          result.push(file);
+        result.push(...subFiles);
+      } else if (fileStats.isFile()) {
+        if (fileStats.size > MAX_SUPPORTED_FILE_SIZE) {
+          continue;
         }
-      }
-      if (fileStat.isFile()) {
         result.push(absolutePath);
       }
     } catch (error) {
-      debug(error.message || `Error reading file ${relativePath}. ${error}`);
+      debug(error.message || `Error reading file ${absolutePath}. ${error}`);
     }
   }
 
