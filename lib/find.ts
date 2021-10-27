@@ -7,41 +7,41 @@ import { debug } from './debug';
 const readdir = promisify(fs.readdir);
 export const stat = promisify(fs.stat);
 
-export async function find(dir: string): Promise<string[]> {
-  const dirStat = await stat(dir);
-  if (!dirStat.isDirectory()) {
-    throw new Error(`${dir} is not a directory`);
-  }
-
-  const paths = await readdir(dir);
-  const absolutePaths: string[] = [];
-  for (const relativePath of paths) {
-    absolutePaths.push(join(dir, relativePath));
-  }
-
-  return await extractFilePaths(absolutePaths);
+interface FileHandler {
+  (filePath: string, stats: fs.Stats): void;
 }
 
-export async function extractFilePaths(
-  absolutePaths: string[],
-): Promise<string[]> {
+export async function find(src: string): Promise<string[]> {
   const result: string[] = [];
-  for (const absolutePath of absolutePaths) {
-    try {
-      const fileStats = await stat(absolutePath);
-      if (fileStats.isDirectory()) {
-        const subFiles = await find(absolutePath);
-        result.push(...subFiles);
-      } else if (fileStats.isFile()) {
-        if (fileStats.size > MAX_SUPPORTED_FILE_SIZE) {
-          continue;
-        }
-        result.push(absolutePath);
-      }
-    } catch (error) {
-      debug(error.message || `Error reading file ${absolutePath}. ${error}`);
+
+  await traverse(src, (filePath: string, stats: fs.Stats) => {
+    if (!stats.isFile() || stats.size > MAX_SUPPORTED_FILE_SIZE) {
+      return;
     }
-  }
+
+    result.push(filePath);
+  });
 
   return result;
+}
+
+async function traverse(src: string, handle: FileHandler) {
+  try {
+    const stats = await stat(src);
+
+    if (!stats.isDirectory()) {
+      handle(src, stats);
+      return;
+    }
+
+    const entries = await readdir(src);
+
+    for (const entry of entries) {
+      const absolute = join(src, entry);
+
+      await traverse(absolute, handle);
+    }
+  } catch (error) {
+    debug(error.message || `Error reading file ${src}. ${error}`);
+  }
 }

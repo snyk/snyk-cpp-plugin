@@ -1,10 +1,18 @@
 import { Stats } from 'fs';
+import * as path from 'path';
 import * as findModule from '../lib/find';
 import { MAX_SUPPORTED_FILE_SIZE } from '../lib/common';
 
 describe('extract file paths', () => {
   it('should skip files greater than 2GB', async () => {
+    const fixturePath = path.join(__dirname, 'fixtures', 'hello-world');
+
     const statSpy = jest.spyOn(findModule, 'stat');
+
+    const statWithDir = {
+      isFile: () => false,
+      isDirectory: () => true,
+    } as Stats;
 
     const statWithAllowedFileSize = {
       isFile: () => true,
@@ -18,23 +26,18 @@ describe('extract file paths', () => {
       size: MAX_SUPPORTED_FILE_SIZE + 1,
     } as Stats;
 
+    statSpy.mockResolvedValueOnce(statWithDir);
     statSpy.mockResolvedValueOnce(statWithAllowedFileSize);
     statSpy.mockResolvedValueOnce(statWithFileSizeGreaterThanMaxAllowed);
     statSpy.mockResolvedValueOnce(statWithAllowedFileSize);
 
-    const absolutePathWithAllowedFileSize = 'fake-proj/allowed-size.c';
-    const absolutePathThatExceedsMaxFileSize = 'fake-proj/exceeds-max-size.c';
-
-    const result = await findModule.extractFilePaths([
-      absolutePathWithAllowedFileSize,
-      absolutePathThatExceedsMaxFileSize,
-      absolutePathWithAllowedFileSize,
-    ]);
+    const result = await findModule.find(fixturePath);
 
     const expected = [
-      absolutePathWithAllowedFileSize,
-      absolutePathWithAllowedFileSize,
+      path.join(fixturePath, 'add.cpp'),
+      path.join(fixturePath, 'main.cpp'),
     ];
+
     expect(result).toEqual(expected);
   });
 });
