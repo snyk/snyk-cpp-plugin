@@ -1,7 +1,5 @@
 import * as path from 'path';
-
 import { PluginResponse, scan } from '../lib';
-
 import { Facts } from '../lib/types';
 
 const helloWorldFixturePath = path.join(__dirname, 'fixtures', 'hello-world');
@@ -16,7 +14,12 @@ const helloWorldSignatures: Facts[] = [
             format: 1,
             data: 'UtGwRgR9ueoMWByv1MaP5Q',
           },
+          {
+            format: 3,
+            data: 'd53b2679a07eb6ab82e60dbb',
+          },
         ],
+        size: 41,
       },
       {
         path: 'add.h',
@@ -25,7 +28,12 @@ const helloWorldSignatures: Facts[] = [
             format: 1,
             data: 'rspxpuOfmaJOz0wIju6cuA',
           },
+          {
+            format: 3,
+            data: '5b49d65b10acfac0f3754b51',
+          },
         ],
+        size: 22,
       },
       {
         path: 'main.cpp',
@@ -34,7 +42,12 @@ const helloWorldSignatures: Facts[] = [
             format: 1,
             data: 'rTNlszcO9rHD53j4dQVfGQ',
           },
+          {
+            format: 3,
+            data: 'd7432de58aeeeea23d70d8ce',
+          },
         ],
+        size: 126,
       },
     ],
   },
