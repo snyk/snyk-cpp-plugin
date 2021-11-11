@@ -72,6 +72,14 @@ export interface TestResult {
   issuesData: IssuesData;
   depGraphData: DepGraphData;
   depsFilePaths?: DepsFilePaths;
+  fileSignaturesDetails?: FileSignaturesDetails;
+}
+
+export interface FileSignaturesDetails {
+  [pkgKey: string]: {
+    confidence: number;
+    filePaths: string[];
+  };
 }
 
 export interface SignatureResult {
