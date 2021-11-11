@@ -1,37 +1,19 @@
 import { promises } from 'fs';
-import { SignatureHashAlgorithm, SignatureResult } from './types';
-import { getDubHashSignature } from './dubhash';
-import { getUhashSignature } from './uhash';
+import { SignatureResult } from './types';
+import { getHashSignature } from './hash';
 import pMap = require('p-map');
 
 const { readFile } = promises;
 
-export async function getSignaturesByAlgorithm(
+export async function getSignatures(
   filePaths: string[],
-  hashType: SignatureHashAlgorithm = 'dubhash',
 ): Promise<(SignatureResult | null)[]> {
-  if (hashType !== 'dubhash' && hashType !== 'uhash') {
-    throw new Error(`Unsupported hashType ${hashType}`);
-  }
-  let signatureMapperToBeUsed = getDubHashSignatureMapper;
-  if (hashType === 'uhash') {
-    signatureMapperToBeUsed = getUHashSignatureMapper;
-  }
-  return await pMap(filePaths, signatureMapperToBeUsed, { concurrency: 20 });
-}
-
-async function getDubHashSignatureMapper(
-  filePath: string,
-): Promise<SignatureResult | null> {
-  const fileContents = await readFile(filePath);
-  if (fileContents.length === 0) return null;
-  return getDubHashSignature(filePath, fileContents);
-}
-
-async function getUHashSignatureMapper(
-  filePath: string,
-): Promise<SignatureResult | null> {
-  const fileContents = await readFile(filePath);
-  if (fileContents.length === 0) return null;
-  return getUhashSignature(filePath, fileContents);
+  return await pMap(
+    filePaths,
+    async (path: string) => {
+      const contents = await readFile(path);
+      return contents.length > 0 ? getHashSignature(path, contents) : null;
+    },
+    { concurrency: 20 },
+  );
 }

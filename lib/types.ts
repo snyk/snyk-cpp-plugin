@@ -49,7 +49,6 @@ export interface Options {
   'print-dep-paths'?: boolean;
 }
 
-export type SignatureHashAlgorithm = 'dubhash' | 'uhash';
 export interface Issue {
   pkgName: string;
   pkgVersion?: string;
@@ -76,6 +75,7 @@ export interface TestResult {
 
 export interface SignatureResult {
   path: string;
+  size: number;
   hashes_ffm: FullFileHash[];
 }
 

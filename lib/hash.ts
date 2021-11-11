@@ -4,6 +4,7 @@ import { SignatureResult } from './types';
 import { isBinary } from './utils/binary';
 
 const hashAlgorithm = 'md5';
+const Utf8Bom = Buffer.from(new Uint8Array([0xef, 0xbb, 0xbf]));
 
 const regex = /=/g;
 
@@ -18,52 +19,53 @@ const LF = 0x0a;
 
 type DubHashResult = [string, string] | [string, null];
 
-export function getDubHashSignature(
+export function getHashSignature(
   filePath: string,
   fileContents: Buffer,
   getAltHash = false,
 ): SignatureResult | null {
-  // Unless getAltHash is true, we only need a single hash, AKA the "half double hash".
-  if (!getAltHash) {
-    return {
-      path: filePath,
-      hashes_ffm: [
-        {
-          data: getSingleDigest(fileContents),
-          format: 1,
-        },
-      ],
-    };
+  const fileIsBinary = isBinary(fileContents);
+  const hashes_ffm = [];
+
+  // Unless getAltHash is true, we get the default hash types
+  if (getAltHash) {
+    const [digest1, digest2] = getDubHashDigests(fileContents, fileIsBinary);
+    // Check that digest1 could be generated
+    if (!digest1) {
+      throw Error(`Failed to generate hash of ${filePath}`);
+    }
+
+    hashes_ffm.push({
+      data: digest1,
+      format: 1,
+    });
+
+    // digest2 not being generated is ok, just check that it has been generated
+    // before adding it.
+    if (digest2) {
+      hashes_ffm.push({
+        data: digest2 as string,
+        format: 1,
+      });
+    }
+  } else {
+    // Add "half double hash"
+    hashes_ffm.push({
+      data: getSingleDigest(fileContents),
+      format: 1,
+    });
   }
 
-  const [digest1, digest2] = getDubHashDigests(
-    fileContents,
-    isBinary(fileContents),
-  );
-  if (!digest1) throw Error(`Failed to generate hash of ${filePath}`);
-  if (digest1 && !digest2) {
-    return {
-      path: filePath,
-      hashes_ffm: [
-        {
-          data: digest1,
-          format: 1,
-        },
-      ],
-    };
-  }
+  // Always generate uhash
+  hashes_ffm.push({
+    data: getUhashDigest(fileContents, fileIsBinary),
+    format: 3,
+  });
+
   return {
     path: filePath,
-    hashes_ffm: [
-      {
-        data: digest1,
-        format: 1,
-      },
-      {
-        data: digest2 as string, // digest2 is guaranteed not to be null, due to earlier return
-        format: 1,
-      },
-    ],
+    size: fileContents.length,
+    hashes_ffm: hashes_ffm,
   };
 }
 
@@ -194,4 +196,50 @@ function getSingleDigest(fileContents: Buffer): string {
     // return xxhash.hash64(fileContents, 0xcafebabe).digest();
     return '';
   }
+}
+
+function getUhashDigest(fileContents: Buffer, isBinary: boolean): string {
+  if (hashAlgorithm !== 'md5') {
+    // placeholder for non-md5 hashing algorithm, e.g. xxhash
+    throw new Error(`hashAlgorithm ${hashAlgorithm} is not supported`);
+  }
+  const file = isBinary ? fileContents : removeUnwantedBytes(fileContents);
+  const hash = crypto.createHash(hashAlgorithm).update(file);
+  return hash.digest('hex');
+}
+
+function removeUnwantedBytes(fileBuffer: Buffer): Buffer {
+  const startingIndex = isUtf8BomPresent(fileBuffer) ? 3 : 0;
+  return removeWhitespaceBytewise(fileBuffer, startingIndex);
+}
+
+function isUtf8BomPresent(fileBuffer: Buffer): boolean {
+  if (fileBuffer.length < 3) return false;
+  return Utf8Bom.compare(fileBuffer.subarray(0, 3)) === 0;
+}
+
+function removeWhitespaceBytewise(
+  fileBuffer: Buffer,
+  startingIndex: number,
+): Buffer {
+  let writeIndex = 0;
+  for (
+    let readIndex = startingIndex;
+    readIndex < fileBuffer.length;
+    readIndex++
+  ) {
+    const c = fileBuffer[readIndex];
+    if (includeChar(c)) {
+      fileBuffer[writeIndex] = c;
+      writeIndex++;
+    }
+  }
+  return fileBuffer.slice(0, writeIndex);
+}
+
+function includeChar(c: number): boolean {
+  return (
+    c > 0x20 ||
+    (c != 0x20 && c != 0x0d && c != 0x0a && c != 0x09 && c != 0x0b && c != 0x0c)
+  );
 }
