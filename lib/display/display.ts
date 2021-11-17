@@ -7,8 +7,10 @@ import {
   Options,
   ScanResult,
   TestResult,
+  FileSignaturesDetails,
 } from '../types';
 import { capitalize, getColorBySeverity, leftPad } from './common';
+import { isEmpty } from '../utils/object';
 
 export function displaySignatures(scanResults: ScanResult[]): string[] {
   const result: string[] = [chalk.whiteBright('Signatures')];
@@ -31,63 +33,45 @@ function findDependencyLines(
   depGraph: DepGraph,
   options: Options | undefined,
   depsFilePaths?: DepsFilePaths,
-) {
-  const showDepsFilePaths = (options && options['print-dep-paths']) || false;
-  const isAllowedToShowDependenciesWithFilePaths =
-    showDepsFilePaths && depsFilePaths && Object.keys(depsFilePaths).length > 0;
+  fileSignaturesDetails?: FileSignaturesDetails,
+): string[] {
+  const displayDepsWithPaths = (options && options['print-dep-paths']) || false;
+  const displayDeps = (options && options['print-deps']) || false;
 
-  if (isAllowedToShowDependenciesWithFilePaths) {
-    return displayDependenciesWithFilePaths(depGraph, depsFilePaths);
+  if (displayDepsWithPaths) {
+    return displayDependencies(depGraph, fileSignaturesDetails, depsFilePaths);
+  } else if (displayDeps) {
+    return displayDependencies(depGraph, fileSignaturesDetails);
   }
 
-  const isAllowedToShowDependencies =
-    (options && options['print-deps']) || false;
-
-  const emptyDependencySection = '';
-
-  return isAllowedToShowDependencies
-    ? displayDependencies(depGraph)
-    : [emptyDependencySection];
+  return [''];
 }
 
 export function selectDisplayStrategy(
   options: Options | undefined,
   depGraph: DepGraph,
   testResult: TestResult,
-) {
-  const { depsFilePaths, issues, issuesData } = testResult;
+): string[][] {
+  const {
+    depsFilePaths,
+    issues,
+    issuesData,
+    fileSignaturesDetails,
+  } = testResult;
   const dependencySection = findDependencyLines(
     depGraph,
     options,
     depsFilePaths,
+    fileSignaturesDetails,
   );
   const issuesSection = displayIssues(depGraph, issues, issuesData);
   return [dependencySection, issuesSection];
 }
 
-export function displayDependencies(depGraph: DepGraph): string[] {
-  const result: string[] = [];
-  const dependencies = depGraph?.getDepPkgs();
-  const hasDependencies = dependencies?.length > 0;
-
-  if (!hasDependencies) {
-    return result;
-  }
-
-  result.push(chalk.whiteBright('\nDependencies:\n'));
-  for (const { name, version } of dependencies || []) {
-    result.push(leftPad(`${name}@${version}`, 2));
-  }
-
-  if (result.length) {
-    result.push('');
-  }
-  return result;
-}
-
-export function displayDependenciesWithFilePaths(
+export function displayDependencies(
   depGraph: DepGraph,
-  depsFilePaths?: DepsFilePaths,
+  fileSignaturesDetails?: FileSignaturesDetails,
+  depsFilePaths: DepsFilePaths = {},
 ): string[] {
   let result: string[] = [];
   const dependencies = depGraph?.getDepPkgs();
@@ -97,12 +81,26 @@ export function displayDependenciesWithFilePaths(
     return result;
   }
 
-  result.push(chalk.whiteBright('\nDependencies:'));
+  result.push(chalk.whiteBright('\nDependencies:\n'));
   for (const { name, version } of dependencies) {
     const dependencyId = `${name}@${version}`;
     result.push(`\n${leftPad(dependencyId, 2)}`);
 
-    if (depsFilePaths && depsFilePaths[dependencyId]) {
+    if (
+      fileSignaturesDetails &&
+      fileSignaturesDetails[dependencyId].confidence
+    ) {
+      result.push(
+        leftPad(
+          `confidence: ${fileSignaturesDetails[dependencyId].confidence.toFixed(
+            3,
+          )}`,
+          2,
+        ),
+      );
+    }
+
+    if (!isEmpty(depsFilePaths)) {
       const displayDepsFilePathsOutput = displayDepsFilePaths(
         depsFilePaths,
         dependencyId,
@@ -110,7 +108,10 @@ export function displayDependenciesWithFilePaths(
       result = [...result, ...displayDepsFilePathsOutput];
     }
   }
-  result.push('');
+
+  if (result.length) {
+    result.push('');
+  }
   return result;
 }
 
@@ -130,9 +131,7 @@ function displayDepsFilePaths(
     result.push(leftPad(`- ${filePathToDisplay}`, 4));
   }
 
-  const hasToHideAndSayDepsFilePathsCount =
-    depsFilePaths[dependencyId].length > 3;
-  if (hasToHideAndSayDepsFilePathsCount) {
+  if (depsFilePaths[dependencyId].length > 3) {
     result.push(
       leftPad(
         `... and ${depsFilePaths[dependencyId].length -
