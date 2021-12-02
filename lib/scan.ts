@@ -6,7 +6,7 @@ import { SignatureResult } from './types';
 import { debug } from './debug';
 import { find } from './find';
 import { fromUrl } from 'hosted-git-info';
-import { getSignaturesByAlgorithm } from './signatures';
+import { getSignatures } from './signatures';
 import { getTarget } from './git';
 
 export async function scan(options: Options): Promise<PluginResponse> {
@@ -26,7 +26,7 @@ export async function scan(options: Options): Promise<PluginResponse> {
     const filePaths = await find(options.path);
     debug('%d files found \n', filePaths.length);
 
-    const allSignatures: (SignatureResult | null)[] = await getSignaturesByAlgorithm(
+    const allSignatures: (SignatureResult | null)[] = await getSignatures(
       filePaths,
     );
 
