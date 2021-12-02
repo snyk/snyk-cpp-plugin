@@ -1,25 +1,19 @@
 version: 2.1
 
-executors:
-  linux: &linux-executor
-    docker:
-      - image: cimg/base:2020.01
-  macos: &macos-executor
-    macos:
-      xcode: 11.3.0
-  windows: win/default
-  docker-node:
-    parameters:
-      version:
-        default: "lts"
-        type: string
-    docker:
-      - image: cimg/node:<<parameters.version>>
-
-
 orbs:
   win: circleci/windows@2.4.0
-  node: circleci/node@4.7.0
+
+defaults: &defaults
+  parameters:
+    node_version:
+      type: string
+      default: ""
+
+windows_defaults: &windows_defaults
+  environment:
+    npm_config_loglevel: silent
+  executor:
+    name: win/default
 
 commands:
   npmrc:
@@ -41,75 +35,74 @@ commands:
           name: Install dependencies
           command: npm install
 
-  install_node:
-    description: Install nodejs
+  install_node_npm:
+    description: Install correct Node version
     parameters:
-      os:
-        type: executor
       node_version:
         type: string
+        default: ""
     steps:
-      - when:
-          condition:
-            or:
-              - equal: [*macos-executor, << parameters.os >>]
-              - equal: [*linux-executor, << parameters.os >>]
-          steps:
-            - node/install:
-                node-version: << parameters.node_version >>
-
-      - unless:
-          condition:
-            or:
-              - equal: [*macos-executor, << parameters.os >>]
-              - equal: [*linux-executor, << parameters.os >>]
-          steps:
-            - run:
-                name: Install Node.js << parameters.node_version >>
-                command: nvm install << parameters.node_version >>
-            - run:
-                name: Use Node.js << parameters.node_version >>
-                command: nvm use << parameters.node_version >>
+      - run:
+          name: Install correct version of Node
+          command: nvm install << parameters.node_version >>
+      - run:
+          name: Use correct version of Node
+          command: nvm use << parameters.node_version >>
+  show_node_version:
+    description: Log Node and npm version
+    steps:
+      - run:
+          name: Node version
+          command: node --version
+      - run:
+          name: NPM version
+          command: npm --version
 
 jobs:
   lint:
-    parameters:
-      node_version:
-        type: string
+    <<: *defaults
     docker:
       - image: circleci/node:<< parameters.node_version >>
     steps:
       - checkout
+      - show_node_version
       - install_deps
       - run:
           name: Run lint
           command: npm run lint
 
-  test:
-    parameters:
-      os:
-        type: executor
-      node_version:
-        type: string
-    executor: << parameters.os >>
+  test-windows:
+    <<: *defaults
+    <<: *windows_defaults
     steps:
       - setup_git
-      - install_node:
-          os: << parameters.os >>
-          node_version: << parameters.node_version >>
       - checkout
+      - install_node_npm
+      - show_node_version
+      - install_deps
+      - run:
+          name: Run tests
+          command: npm test
+
+  test-unix:
+    <<: *defaults
+    docker:
+      - image: circleci/node:<< parameters.node_version >>
+    steps:
+      - checkout
+      - show_node_version
       - install_deps
       - run:
           name: Run tests
           command: npm test
 
   release:
+    <<: *defaults
+    docker:
+      - image: circleci/node:<< parameters.node_version >>
     resource_class: small
-    executor:
-      name: docker-node
     steps:
       - checkout
-      - npmrc
       - install_deps
       - run:
           name: Release
@@ -127,18 +120,42 @@ workflows:
               ignore:
                 - master
 
-      - test:
+      # UNIX tests
+      - test-unix:
+          name: Unix Tests for Node << matrix.node_version >>
+          context: nodejs-install
+          requires:
+            - lint
           matrix:
             parameters:
-              os: [linux, macos, windows]
-              node_version: ["10.22", "12.18", "14.8"]
+              node_version: ["14.17.6", "12.0.0", "10.21.0"]
+          filters:
+            branches:
+              ignore:
+                - master
+
+      # Windows tests
+      - test-windows:
+          name: Windows Tests for Node << matrix.node_version >>
+          context: nodejs-install
+          requires:
+            - lint
+          matrix:
+            parameters:
+              node_version: ["14.17.6", "12.0.0", "10.21.0"]
+          filters:
+            branches:
+              ignore:
+                - master
 
       - release:
           name: Release
           context: nodejs-lib-release
+          node_version: "lts"
           requires:
             - lint
-            - test
+            - test-unix
+            - test-windows
           filters:
             branches:
               only:
