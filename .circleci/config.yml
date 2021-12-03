@@ -116,10 +116,6 @@ workflows:
         name: lint
         context: nodejs-install
         node_version: "10"
-        filters:
-          branches:
-            ignore:
-              - master
 
     # UNIX tests
     - test-unix:
@@ -130,10 +126,6 @@ workflows:
         matrix:
           parameters:
             node_version: ["14.17.6", "12.0.0", "10.21.0"]
-        filters:
-          branches:
-            ignore:
-              - master
 
     # Windows tests
     - test-windows:
@@ -144,10 +136,6 @@ workflows:
         matrix:
           parameters:
             node_version: ["14.17.6", "12.0.0", "10.21.0"]
-        filters:
-          branches:
-            ignore:
-              - master
 
     - release:
         name: Release
