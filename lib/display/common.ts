@@ -10,9 +10,10 @@ export function getColorBySeverity(severity: string): chalk.Chalk {
       return chalk.blueBright;
     case 'medium':
       return chalk.yellowBright;
-
     case 'high':
       return chalk.redBright;
+    case 'critical':
+      return chalk.magentaBright;
 
     default:
       return chalk.whiteBright;
