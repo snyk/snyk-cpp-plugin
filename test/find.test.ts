@@ -1,23 +1,7 @@
-import { Stats } from 'fs';
-
 import * as path from 'path';
 import * as findModule from '../lib/find';
 
 describe('find', () => {
-  it('find should throw if dirStat is not a directory', async () => {
-    const statSpy = jest.spyOn(findModule, 'stat');
-    const statIsNotDirectory = {
-      isFile: () => true,
-      isDirectory: () => false,
-      size: 0,
-    } as Stats;
-
-    statSpy.mockResolvedValueOnce(statIsNotDirectory);
-    await expect(findModule.find('workspace')).rejects.toThrow(
-      'workspace is not a directory',
-    );
-  });
-
   it('should produce list of files found in directory', async () => {
     const fixturePath = path.join(__dirname, 'fixtures', 'example');
     const actual = await findModule.find(fixturePath);
