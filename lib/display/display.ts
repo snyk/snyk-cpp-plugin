@@ -83,12 +83,12 @@ export function displayDependencies(
 
   result.push(chalk.whiteBright('\nDependencies:\n'));
   for (const { name, version } of dependencies) {
-    const dependencyId = `${name}@${version}`;
+    const dependencyId = `${name}@${version}`.toLowerCase();
     result.push(`\n${leftPad(dependencyId, 2)}`);
 
     if (
       fileSignaturesDetails &&
-      fileSignaturesDetails[dependencyId].confidence
+      fileSignaturesDetails[dependencyId]?.confidence
     ) {
       result.push(
         leftPad(
