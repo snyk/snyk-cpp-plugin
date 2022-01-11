@@ -1,0 +1,14 @@
+
+Testing test\fixtures\hello-world...
+
+
+[97mIssues:[39m
+[93m[39m
+[93m ✗ [Medium] Cross-site Scripting (XSS)[39m
+    Introduced through: hello-world@1.2.3
+    URL: https://security.snyk.io/vuln/cpp:hello-world:20161130
+
+Tested 1 dependency for known issues, found [91m1 issue[39m.
+
+[91mErrors[39m
+Could not test dependencies in test/fixtures/invalid

@@ -1,0 +1,19 @@
+
+Testing test/fixtures/hello-world...
+
+
+[97mIssues:[39m
+[91m[39m
+[91m ✗ [High] Information Exposure[39m
+    Introduced through: hello-world@1.2.3
+    URL: https://security.snyk.io/vuln/cpp:hello-world:123
+[93m[39m
+[93m ✗ [Medium] Use of Insufficiently Random Values[39m
+    Introduced through: hello-world@1.2.3
+    URL: https://security.snyk.io/vuln/cpp:hello-world:456
+[94m[39m
+[94m ✗ [Low] Missing Encryption of Sensitive Data[39m
+    Introduced through: hello-world@1.2.3
+    URL: https://security.snyk.io/vuln/cpp:hello-world:789
+
+Tested 1 dependency for known issues, found [91m3 issues[39m.
