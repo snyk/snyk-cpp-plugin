@@ -2,7 +2,7 @@ import * as path from 'path';
 
 import stripAnsi from 'strip-ansi';
 
-import { display, scan, ScanResult } from '../lib';
+import { display, Options, scan, ScanResult } from '../lib';
 import { readFixture } from './read-fixture';
 import {
   withDepOneIssueAndFix,
@@ -10,6 +10,7 @@ import {
   withDepNoIssues,
   noDepOrIssues,
 } from './fixtures/hello-world-display/test-results';
+import { isWindowsOS } from '../lib/common';
 
 const helloWorldPath = path.join('test', 'fixtures', 'hello-world');
 
@@ -21,6 +22,29 @@ describe('display', () => {
     const expected = await readFixture(
       'hello-world-display',
       'display-one-dep-three-issues-no-errors.txt',
+    );
+    expect(stripAnsi(actual)).toEqual(stripAnsi(expected));
+  });
+
+  it('should return expected text for one dependency, three issues (using https://security.snyk.io/), no errors using', async () => {
+    const path = helloWorldPath;
+    const { scanResults } = await scan({ path });
+    const errors: string[] = [];
+    const options: Options = {
+      path,
+      supportUnmanagedVulnDB: true,
+    };
+    const actual = await display(
+      scanResults,
+      withDepThreeIssues,
+      errors,
+      options,
+    );
+
+    const osName = isWindowsOS() ? 'windows' : 'unix';
+    const expected = await readFixture(
+      'display-snyk-security-details-url',
+      `one-dep-three-issues-no-errors-${osName}.txt`,
     );
     expect(stripAnsi(actual)).toEqual(stripAnsi(expected));
   });
@@ -106,6 +130,33 @@ describe('display', () => {
       'hello-world-display',
       'display-one-dep-one-issue-one-error.txt',
     );
+    expect(stripAnsi(actual)).toEqual(stripAnsi(expected));
+  });
+
+  it('should return expected text for one dependency, one issue (using https://security.snyk.io/), one error', async () => {
+    const path = helloWorldPath;
+    const { scanResults } = await scan({ path });
+    const errors: string[] = [
+      'Could not test dependencies in test/fixtures/invalid',
+    ];
+    const options: Options = {
+      path,
+      supportUnmanagedVulnDB: true,
+    };
+
+    const actual = await display(
+      scanResults,
+      withDepOneIssueAndFix,
+      errors,
+      options,
+    );
+
+    const osName = isWindowsOS() ? 'windows' : 'unix';
+    const expected = await readFixture(
+      'display-snyk-security-details-url',
+      `one-dep-one-issue-one-error-${osName}.txt`,
+    );
+
     expect(stripAnsi(actual)).toEqual(stripAnsi(expected));
   });
 
