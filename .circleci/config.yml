@@ -1,19 +1,13 @@
 version: 2.1
 
 orbs:
-  win: circleci/windows@2.4.0
+  win: circleci/windows@2.4.1
 
 defaults: &defaults
   parameters:
     node_version:
       type: string
       default: ""
-
-windows_defaults: &windows_defaults
-  environment:
-    npm_config_loglevel: silent
-  executor:
-    name: win/default
 
 commands:
   npmrc:
@@ -28,27 +22,18 @@ commands:
           name: "Setup git environment"
           command: git config --global core.autocrlf false
 
-  install_deps:
-    description: Install dependencies
-    steps:
-      - run:
-          name: Install dependencies
-          command: npm install
-
   install_node_npm:
-    description: Install correct Node version
-    parameters:
-      node_version:
-        type: string
-        default: ""
+    <<: *defaults
+    description: Install specific version of Node
     steps:
       - run:
-          name: Install correct version of Node
+          name: Installing node version << parameters.node_version >>
           command: nvm install << parameters.node_version >>
       - run:
-          name: Use correct version of Node
+          name: Using node version << parameters.node_version >>
           command: nvm use << parameters.node_version >>
-  show_node_version:
+
+  show_node_npm_version:
     description: Log Node and npm version
     steps:
       - run:
@@ -58,6 +43,12 @@ commands:
           name: NPM version
           command: npm --version
 
+  install_deps:
+    description: Install dependencies
+    steps:
+      - run:
+          name: Install npm dependencies
+          command: npm install
 jobs:
   lint:
     <<: *defaults
@@ -65,7 +56,7 @@ jobs:
       - image: circleci/node:<< parameters.node_version >>
     steps:
       - checkout
-      - show_node_version
+      - show_node_npm_version
       - install_deps
       - run:
           name: Run lint
@@ -73,12 +64,16 @@ jobs:
 
   test-windows:
     <<: *defaults
-    <<: *windows_defaults
+    environment:
+      npm_config_loglevel: silent
+    executor:
+      name: win/default
     steps:
       - setup_git
       - checkout
-      - install_node_npm
-      - show_node_version
+      - install_node_npm:
+          node_version: << parameters.node_version >>
+      - show_node_npm_version
       - install_deps
       - run:
           name: Run tests
@@ -90,7 +85,7 @@ jobs:
       - image: circleci/node:<< parameters.node_version >>
     steps:
       - checkout
-      - show_node_version
+      - show_node_npm_version
       - install_deps
       - run:
           name: Run tests
@@ -130,7 +125,6 @@ workflows:
     # Windows tests
     - test-windows:
         name: Windows Tests for Node << matrix.node_version >>
-        context: nodejs-install
         requires:
           - lint
         matrix:
