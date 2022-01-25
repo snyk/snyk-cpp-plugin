@@ -1,5 +1,7 @@
 import * as path from 'path';
 import * as findModule from '../lib/find';
+import * as fs from 'fs';
+import { promisify } from 'util';
 
 describe('find', () => {
   it('should produce list of files found in directory', async () => {
@@ -57,5 +59,22 @@ describe('find', () => {
     } catch (err) {
       expect(err).toEqual(expected);
     }
+  });
+
+  it('should ignore symlinks', async () => {
+    const fixturePath = path.join(__dirname, 'fixtures', 'with-symlink');
+
+    const symlinkTarget = path.join(fixturePath, 'to-include');
+    const symlinkPath = path.join(fixturePath, 'to-exclude');
+    const expected = [path.join(symlinkTarget, 'file.txt')];
+
+    await promisify(fs.symlink)(symlinkTarget, symlinkPath, 'dir');
+
+    const actual = await findModule.find(fixturePath);
+
+    expect(actual).toHaveLength(1);
+    expect(actual).toEqual(expected);
+
+    await promisify(fs.unlink)(symlinkPath);
   });
 });
