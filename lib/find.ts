@@ -5,7 +5,7 @@ import { MAX_SUPPORTED_FILE_SIZE } from './common';
 import { debug } from './debug';
 
 const readdir = promisify(fs.readdir);
-export const stat = promisify(fs.stat);
+export const stat = promisify(fs.lstat);
 
 interface FileHandler {
   (filePath: string, stats: fs.Stats): void;
@@ -28,6 +28,10 @@ export async function find(src: string): Promise<string[]> {
 async function traverse(src: string, handle: FileHandler) {
   try {
     const stats = await stat(src);
+
+    if (stats.isSymbolicLink()) {
+      return;
+    }
 
     if (!stats.isDirectory()) {
       handle(src, stats);

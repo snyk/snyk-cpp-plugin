@@ -12,18 +12,21 @@ describe('extract file paths', () => {
     const statWithDir = {
       isFile: () => false,
       isDirectory: () => true,
+      isSymbolicLink: () => false,
     } as Stats;
 
     const statWithAllowedFileSize = {
       isFile: () => true,
       isDirectory: () => false,
       size: MAX_SUPPORTED_FILE_SIZE - 1,
+      isSymbolicLink: () => false,
     } as Stats;
 
     const statWithFileSizeGreaterThanMaxAllowed = {
       isFile: () => true,
       isDirectory: () => false,
       size: MAX_SUPPORTED_FILE_SIZE + 1,
+      isSymbolicLink: () => false,
     } as Stats;
 
     statSpy.mockResolvedValueOnce(statWithDir);
