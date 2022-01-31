@@ -44,7 +44,7 @@ function findDependencyLines(
     return displayDependencies(depGraph, fileSignaturesDetails);
   }
 
-  return [''];
+  return [];
 }
 
 export function selectDisplayStrategy(
@@ -196,14 +196,9 @@ export function displayIssues(
     : chalk.greenBright(issuesCount);
 
   const identifiedUnmanagedDeps = `Tested ${dependenciesCountMsg} for known issues, found ${issuesFound}.\n`;
-  const failedToIdentifyUnmanagedDeps = `Could not identify unmanaged dependencies to be tested.`;
-
-  const endlineMsg =
-    dependencies?.length > 0
-      ? identifiedUnmanagedDeps
-      : failedToIdentifyUnmanagedDeps;
-
-  result.push(endlineMsg);
+  if (dependencies?.length > 0) {
+    result.push(identifiedUnmanagedDeps);
+  }
 
   return result;
 }

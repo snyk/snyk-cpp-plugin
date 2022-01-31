@@ -1,4 +1,3 @@
-
 [97mIssues:[39m
 [91m[39m
 [91m ✗ [High] Information Exposure[39m

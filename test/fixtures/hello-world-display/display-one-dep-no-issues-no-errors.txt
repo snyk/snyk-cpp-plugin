@@ -1,2 +1,1 @@
-
 Tested 1 dependency for known issues, found [92m0 issues[39m.
