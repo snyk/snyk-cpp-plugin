@@ -1,7 +1,6 @@
 
 Testing /path/to/project...
 
-
 Issues:
 
  ✗ [Medium] Cross-site Scripting (XSS)

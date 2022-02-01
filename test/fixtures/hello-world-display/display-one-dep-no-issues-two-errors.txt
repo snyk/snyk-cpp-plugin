@@ -1,6 +1,3 @@
-
-Tested 1 dependency for known issues, found [92m0 issues[39m.
-
 [91mErrors[39m
 Could not test dependencies in test/fixtures/invalid1
 Could not test dependencies in test/fixtures/invalid2
