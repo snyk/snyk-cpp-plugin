@@ -1,4 +1,5 @@
 import { DepGraphData } from '@snyk/dep-graph';
+
 export interface PluginResponse {
   scanResults: ScanResult[];
 }

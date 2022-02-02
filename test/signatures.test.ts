@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { getSignatures } from '../lib/signatures';
+import { computeSignaturesConcurrently } from '../lib/signatures';
 
 describe('getSignature', () => {
   it('should return a correct scan result containing both single hash and uhash and file size', async () => {
@@ -21,7 +21,7 @@ describe('getSignature', () => {
         size: 95,
       },
     ];
-    const actual = await getSignatures([filePath]);
+    const actual = await computeSignaturesConcurrently([filePath]);
     expect(actual).toStrictEqual(expected);
   });
 
@@ -44,14 +44,7 @@ describe('getSignature', () => {
         size: 7574,
       },
     ];
-    const actual = await getSignatures([filePath]);
+    const actual = await computeSignaturesConcurrently([filePath]);
     expect(actual).toStrictEqual(expected);
-  });
-
-  it('should return null for empty file', async () => {
-    const fixturePath = path.join(__dirname, 'fixtures');
-    const filePath = path.join(fixturePath, 'empty', '.keep');
-    const actual = await getSignatures([filePath]);
-    expect(actual).toStrictEqual([null]);
   });
 });

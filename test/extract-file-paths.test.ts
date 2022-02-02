@@ -7,12 +7,13 @@ describe('extract file paths', () => {
   it('should skip files greater than 2GB', async () => {
     const fixturePath = path.join(__dirname, 'fixtures', 'hello-world');
 
-    const statSpy = jest.spyOn(findModule, 'stat');
+    const statSpy = jest.spyOn(findModule, 'lstat');
 
     const statWithDir = {
       isFile: () => false,
       isDirectory: () => true,
       isSymbolicLink: () => false,
+      size: 1,
     } as Stats;
 
     const statWithAllowedFileSize = {

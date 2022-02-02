@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { FileContent } from '../lib/types';
-import { computeSingleHash, computeUHash, getHashSignature } from '../lib/hash';
+import { computeSingleHash, computeUHash, computeHash } from '../lib/hash';
 
 const tests = [
   [
@@ -51,7 +51,7 @@ describe('Unit tests for getHashSignature and associated functions', () => {
     const content: FileContent = fs.readFileSync(path);
     const output = JSON.parse(fs.readFileSync(expected, 'utf8'));
 
-    const result = await getHashSignature(path, content);
+    const result = await computeHash(path, content);
 
     expect(result).toEqual(output);
   });
