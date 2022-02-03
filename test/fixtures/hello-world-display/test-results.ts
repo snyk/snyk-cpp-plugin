@@ -37,13 +37,40 @@ export const withDepOneIssueAndFix: TestResult[] = [
         title: 'Cross-site Scripting (XSS)',
       },
     },
+    depsFilePaths: {
+      "hello-world@1.2.3": [
+        '/path/to/project/a',
+        '/path/to/project/a/b',
+        '/path/to/project/a/b/c',
+        '/path/to/project/a/b/c/d',
+        '/path/to/project/a/b/c/d/e'
+      ],
+    },
+    fileSignaturesDetails: {
+      "hello-world@1.2.3": {
+        confidence: 1,
+        filePaths: [
+          '/path/to/project/a',
+          '/path/to/project/a/b',
+          '/path/to/project/a/b/c',
+          '/path/to/project/a/b/c/d',
+          '/path/to/project/a/b/c/d/e'
+        ],
+      }
+    },
   },
 ];
 
-export const withDepThreeIssues: TestResult[] = [
+export const withDepFourIssues: TestResult[] = [
   {
     depGraphData: withDep(),
     issues: [
+      {
+        pkgName: 'hello-world',
+        pkgVersion: '1.2.3',
+        issueId: 'cpp:hello-world:000',
+        fixInfo: {},
+      },
       {
         pkgName: 'hello-world',
         pkgVersion: '1.2.3',
@@ -64,6 +91,11 @@ export const withDepThreeIssues: TestResult[] = [
       },
     ],
     issuesData: {
+      ['cpp:hello-world:000']: {
+        id: 'cpp:hello-world:20161130',
+        severity: 'critical',
+        title: 'Information Exposure',
+      },
       ['cpp:hello-world:123']: {
         id: 'cpp:hello-world:20161130',
         severity: 'high',

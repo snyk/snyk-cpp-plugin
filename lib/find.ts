@@ -1,25 +1,24 @@
-import * as fs from 'fs';
+import { Stats, promises } from 'fs';
 import { join } from 'path';
-import { promisify } from 'util';
 import { MAX_SUPPORTED_FILE_SIZE } from './common';
 import { debug } from './debug';
+import { FilePath } from './types';
 
-const readdir = promisify(fs.readdir);
-export const stat = promisify(fs.lstat);
+export const { readdir, lstat } = promises;
 
 interface FileHandler {
-  (filePath: string, stats: fs.Stats): void;
+  (path: FilePath, stats: Stats): void;
 }
 
-export async function find(src: string): Promise<string[]> {
-  const result: string[] = [];
+export async function find(src: string): Promise<FilePath[]> {
+  const result: FilePath[] = [];
 
-  await traverse(src, (filePath: string, stats: fs.Stats) => {
-    if (!stats.isFile() || stats.size > MAX_SUPPORTED_FILE_SIZE) {
+  await traverse(src, async (path: FilePath, stats: Stats) => {
+    if (stats.size > MAX_SUPPORTED_FILE_SIZE || stats.size <= 0) {
       return;
     }
 
-    result.push(filePath);
+    result.push(path);
   });
 
   return result;
@@ -27,23 +26,25 @@ export async function find(src: string): Promise<string[]> {
 
 async function traverse(src: string, handle: FileHandler) {
   try {
-    const stats = await stat(src);
+    const stats = await lstat(src);
 
     if (stats.isSymbolicLink()) {
       return;
     }
 
-    if (!stats.isDirectory()) {
+    if (stats.isFile()) {
       handle(src, stats);
       return;
     }
 
-    const entries = await readdir(src);
+    if (stats.isDirectory()) {
+      const entries = await readdir(src);
 
-    for (const entry of entries) {
-      const absolute = join(src, entry);
+      for (const entry of entries) {
+        const absolute = join(src, entry);
 
-      await traverse(absolute, handle);
+        await traverse(absolute, handle);
+      }
     }
   } catch (error) {
     debug(error.message || `Error reading file ${src}. ${error}`);

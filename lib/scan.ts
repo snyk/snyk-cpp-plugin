@@ -1,19 +1,26 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { Analytics, Facts, Options, PluginResponse, ScanResult } from './types';
+import {
+  Analytics,
+  Facts,
+  FilePath,
+  Options,
+  PluginResponse,
+  ScanResult,
+} from './types';
 import { SignatureResult } from './types';
 import { debug } from './debug';
 import { find } from './find';
 import { fromUrl } from 'hosted-git-info';
-import { getSignatures } from './signatures';
+import { computeSignaturesConcurrently } from './signatures';
 import { getTarget } from './git';
 
 export async function scan(options: Options): Promise<PluginResponse> {
   try {
     debug.enabled = !!options?.debug;
-
     debug('options %o \n', options);
+
     if (!options.path) {
       throw 'invalid options: no path provided.';
     }
@@ -23,25 +30,22 @@ export async function scan(options: Options): Promise<PluginResponse> {
     }
 
     const start = Date.now();
-    const filePaths = await find(options.path);
-    debug('%d files found \n', filePaths.length);
 
-    const allSignatures: (SignatureResult | null)[] = await getSignatures(
-      filePaths,
+    const paths: FilePath[] = await find(options.path);
+    debug('%d files found \n', paths.length);
+
+    const signatures: SignatureResult[] = await computeSignaturesConcurrently(
+      paths,
     );
 
-    const filteredSignatures: SignatureResult[] = allSignatures.filter((s) => {
-      return s !== null;
-    }) as SignatureResult[];
-
-    filteredSignatures.forEach((s) => {
+    signatures.forEach((s) => {
       s.path = path.relative(options.path, s.path);
     });
 
     const end = Date.now();
-    const totalMilliseconds = end - start;
 
-    const totalFileSignatures = allSignatures.length;
+    const totalMilliseconds = end - start;
+    const totalFileSignatures = signatures.length;
     const totalSecondsElapsedToGenerateFileSignatures = Math.floor(
       totalMilliseconds / 1000,
     );
@@ -51,9 +55,7 @@ export async function scan(options: Options): Promise<PluginResponse> {
       `elapsed time in seconds to generate fileSignatures: ${totalSecondsElapsedToGenerateFileSignatures}s \n`,
     );
 
-    const facts: Facts[] = [
-      { type: 'fileSignatures', data: filteredSignatures },
-    ];
+    const facts: Facts[] = [{ type: 'fileSignatures', data: signatures }];
 
     const analytics: Analytics[] = [
       {

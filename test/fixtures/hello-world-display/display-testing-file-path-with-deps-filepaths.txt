@@ -1,0 +1,22 @@
+
+Testing /path/to/project...
+
+
+Dependencies:
+
+
+  hello-world@1.2.3
+  confidence: 1.000
+  matching files:
+    - /path/to/project/a
+    - /path/to/project/a/b
+    - /path/to/project/a/b/c
+    ... and 2 more files
+
+Issues:
+
+ ✗ [Medium] Cross-site Scripting (XSS)
+    Introduced through: hello-world@1.2.3
+    URL: https://nvd.nist.gov/vuln/detail/cpp:hello-world:20161130
+
+Tested 1 dependency for known issues, found 1 issue.

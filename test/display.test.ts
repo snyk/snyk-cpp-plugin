@@ -2,11 +2,12 @@ import * as path from 'path';
 
 import stripAnsi from 'strip-ansi';
 
+import * as displayModule from '../lib/display/display';
 import { display, Options, scan, ScanResult } from '../lib';
 import { readFixture } from './read-fixture';
 import {
   withDepOneIssueAndFix,
-  withDepThreeIssues,
+  withDepFourIssues,
   withDepNoIssues,
   noDepOrIssues,
 } from './fixtures/hello-world-display/test-results';
@@ -16,23 +17,23 @@ import { ExitCode } from '../lib/utils/error';
 const helloWorldPath = path.join('test', 'fixtures', 'hello-world');
 
 describe('display', () => {
-  it('should return expected text for one dependency, three issues, no errors', async () => {
+  it('should throw VulnerabilitiesFound error containing expected text for one dependency, four issues, no errors', async () => {
     const { scanResults } = await scan({ path: helloWorldPath });
     const errors: string[] = [];
     const expected = await readFixture(
       'hello-world-display',
-      'display-one-dep-three-issues-no-errors.txt',
+      'display-one-dep-four-issues-no-errors.txt',
     );
 
     try {
-      await display(scanResults, withDepThreeIssues, errors);
+      await display(scanResults, withDepFourIssues, errors);
     } catch (error) {
       expect(stripAnsi(error.code)).toEqual(ExitCode.VulnerabilitiesFound);
       expect(stripAnsi(error.message)).toEqual(stripAnsi(expected));
     }
   });
 
-  it('should return expected text for one dependency, three issues (using https://security.snyk.io/), no errors using', async () => {
+  it('should throw VulnerabilitiesFound error containing expected text for one dependency, four issues (using https://security.snyk.io/), no errors using', async () => {
     const path = helloWorldPath;
     const { scanResults } = await scan({ path });
     const errors: string[] = [];
@@ -43,11 +44,11 @@ describe('display', () => {
     const osName = isWindowsOS() ? 'windows' : 'unix';
     const expected = await readFixture(
       'display-snyk-security-details-url',
-      `one-dep-three-issues-no-errors-${osName}.txt`,
+      `one-dep-four-issues-no-errors-${osName}.txt`,
     );
 
     try {
-      await display(scanResults, withDepThreeIssues, errors, options);
+      await display(scanResults, withDepFourIssues, errors, options);
     } catch (error) {
       expect(stripAnsi(error.code)).toEqual(ExitCode.VulnerabilitiesFound);
       expect(stripAnsi(error.message)).toEqual(stripAnsi(expected));
@@ -66,7 +67,7 @@ describe('display', () => {
     expect(stripAnsi(result)).toEqual(stripAnsi(expected));
   });
 
-  it('should return expected text when no dependencies, no issues, no errors', async () => {
+  it('should throw NoSupportedFiles when no dependencies, no issues, no errors', async () => {
     const { scanResults } = await scan({ path: helloWorldPath });
     const errors: string[] = [];
     const expected = await readFixture(
@@ -82,7 +83,7 @@ describe('display', () => {
     }
   });
 
-  it('should return expected text string when no projects', async () => {
+  it('should throw NoSupportedFiles when no projects', async () => {
     const scanResult: ScanResult[] = [];
     const errors: string[] = [];
     const expected = await readFixture(
@@ -98,7 +99,7 @@ describe('display', () => {
     }
   });
 
-  it('should return expected text string when invalid projects', async () => {
+  it('should throw NoSupportedFiles when invalid artifact data', async () => {
     const errors: string[] = [];
     const expected = await readFixture(
       'hello-world-display',
@@ -113,7 +114,7 @@ describe('display', () => {
     }
   });
 
-  it('should return expected text when invalid artifacts', async () => {
+  it('should throw NoSupportedFiles when invalid artifacts', async () => {
     const errors: string[] = [];
     const expected = await readFixture(
       'hello-world-display',
@@ -132,7 +133,7 @@ describe('display', () => {
     }
   });
 
-  it('should return expected text when invalid artifact data', async () => {
+  it('should throw NoSupportedFiles when invalid artifact data', async () => {
     const errors: string[] = [];
     const expected = await readFixture(
       'hello-world-display',
@@ -151,7 +152,7 @@ describe('display', () => {
     }
   });
 
-  it('should return expected text for error', async () => {
+  it('should throw NoSupportedFiles containing expected text for error', async () => {
     const { scanResults } = await scan({ path: helloWorldPath });
     const errors: string[] = [
       'Could not test dependencies in test/fixtures/invalid',
@@ -169,7 +170,7 @@ describe('display', () => {
     }
   });
 
-  it('should return expected text for one dependency, one issue (using https://security.snyk.io/)', async () => {
+  it('should throw VulnerabilitiesFound error containing one dependency, one issue (using https://security.snyk.io/)', async () => {
     const path = helloWorldPath;
     const { scanResults } = await scan({ path });
     const options: Options = {
@@ -190,7 +191,7 @@ describe('display', () => {
     }
   });
 
-  it('should return expected text for two errors', async () => {
+  it('should throw Error containing two errors', async () => {
     const { scanResults } = await scan({ path: helloWorldPath });
     const errors: string[] = [
       'Could not test dependencies in test/fixtures/invalid1',
@@ -209,7 +210,7 @@ describe('display', () => {
     }
   });
 
-  it('should show test path in output if path present', async () => {
+  it('should throw VulnerabilitiesFound error containing test path in output if path present', async () => {
     const { scanResults } = await scan({ path: helloWorldPath });
     const errors: string[] = [];
     const options = { path: '/path/to/project' };
@@ -226,7 +227,7 @@ describe('display', () => {
     }
   });
 
-  it('should show return success without any error being thrown', async () => {
+  it('should throw VulnerabilitiesFound error containing the proper vulns', async () => {
     const { scanResults } = await scan({ path: helloWorldPath });
     const errors: string[] = [];
     const options = { path: '/path/to/project' };
@@ -240,6 +241,75 @@ describe('display', () => {
     } catch (error) {
       expect(stripAnsi(error.code)).toEqual(ExitCode.VulnerabilitiesFound);
       expect(stripAnsi(error.message)).toEqual(stripAnsi(expected));
+    }
+  });
+
+  it('should throw VulnerabilitiesFound error containing also the signatures when debug enabled', async () => {
+    const { scanResults } = await scan({ path: helloWorldPath });
+    const errors: string[] = [];
+    const options = { path: '/path/to/project', debug: true };
+    const expected = await readFixture(
+      'hello-world-display',
+      'display-testing-file-path-with-debug.txt',
+    );
+
+    try {
+      await display(scanResults, withDepOneIssueAndFix, errors, options);
+    } catch (error) {
+      expect(stripAnsi(error.code)).toEqual(ExitCode.VulnerabilitiesFound);
+      expect(stripAnsi(error.message)).toEqual(stripAnsi(expected));
+    }
+  });
+
+  it('should throw VulnerabilitiesFound error containing deps', async () => {
+    const { scanResults } = await scan({ path: helloWorldPath });
+    const errors: string[] = [];
+    const options = { path: '/path/to/project', 'print-deps': true };
+    const expected = await readFixture(
+      'hello-world-display',
+      'display-testing-file-path-with-deps.txt',
+    );
+
+    try {
+      await display(scanResults, withDepOneIssueAndFix, errors, options);
+    } catch (error) {
+      expect(stripAnsi(error.code)).toEqual(ExitCode.VulnerabilitiesFound);
+      expect(stripAnsi(error.message)).toEqual(stripAnsi(expected));
+    }
+  });
+
+  it('should throw VulnerabilitiesFound error containing deps and paths', async () => {
+    const { scanResults } = await scan({ path: helloWorldPath });
+    const errors: string[] = [];
+    const options = { path: '/path/to/project', 'print-dep-paths': true };
+    const expected = await readFixture(
+      'hello-world-display',
+      'display-testing-file-path-with-deps-filepaths.txt',
+    );
+
+    try {
+      await display(scanResults, withDepOneIssueAndFix, errors, options);
+    } catch (error) {
+      expect(stripAnsi(error.code)).toEqual(ExitCode.VulnerabilitiesFound);
+      expect(stripAnsi(error.message)).toEqual(stripAnsi(expected));
+    }
+  });
+
+  it('should throw a proper exception when an unexpected error within the chain happens', async () => {
+    const { scanResults } = await scan({ path: helloWorldPath });
+    const errors: string[] = [];
+    const options = { path: '/path/to/project' };
+    jest
+      .spyOn(displayModule, 'selectDisplayStrategy')
+      .mockImplementation(() => {
+        throw new Error('test error');
+      });
+
+    try {
+      await display(scanResults, withDepOneIssueAndFix, errors, options);
+    } catch (error) {
+      expect(stripAnsi(error.code)).toEqual(ExitCode.Error);
+      expect(stripAnsi(error.message)).toEqual('Error displaying results.');
     }
   });
 });

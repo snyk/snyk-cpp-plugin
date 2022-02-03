@@ -15,7 +15,7 @@ enum HashAlgorithm {
 
 const usedHashAlgorithm: HashAlgorithm = HashAlgorithm.MD5;
 
-export async function getHashSignature(
+export async function computeHash(
   path: FilePath,
   content: FileContent,
 ): Promise<SignatureResult> {
