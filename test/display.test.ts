@@ -13,6 +13,7 @@ import {
 } from './fixtures/hello-world-display/test-results';
 import { isWindowsOS } from '../lib/common';
 import { ExitCode } from '../lib/utils/error';
+import { DepGraph, createFromJSON } from '@snyk/dep-graph';
 
 const helloWorldPath = path.join('test', 'fixtures', 'hello-world');
 
@@ -311,5 +312,67 @@ describe('display', () => {
       expect(stripAnsi(error.code)).toEqual(ExitCode.Error);
       expect(stripAnsi(error.message)).toEqual('Error displaying results.');
     }
+  });
+});
+
+describe('displayDependecies', () => {
+  it('should accept ID with mixed casing', async () => {
+    const depGraph: DepGraph = createFromJSON({
+      schemaVersion: '1.2.0',
+      pkgManager: { name: 'cpp' },
+      pkgs: [
+        {
+          id: 'root-node@0.0.0',
+          info: { name: 'root-node', version: '0.0.0' },
+        },
+        {
+          id: 'rOoT@1.0.0',
+          info: { name: 'rOoT', version: '1.0.0' },
+        },
+      ],
+      graph: {
+        rootNodeId: 'root-node',
+        nodes: [
+          {
+            nodeId: 'root-node',
+            pkgId: 'root-node@0.0.0',
+            deps: [
+              {
+                nodeId: 'rOoT@1.0.0',
+              },
+            ],
+          },
+          {
+            nodeId: 'rOoT@1.0.0',
+            pkgId: 'rOoT@1.0.0',
+            deps: [],
+          },
+        ],
+      },
+    });
+
+    const expected: string[] = [
+      '\nDependencies:\n',
+      '\n  rOoT@1.0.0',
+      '  confidence: 1.000',
+      '  matching files:',
+      '    - proj/foo.c',
+      '',
+    ];
+
+    const depsFilePaths: any = { 'rOoT@1.0.0': ['proj/foo.c'] };
+    const details: any = {
+      'rOoT@1.0.0': { confidence: 1.0, filePaths: ['proj/foo.c'] },
+    };
+
+    const result: string[] = displayModule.displayDependencies(
+      depGraph,
+      details,
+      depsFilePaths,
+    );
+
+    expect(stripAnsi(expected.join('\n'))).toEqual(
+      stripAnsi(result.join('\n')),
+    );
   });
 });
