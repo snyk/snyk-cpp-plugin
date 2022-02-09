@@ -15,11 +15,22 @@ import { find } from './find';
 import { fromUrl } from 'hosted-git-info';
 import { computeSignaturesConcurrently } from './signatures';
 import { getTarget } from './git';
+import { extract, filterArchives } from './extract';
+import { DEFAULT_DECOMPRESSING_DEPTH, EXTRACTED_DIR_SUFFIX } from './common';
+import { createTemporaryDir } from './utils/fs';
 
 export async function scan(options: Options): Promise<PluginResponse> {
   try {
     debug.enabled = !!options?.debug;
     debug('options %o \n', options);
+    const extractionDepthLimit =
+      options['--max-depth'] !== undefined
+        ? options['--max-depth']
+        : DEFAULT_DECOMPRESSING_DEPTH;
+
+    if (extractionDepthLimit < 0) {
+      throw 'invalid options: --max-depth should be a positive number.';
+    }
 
     if (!options.path) {
       throw 'invalid options: no path provided.';
@@ -32,6 +43,17 @@ export async function scan(options: Options): Promise<PluginResponse> {
     const start = Date.now();
 
     const paths: FilePath[] = await find(options.path);
+    const archives: FilePath[] = filterArchives(paths);
+
+    let temporaryDir: FilePath | null = null;
+
+    if (archives.length > 0) {
+      temporaryDir = await createTemporaryDir();
+
+      await extract(archives, temporaryDir, extractionDepthLimit);
+      paths.push(...(await find(temporaryDir)));
+    }
+
     debug('%d files found \n', paths.length);
 
     const signatures: SignatureResult[] = await computeSignaturesConcurrently(
@@ -39,7 +61,13 @@ export async function scan(options: Options): Promise<PluginResponse> {
     );
 
     signatures.forEach((s) => {
-      s.path = path.relative(options.path, s.path);
+      if (temporaryDir && s.path.includes(temporaryDir)) {
+        s.path = path
+          .relative(temporaryDir, s.path)
+          .replace(new RegExp(EXTRACTED_DIR_SUFFIX, 'g'), '');
+      } else {
+        s.path = path.relative(options.path, s.path);
+      }
     });
 
     const end = Date.now();

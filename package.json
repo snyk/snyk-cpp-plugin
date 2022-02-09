@@ -30,10 +30,12 @@
   },
   "dependencies": {
     "@snyk/dep-graph": "^1.19.3",
+    "adm-zip": "^0.5.9",
     "chalk": "^4.1.0",
     "debug": "^4.1.1",
     "hosted-git-info": "^3.0.7",
     "p-map": "^4.0.0",
+    "tar": "^6.1.11",
     "tslib": "^2.0.0"
   },
   "devDependencies": {

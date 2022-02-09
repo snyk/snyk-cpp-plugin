@@ -1,6 +1,6 @@
 import { Stats, promises } from 'fs';
 import { join } from 'path';
-import { MAX_SUPPORTED_FILE_SIZE } from './common';
+import { isSupportedSize } from './common';
 import { debug } from './debug';
 import { FilePath } from './types';
 
@@ -14,7 +14,7 @@ export async function find(src: string): Promise<FilePath[]> {
   const result: FilePath[] = [];
 
   await traverse(src, async (path: FilePath, stats: Stats) => {
-    if (stats.size > MAX_SUPPORTED_FILE_SIZE || stats.size <= 0) {
+    if (!isSupportedSize(stats.size)) {
       return;
     }
 

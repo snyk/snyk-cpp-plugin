@@ -1,7 +1,7 @@
 import { promises } from 'fs';
 import { FileContent, FilePath, SignatureResult } from './types';
 import { computeHash } from './hash';
-import { CONCURRENCY_LEVEL } from './common';
+import { HASHING_CONCURRENCY_LEVEL } from './common';
 
 import pMap = require('p-map');
 
@@ -16,6 +16,6 @@ export async function computeSignaturesConcurrently(
       const content: FileContent = await readFile(path);
       return await computeHash(path, content);
     },
-    { concurrency: CONCURRENCY_LEVEL },
+    { concurrency: HASHING_CONCURRENCY_LEVEL },
   );
 }
