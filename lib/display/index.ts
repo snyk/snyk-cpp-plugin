@@ -58,7 +58,7 @@ export async function display(
   }
 
   if (hasVulnerabilities) {
-    exitWith(ExitCode.VulnerabilitiesFound, result.join('\n'));
+    exitWith(ExitCode.VulnerabilitiesFound, result.join('\n'), testResults);
   }
 
   if (!hasDependencies) {

@@ -29,7 +29,7 @@ describe('display', () => {
     try {
       await display(scanResults, withDepFourIssues, errors);
     } catch (error) {
-      expect(stripAnsi(error.code)).toEqual(ExitCode.VulnerabilitiesFound);
+      expect(error.code).toEqual(ExitCode.VulnerabilitiesFound);
       expect(stripAnsi(error.message)).toEqual(stripAnsi(expected));
     }
   });
@@ -51,7 +51,7 @@ describe('display', () => {
     try {
       await display(scanResults, withDepFourIssues, errors, options);
     } catch (error) {
-      expect(stripAnsi(error.code)).toEqual(ExitCode.VulnerabilitiesFound);
+      expect(error.code).toEqual(ExitCode.VulnerabilitiesFound);
       expect(stripAnsi(error.message)).toEqual(stripAnsi(expected));
     }
   });
@@ -79,7 +79,7 @@ describe('display', () => {
     try {
       await display(scanResults, noDepOrIssues, errors);
     } catch (error) {
-      expect(stripAnsi(error.code)).toEqual(ExitCode.NoSupportedFiles);
+      expect(error.code).toEqual(ExitCode.NoSupportedFiles);
       expect(stripAnsi(error.message)).toContain(stripAnsi(expected));
     }
   });
@@ -95,7 +95,7 @@ describe('display', () => {
     try {
       await display(scanResult, noDepOrIssues, errors);
     } catch (error) {
-      expect(stripAnsi(error.code)).toEqual(ExitCode.NoSupportedFiles);
+      expect(error.code).toEqual(ExitCode.NoSupportedFiles);
       expect(stripAnsi(error.message)).toContain(stripAnsi(expected));
     }
   });
@@ -110,7 +110,7 @@ describe('display', () => {
     try {
       await display([1, 2, 3] as any, noDepOrIssues, errors);
     } catch (error) {
-      expect(stripAnsi(error.code)).toEqual(ExitCode.NoSupportedFiles);
+      expect(error.code).toEqual(ExitCode.NoSupportedFiles);
       expect(stripAnsi(error.message)).toContain(stripAnsi(expected));
     }
   });
@@ -129,7 +129,7 @@ describe('display', () => {
         errors,
       );
     } catch (error) {
-      expect(stripAnsi(error.code)).toEqual(ExitCode.NoSupportedFiles);
+      expect(error.code).toEqual(ExitCode.NoSupportedFiles);
       expect(stripAnsi(error.message)).toContain(stripAnsi(expected));
     }
   });
@@ -148,7 +148,7 @@ describe('display', () => {
         errors,
       );
     } catch (error) {
-      expect(stripAnsi(error.code)).toEqual(ExitCode.NoSupportedFiles);
+      expect(error.code).toEqual(ExitCode.NoSupportedFiles);
       expect(stripAnsi(error.message)).toContain(stripAnsi(expected));
     }
   });
@@ -166,7 +166,7 @@ describe('display', () => {
     try {
       await display(scanResults, withDepOneIssueAndFix, errors);
     } catch (error) {
-      expect(stripAnsi(error.code)).toEqual(ExitCode.Error);
+      expect(error.code).toEqual(ExitCode.Error);
       expect(stripAnsi(error.message)).toEqual(stripAnsi(expected));
     }
   });
@@ -187,7 +187,7 @@ describe('display', () => {
     try {
       await display(scanResults, withDepOneIssueAndFix, [], options);
     } catch (error) {
-      expect(stripAnsi(error.code)).toEqual(ExitCode.VulnerabilitiesFound);
+      expect(error.code).toEqual(ExitCode.VulnerabilitiesFound);
       expect(stripAnsi(error.message)).toEqual(stripAnsi(expected));
     }
   });
@@ -206,7 +206,7 @@ describe('display', () => {
     try {
       await display(scanResults, withDepNoIssues, errors);
     } catch (error) {
-      expect(stripAnsi(error.code)).toEqual(ExitCode.Error);
+      expect(error.code).toEqual(ExitCode.Error);
       expect(stripAnsi(error.message)).toEqual(stripAnsi(expected));
     }
   });
@@ -223,7 +223,7 @@ describe('display', () => {
     try {
       await display(scanResults, withDepOneIssueAndFix, errors, options);
     } catch (error) {
-      expect(stripAnsi(error.code)).toEqual(ExitCode.VulnerabilitiesFound);
+      expect(error.code).toEqual(ExitCode.VulnerabilitiesFound);
       expect(stripAnsi(error.message)).toEqual(stripAnsi(expected));
     }
   });
@@ -240,7 +240,7 @@ describe('display', () => {
     try {
       await display(scanResults, withDepOneIssueAndFix, errors, options);
     } catch (error) {
-      expect(stripAnsi(error.code)).toEqual(ExitCode.VulnerabilitiesFound);
+      expect(error.code).toEqual(ExitCode.VulnerabilitiesFound);
       expect(stripAnsi(error.message)).toEqual(stripAnsi(expected));
     }
   });
@@ -257,7 +257,7 @@ describe('display', () => {
     try {
       await display(scanResults, withDepOneIssueAndFix, errors, options);
     } catch (error) {
-      expect(stripAnsi(error.code)).toEqual(ExitCode.VulnerabilitiesFound);
+      expect(error.code).toEqual(ExitCode.VulnerabilitiesFound);
       expect(stripAnsi(error.message)).toEqual(stripAnsi(expected));
     }
   });
@@ -274,7 +274,7 @@ describe('display', () => {
     try {
       await display(scanResults, withDepOneIssueAndFix, errors, options);
     } catch (error) {
-      expect(stripAnsi(error.code)).toEqual(ExitCode.VulnerabilitiesFound);
+      expect(error.code).toEqual(ExitCode.VulnerabilitiesFound);
       expect(stripAnsi(error.message)).toEqual(stripAnsi(expected));
     }
   });
@@ -291,8 +291,93 @@ describe('display', () => {
     try {
       await display(scanResults, withDepOneIssueAndFix, errors, options);
     } catch (error) {
-      expect(stripAnsi(error.code)).toEqual(ExitCode.VulnerabilitiesFound);
+      expect(error.code).toEqual(ExitCode.VulnerabilitiesFound);
       expect(stripAnsi(error.message)).toEqual(stripAnsi(expected));
+    }
+  });
+
+  it('should throw VulnerabilitiesFound error containing the deps and json output', async () => {
+    const { scanResults } = await scan({ path: helloWorldPath });
+    const errors: string[] = [];
+    const options = { path: '/path/to/project' };
+    const expected = await readFixture(
+      'hello-world-display',
+      'display-testing-file-path.txt',
+    );
+
+    const expectedJsonOutput = {
+      depGraphData: {
+        schemaVersion: '1.2.0',
+        pkgManager: { name: 'cpp' },
+        pkgs: [
+          { id: '_root@0.0.0', info: { name: '_root', version: '0.0.0' } },
+          {
+            id: 'hello-world@1.2.3',
+            info: { name: 'hello-world', version: '1.2.3' },
+          },
+        ],
+        graph: {
+          rootNodeId: 'root-node',
+          nodes: [
+            {
+              nodeId: 'root-node',
+              pkgId: '_root@0.0.0',
+              deps: [{ nodeId: 'hello-world@1.2.3' }],
+            },
+            {
+              nodeId: 'hello-world@1.2.3',
+              pkgId: 'hello-world@1.2.3',
+              deps: [],
+            },
+          ],
+        },
+      },
+      issues: [
+        {
+          pkgName: 'hello-world',
+          pkgVersion: '1.2.3',
+          issueId: 'cpp:hello-world:20161130',
+          fixInfo: { nearestFixedInVersion: '1.2.4' },
+        },
+      ],
+      issuesData: {
+        'cpp:hello-world:20161130': {
+          id: 'cpp:hello-world:20161130',
+          severity: 'medium',
+          title: 'Cross-site Scripting (XSS)',
+        },
+      },
+      depsFilePaths: {
+        'hello-world@1.2.3': [
+          '/path/to/project/a',
+          '/path/to/project/a/b',
+          '/path/to/project/a/b/c',
+          '/path/to/project/a/b/c/d',
+          '/path/to/project/a/b/c/d/e',
+        ],
+      },
+      fileSignaturesDetails: {
+        'hello-world@1.2.3': {
+          confidence: 1,
+          filePaths: [
+            '/path/to/project/a',
+            '/path/to/project/a/b',
+            '/path/to/project/a/b/c',
+            '/path/to/project/a/b/c/d',
+            '/path/to/project/a/b/c/d/e',
+          ],
+        },
+      },
+    };
+
+    try {
+      await display(scanResults, withDepOneIssueAndFix, errors, options);
+    } catch (error) {
+      expect(error.code).toEqual(ExitCode.VulnerabilitiesFound);
+      expect(stripAnsi(error.message)).toEqual(stripAnsi(expected));
+      expect(JSON.parse(error.jsonStringifiedResults)).toEqual(
+        expectedJsonOutput,
+      );
     }
   });
 
@@ -309,7 +394,7 @@ describe('display', () => {
     try {
       await display(scanResults, withDepOneIssueAndFix, errors, options);
     } catch (error) {
-      expect(stripAnsi(error.code)).toEqual(ExitCode.Error);
+      expect(error.code).toEqual(ExitCode.Error);
       expect(stripAnsi(error.message)).toEqual('Error displaying results.');
     }
   });
