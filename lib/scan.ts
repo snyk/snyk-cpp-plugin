@@ -8,8 +8,8 @@ import {
   Options,
   PluginResponse,
   ScanResult,
+  SignatureResult,
 } from './types';
-import { SignatureResult } from './types';
 import { debug } from './debug';
 import { find } from './find';
 import { fromUrl } from 'hosted-git-info';
@@ -24,8 +24,8 @@ export async function scan(options: Options): Promise<PluginResponse> {
     debug.enabled = !!options?.debug;
     debug('options %o \n', options);
     const extractionDepthLimit =
-      options['--max-depth'] !== undefined
-        ? options['--max-depth']
+      options['max-depth'] !== undefined
+        ? options['max-depth']
         : DEFAULT_DECOMPRESSING_DEPTH;
 
     if (extractionDepthLimit < 0) {
