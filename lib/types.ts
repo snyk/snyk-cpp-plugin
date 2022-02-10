@@ -49,7 +49,7 @@ export interface Options {
   'print-deps'?: boolean;
   'print-dep-paths'?: boolean;
   supportUnmanagedVulnDB?: boolean;
-  '--max-depth'?: number;
+  'max-depth'?: number;
 }
 
 export interface Issue {

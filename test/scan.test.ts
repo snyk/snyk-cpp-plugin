@@ -746,7 +746,7 @@ describe('scan', () => {
 
     const actual = await scan({
       path: fixturePath,
-      '--max-depth': 2,
+      'max-depth': 2,
     });
     const expected: PluginResponse = {
       scanResults: [
@@ -917,7 +917,7 @@ describe('scan', () => {
 
     const actual = await scan({
       path: fixturePath,
-      '--max-depth': 20,
+      'max-depth': 20,
     });
     const expected: PluginResponse = {
       scanResults: [
@@ -1301,7 +1301,7 @@ describe('scan', () => {
     try {
       await scan({
         path: fixturePath,
-        '--max-depth': -1,
+        'max-depth': -1,
       });
     } catch (err) {
       expect(err.message).toEqual(
@@ -1319,7 +1319,7 @@ describe('scan', () => {
       '3-levels',
     );
 
-    const actual = await scan({ path: fixturePath, '--max-depth': 0 });
+    const actual = await scan({ path: fixturePath, 'max-depth': 0 });
     const expected = {
       scanResults: [
         {
