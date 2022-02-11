@@ -13,9 +13,9 @@ export const HASHING_CONCURRENCY_LEVEL = os.cpus().length;
 
 export const DECOMPRESSING_CONCURRENCY_LEVEL = os.cpus().length * 8;
 
-export const DEFAULT_DECOMPRESSING_DEPTH = 1;
+export const DECOMPRESSING_WORKSPACE_DIR = 'workspace';
 
-export const EXTRACTED_DIR_SUFFIX = '.extracted';
+export const DECOMPRESSING_IGNORE_DIR = 'ignore';
 
 export const isSupportedSize = (size: number): boolean =>
   0 < size && size < MAX_SUPPORTED_FILE_SIZE;

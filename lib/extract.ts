@@ -1,9 +1,11 @@
 import { promises } from 'fs';
-import { join, extname, basename, relative } from 'path';
+import { join, extname, basename, relative, dirname } from 'path';
+import { v4 as uuidv4 } from 'uuid';
 import { FilePath } from './types';
 import {
   DECOMPRESSING_CONCURRENCY_LEVEL,
-  EXTRACTED_DIR_SUFFIX,
+  DECOMPRESSING_IGNORE_DIR,
+  DECOMPRESSING_WORKSPACE_DIR,
 } from './common';
 import { debug } from './debug';
 
@@ -11,7 +13,7 @@ const pMap = require('p-map');
 const AdmZip = require('adm-zip');
 const tar = require('tar');
 
-const { mkdir } = promises;
+const { mkdir, rename } = promises;
 
 const zipFormats = ['.zip', '.zipx'];
 const tarFormats = ['.tar', '.gz', '.tgz'];
@@ -23,20 +25,36 @@ interface ExtractionHandler {
 async function handleExtraction(
   path: FilePath,
   temporaryDir: FilePath,
+  keepArchive: boolean,
   childArchiveHandler: ExtractionHandler,
 ) {
+  const extractionSource: FilePath = keepArchive
+    ? path
+    : join(
+        temporaryDir,
+        DECOMPRESSING_IGNORE_DIR,
+        `${uuidv4()}-${basename(path)}`,
+      );
+
+  if (!keepArchive) {
+    await mkdir(dirname(extractionSource), { recursive: true });
+    await rename(path, extractionSource);
+  }
+
   const extractionTarget: FilePath = join(
     temporaryDir,
+    DECOMPRESSING_WORKSPACE_DIR,
+
     path.includes(temporaryDir)
-      ? relative(temporaryDir, `${path}${EXTRACTED_DIR_SUFFIX}`)
+      ? relative(join(temporaryDir, DECOMPRESSING_WORKSPACE_DIR), path)
       : basename(path),
   );
 
   await mkdir(extractionTarget, { recursive: true });
 
-  if (isTar(path)) {
+  if (isTar(extractionSource)) {
     await tar.x({
-      file: path,
+      file: extractionSource,
       cwd: extractionTarget,
       sync: true,
       onentry: (entry: any) => {
@@ -47,8 +65,8 @@ async function handleExtraction(
         }
       },
     });
-  } else if (isZip(path)) {
-    const zip = new AdmZip(path);
+  } else if (isZip(extractionSource)) {
+    const zip = new AdmZip(extractionSource);
     await pMap(
       zip.getEntries(),
       (entry: any) => {
@@ -78,8 +96,13 @@ export async function extract(
 
   for (const archive of archives) {
     try {
-      await handleExtraction(archive, temporaryDir, (childArchive: FilePath) =>
-        childArchives.push(childArchive),
+      const keepArchive = 0 === depth;
+
+      await handleExtraction(
+        archive,
+        temporaryDir,
+        keepArchive,
+        (childArchive: FilePath) => childArchives.push(childArchive),
       );
     } catch (err) {
       debug(`Could not extract archive: ${archive} ${err}`);
@@ -101,8 +124,4 @@ export function isZip(path: FilePath): boolean {
 
 export function isArchive(path: FilePath): boolean {
   return isTar(path) || isZip(path);
-}
-
-export function filterArchives(paths: readonly FilePath[]): FilePath[] {
-  return paths.filter((path) => isArchive(path));
 }

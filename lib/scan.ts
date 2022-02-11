@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { join } from 'path';
 
 import {
   Analytics,
@@ -15,21 +16,18 @@ import { find } from './find';
 import { fromUrl } from 'hosted-git-info';
 import { computeSignaturesConcurrently } from './signatures';
 import { getTarget } from './git';
-import { extract, filterArchives } from './extract';
-import { DEFAULT_DECOMPRESSING_DEPTH, EXTRACTED_DIR_SUFFIX } from './common';
+import { extract } from './extract';
 import { createTemporaryDir } from './utils/fs';
+import { DECOMPRESSING_WORKSPACE_DIR } from './common';
 
 export async function scan(options: Options): Promise<PluginResponse> {
   try {
     debug.enabled = !!options?.debug;
     debug('options %o \n', options);
-    const extractionDepthLimit =
-      options['max-depth'] !== undefined
-        ? options['max-depth']
-        : DEFAULT_DECOMPRESSING_DEPTH;
+    const extractionDepthLimit = options['max-depth'] || 0;
 
     if (extractionDepthLimit < 0) {
-      throw 'invalid options: --max-depth should be a positive number.';
+      throw 'invalid options: --max-depth should be greater than or equal to 0.';
     }
 
     if (!options.path) {
@@ -42,32 +40,34 @@ export async function scan(options: Options): Promise<PluginResponse> {
 
     const start = Date.now();
 
-    const paths: FilePath[] = await find(options.path);
-    const archives: FilePath[] = filterArchives(paths);
+    const [filePaths, archivePaths] = await find(options.path);
+    let extractionWorkspace: FilePath | null = null;
 
-    let temporaryDir: FilePath | null = null;
+    if (0 < extractionDepthLimit && 0 < archivePaths.length) {
+      const temporaryDir = await createTemporaryDir();
+      extractionWorkspace = join(temporaryDir, DECOMPRESSING_WORKSPACE_DIR);
 
-    if (archives.length > 0) {
-      temporaryDir = await createTemporaryDir();
+      await extract(archivePaths, temporaryDir, extractionDepthLimit);
+      const [newFilePaths, newArchivePaths] = await find(extractionWorkspace);
 
-      await extract(archives, temporaryDir, extractionDepthLimit);
-      paths.push(...(await find(temporaryDir)));
+      filePaths.push(...newFilePaths, ...newArchivePaths);
+    } else {
+      filePaths.push(...archivePaths);
     }
 
-    debug('%d files found \n', paths.length);
+    debug('%d files found \n', filePaths.length);
 
     const signatures: SignatureResult[] = await computeSignaturesConcurrently(
-      paths,
+      filePaths,
     );
 
     signatures.forEach((s) => {
-      if (temporaryDir && s.path.includes(temporaryDir)) {
-        s.path = path
-          .relative(temporaryDir, s.path)
-          .replace(new RegExp(EXTRACTED_DIR_SUFFIX, 'g'), '');
-      } else {
-        s.path = path.relative(options.path, s.path);
-      }
+      const src: FilePath =
+        extractionWorkspace && s.path.includes(extractionWorkspace)
+          ? extractionWorkspace
+          : options.path;
+
+      s.path = path.relative(src, s.path);
     });
 
     const end = Date.now();
