@@ -3,6 +3,7 @@ import { join } from 'path';
 import { isSupportedSize } from './common';
 import { debug } from './debug';
 import { FilePath } from './types';
+import { isArchive } from './extract';
 
 export const { readdir, lstat } = promises;
 
@@ -10,18 +11,24 @@ interface FileHandler {
   (path: FilePath, stats: Stats): void;
 }
 
-export async function find(src: string): Promise<FilePath[]> {
-  const result: FilePath[] = [];
+export async function find(src: string): Promise<[FilePath[], FilePath[]]> {
+  const fileResults: FilePath[] = [];
+  const archiveResults: FilePath[] = [];
 
   await traverse(src, async (path: FilePath, stats: Stats) => {
     if (!isSupportedSize(stats.size)) {
       return;
     }
 
-    result.push(path);
+    if (isArchive(path)) {
+      archiveResults.push(path);
+      return;
+    }
+
+    fileResults.push(path);
   });
 
-  return result;
+  return [fileResults, archiveResults];
 }
 
 async function traverse(src: string, handle: FileHandler) {

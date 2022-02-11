@@ -6,7 +6,7 @@ import { promisify } from 'util';
 describe('find', () => {
   it('should produce list of files found in directory', async () => {
     const fixturePath = path.join(__dirname, 'fixtures', 'example');
-    const actual = await findModule.find(fixturePath);
+    const [actual] = await findModule.find(fixturePath);
     const expected = [
       // md file
       path.join(fixturePath, 'README.md'),
@@ -70,7 +70,7 @@ describe('find', () => {
 
     await promisify(fs.symlink)(symlinkTarget, symlinkPath, 'dir');
 
-    const actual = await findModule.find(fixturePath);
+    const [actual] = await findModule.find(fixturePath);
 
     expect(actual).toHaveLength(1);
     expect(actual).toEqual(expected);

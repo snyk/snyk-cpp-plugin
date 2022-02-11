@@ -35,7 +35,7 @@ describe('extract file paths', () => {
     statSpy.mockResolvedValueOnce(statWithFileSizeGreaterThanMaxAllowed);
     statSpy.mockResolvedValueOnce(statWithAllowedFileSize);
 
-    const result = await findModule.find(fixturePath);
+    const [result] = await findModule.find(fixturePath);
 
     const expected = [
       path.join(fixturePath, 'add.cpp'),
