@@ -18,6 +18,31 @@ import { DepGraph, createFromJSON } from '@snyk/dep-graph';
 const helloWorldPath = path.join('test', 'fixtures', 'hello-world');
 
 describe('display', () => {
+  it('should work with huge set of file signatures', async () => {
+    const { scanResults } = await scan({ path: helloWorldPath });
+
+    const length = 125053 * 2;
+    const errors: string[] = [];
+    const template = scanResults[0].facts[0];
+
+    scanResults[0].facts = new Array(length);
+
+    for (let i = 0; i < length; i++) {
+      scanResults[0].facts[i] = template;
+    }
+
+    let errorReceived: any = null;
+
+    try {
+      const options: Options = { debug: true, path: helloWorldPath };
+      await display(scanResults, withDepFourIssues, errors, options);
+    } catch (error) {
+      errorReceived = error;
+    }
+
+    expect(errorReceived.code).toEqual(ExitCode.VulnerabilitiesFound);
+  });
+
   it('should throw VulnerabilitiesFound error containing expected text for one dependency, four issues, no errors', async () => {
     const { scanResults } = await scan({ path: helloWorldPath });
     const errors: string[] = [];
@@ -26,12 +51,16 @@ describe('display', () => {
       'display-one-dep-four-issues-no-errors.txt',
     );
 
+    let errorReceived: any = null;
+
     try {
       await display(scanResults, withDepFourIssues, errors);
     } catch (error) {
-      expect(error.code).toEqual(ExitCode.VulnerabilitiesFound);
-      expect(stripAnsi(error.message)).toEqual(stripAnsi(expected));
+      errorReceived = error;
     }
+
+    expect(errorReceived.code).toEqual(ExitCode.VulnerabilitiesFound);
+    expect(stripAnsi(errorReceived.message)).toEqual(stripAnsi(expected));
   });
 
   it('should throw VulnerabilitiesFound error containing expected text for one dependency, four issues (using https://security.snyk.io/), no errors using', async () => {
@@ -48,12 +77,16 @@ describe('display', () => {
       `one-dep-four-issues-no-errors-${osName}.txt`,
     );
 
+    let errorReceived: any = null;
+
     try {
       await display(scanResults, withDepFourIssues, errors, options);
     } catch (error) {
-      expect(error.code).toEqual(ExitCode.VulnerabilitiesFound);
-      expect(stripAnsi(error.message)).toEqual(stripAnsi(expected));
+      errorReceived = error;
     }
+
+    expect(errorReceived.code).toEqual(ExitCode.VulnerabilitiesFound);
+    expect(stripAnsi(errorReceived.message)).toEqual(stripAnsi(expected));
   });
 
   it('should return expected text when one dependency, no issues, no errors', async () => {
@@ -76,12 +109,16 @@ describe('display', () => {
       'display-no-scan-results.txt',
     );
 
+    let errorReceived: any = null;
+
     try {
       await display(scanResults, noDepOrIssues, errors);
     } catch (error) {
-      expect(error.code).toEqual(ExitCode.NoSupportedFiles);
-      expect(stripAnsi(error.message)).toContain(stripAnsi(expected));
+      errorReceived = error;
     }
+
+    expect(errorReceived.code).toEqual(ExitCode.NoSupportedFiles);
+    expect(stripAnsi(errorReceived.message)).toContain(stripAnsi(expected));
   });
 
   it('should throw NoSupportedFiles when no projects', async () => {
@@ -92,12 +129,16 @@ describe('display', () => {
       'display-no-scan-results.txt',
     );
 
+    let errorReceived: any = null;
+
     try {
       await display(scanResult, noDepOrIssues, errors);
     } catch (error) {
-      expect(error.code).toEqual(ExitCode.NoSupportedFiles);
-      expect(stripAnsi(error.message)).toContain(stripAnsi(expected));
+      errorReceived = error;
     }
+
+    expect(errorReceived.code).toEqual(ExitCode.NoSupportedFiles);
+    expect(stripAnsi(errorReceived.message)).toContain(stripAnsi(expected));
   });
 
   it('should throw NoSupportedFiles when invalid artifact data', async () => {
@@ -107,12 +148,16 @@ describe('display', () => {
       'display-no-scan-results.txt',
     );
 
+    let errorReceived: any = null;
+
     try {
       await display([1, 2, 3] as any, noDepOrIssues, errors);
     } catch (error) {
-      expect(error.code).toEqual(ExitCode.NoSupportedFiles);
-      expect(stripAnsi(error.message)).toContain(stripAnsi(expected));
+      errorReceived = error;
     }
+
+    expect(errorReceived.code).toEqual(ExitCode.NoSupportedFiles);
+    expect(stripAnsi(errorReceived.message)).toContain(stripAnsi(expected));
   });
 
   it('should throw NoSupportedFiles when invalid artifacts', async () => {
@@ -122,6 +167,8 @@ describe('display', () => {
       'display-no-scan-results.txt',
     );
 
+    let errorReceived: any = null;
+
     try {
       await display(
         [{ artifacts: ['a', 'b', 'c'] }] as any,
@@ -129,9 +176,11 @@ describe('display', () => {
         errors,
       );
     } catch (error) {
-      expect(error.code).toEqual(ExitCode.NoSupportedFiles);
-      expect(stripAnsi(error.message)).toContain(stripAnsi(expected));
+      errorReceived = error;
     }
+
+    expect(errorReceived.code).toEqual(ExitCode.NoSupportedFiles);
+    expect(stripAnsi(errorReceived.message)).toContain(stripAnsi(expected));
   });
 
   it('should throw NoSupportedFiles when invalid artifact data', async () => {
@@ -141,6 +190,8 @@ describe('display', () => {
       'display-no-scan-results.txt',
     );
 
+    let errorReceived: any = null;
+
     try {
       await display(
         [{ artifacts: [{ type: 'test', data: [1, 2, 3] }] }] as any,
@@ -148,9 +199,11 @@ describe('display', () => {
         errors,
       );
     } catch (error) {
-      expect(error.code).toEqual(ExitCode.NoSupportedFiles);
-      expect(stripAnsi(error.message)).toContain(stripAnsi(expected));
+      errorReceived = error;
     }
+
+    expect(errorReceived.code).toEqual(ExitCode.NoSupportedFiles);
+    expect(stripAnsi(errorReceived.message)).toContain(stripAnsi(expected));
   });
 
   it('should throw NoSupportedFiles containing expected text for error', async () => {
@@ -163,12 +216,16 @@ describe('display', () => {
       'display-one-dep-one-issue-one-error.txt',
     );
 
+    let errorReceived: any = null;
+
     try {
       await display(scanResults, withDepOneIssueAndFix, errors);
     } catch (error) {
-      expect(error.code).toEqual(ExitCode.Error);
-      expect(stripAnsi(error.message)).toEqual(stripAnsi(expected));
+      errorReceived = error;
     }
+
+    expect(errorReceived.code).toEqual(ExitCode.Error);
+    expect(stripAnsi(errorReceived.message)).toEqual(stripAnsi(expected));
   });
 
   it('should throw VulnerabilitiesFound error containing one dependency, one issue (using https://security.snyk.io/)', async () => {
@@ -184,12 +241,16 @@ describe('display', () => {
       `one-dep-one-issue-one-error-${osName}.txt`,
     );
 
+    let errorReceived: any = null;
+
     try {
       await display(scanResults, withDepOneIssueAndFix, [], options);
     } catch (error) {
-      expect(error.code).toEqual(ExitCode.VulnerabilitiesFound);
-      expect(stripAnsi(error.message)).toEqual(stripAnsi(expected));
+      errorReceived = error;
     }
+
+    expect(errorReceived.code).toEqual(ExitCode.VulnerabilitiesFound);
+    expect(stripAnsi(errorReceived.message)).toEqual(stripAnsi(expected));
   });
 
   it('should throw Error containing two errors', async () => {
@@ -203,12 +264,16 @@ describe('display', () => {
       'display-one-dep-no-issues-two-errors.txt',
     );
 
+    let errorReceived: any = null;
+
     try {
       await display(scanResults, withDepNoIssues, errors);
     } catch (error) {
-      expect(error.code).toEqual(ExitCode.Error);
-      expect(stripAnsi(error.message)).toEqual(stripAnsi(expected));
+      errorReceived = error;
     }
+
+    expect(errorReceived.code).toEqual(ExitCode.Error);
+    expect(stripAnsi(errorReceived.message)).toEqual(stripAnsi(expected));
   });
 
   it('should throw VulnerabilitiesFound error containing test path in output if path present', async () => {
@@ -220,12 +285,16 @@ describe('display', () => {
       'display-testing-file-path.txt',
     );
 
+    let errorReceived: any = null;
+
     try {
       await display(scanResults, withDepOneIssueAndFix, errors, options);
     } catch (error) {
-      expect(error.code).toEqual(ExitCode.VulnerabilitiesFound);
-      expect(stripAnsi(error.message)).toEqual(stripAnsi(expected));
+      errorReceived = error;
     }
+
+    expect(errorReceived.code).toEqual(ExitCode.VulnerabilitiesFound);
+    expect(stripAnsi(errorReceived.message)).toEqual(stripAnsi(expected));
   });
 
   it('should throw VulnerabilitiesFound error containing the proper vulns', async () => {
@@ -237,12 +306,16 @@ describe('display', () => {
       'display-testing-file-path.txt',
     );
 
+    let errorReceived: any = null;
+
     try {
       await display(scanResults, withDepOneIssueAndFix, errors, options);
     } catch (error) {
-      expect(error.code).toEqual(ExitCode.VulnerabilitiesFound);
-      expect(stripAnsi(error.message)).toEqual(stripAnsi(expected));
+      errorReceived = error;
     }
+
+    expect(errorReceived.code).toEqual(ExitCode.VulnerabilitiesFound);
+    expect(stripAnsi(errorReceived.message)).toEqual(stripAnsi(expected));
   });
 
   it('should throw VulnerabilitiesFound error containing also the signatures when debug enabled', async () => {
@@ -254,12 +327,16 @@ describe('display', () => {
       'display-testing-file-path-with-debug.txt',
     );
 
+    let errorReceived: any = null;
+
     try {
       await display(scanResults, withDepOneIssueAndFix, errors, options);
     } catch (error) {
-      expect(error.code).toEqual(ExitCode.VulnerabilitiesFound);
-      expect(stripAnsi(error.message)).toEqual(stripAnsi(expected));
+      errorReceived = error;
     }
+
+    expect(errorReceived.code).toEqual(ExitCode.VulnerabilitiesFound);
+    expect(stripAnsi(errorReceived.message)).toEqual(stripAnsi(expected));
   });
 
   it('should throw VulnerabilitiesFound error containing deps', async () => {
@@ -271,12 +348,16 @@ describe('display', () => {
       'display-testing-file-path-with-deps.txt',
     );
 
+    let errorReceived: any = null;
+
     try {
       await display(scanResults, withDepOneIssueAndFix, errors, options);
     } catch (error) {
-      expect(error.code).toEqual(ExitCode.VulnerabilitiesFound);
-      expect(stripAnsi(error.message)).toEqual(stripAnsi(expected));
+      errorReceived = error;
     }
+
+    expect(errorReceived.code).toEqual(ExitCode.VulnerabilitiesFound);
+    expect(stripAnsi(errorReceived.message)).toEqual(stripAnsi(expected));
   });
 
   it('should throw VulnerabilitiesFound error containing deps and paths', async () => {
@@ -288,12 +369,16 @@ describe('display', () => {
       'display-testing-file-path-with-deps-filepaths.txt',
     );
 
+    let errorReceived: any = null;
+
     try {
       await display(scanResults, withDepOneIssueAndFix, errors, options);
     } catch (error) {
-      expect(error.code).toEqual(ExitCode.VulnerabilitiesFound);
-      expect(stripAnsi(error.message)).toEqual(stripAnsi(expected));
+      errorReceived = error;
     }
+
+    expect(errorReceived.code).toEqual(ExitCode.VulnerabilitiesFound);
+    expect(stripAnsi(errorReceived.message)).toEqual(stripAnsi(expected));
   });
 
   it('should throw VulnerabilitiesFound error containing the deps and json output', async () => {
@@ -370,15 +455,19 @@ describe('display', () => {
       },
     };
 
+    let errorReceived: any = null;
+
     try {
       await display(scanResults, withDepOneIssueAndFix, errors, options);
     } catch (error) {
-      expect(error.code).toEqual(ExitCode.VulnerabilitiesFound);
-      expect(stripAnsi(error.message)).toEqual(stripAnsi(expected));
-      expect(JSON.parse(error.jsonStringifiedResults)).toEqual(
-        expectedJsonOutput,
-      );
+      errorReceived = error;
     }
+
+    expect(errorReceived.code).toEqual(ExitCode.VulnerabilitiesFound);
+    expect(stripAnsi(errorReceived.message)).toEqual(stripAnsi(expected));
+    expect(JSON.parse(errorReceived.jsonStringifiedResults)).toEqual(
+      expectedJsonOutput,
+    );
   });
 
   it('should throw a proper exception when an unexpected error within the chain happens', async () => {
@@ -391,12 +480,18 @@ describe('display', () => {
         throw new Error('test error');
       });
 
+    let errorReceived: any = null;
+
     try {
       await display(scanResults, withDepOneIssueAndFix, errors, options);
     } catch (error) {
-      expect(error.code).toEqual(ExitCode.Error);
-      expect(stripAnsi(error.message)).toEqual('Error displaying results.');
+      errorReceived = error;
     }
+
+    expect(errorReceived.code).toEqual(ExitCode.Error);
+    expect(stripAnsi(errorReceived.message)).toEqual(
+      'Error displaying results.',
+    );
   });
 });
 

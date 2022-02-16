@@ -19,24 +19,24 @@ export async function display(
     exitWith(ExitCode.Error, displayErrors(errors).join('\n'));
   }
 
-  const result: string[] = [];
+  let result: string[] = [];
+
   let hasDependencies = false;
   let hasVulnerabilities = false;
 
   try {
     if (options?.path) {
       const prefix = chalk.bold.white(`\nTesting ${options.path}...\n`);
-      result.push(prefix);
+      result = result.concat(prefix);
     }
 
     if (options?.debug) {
-      const signatureLines = displaySignatures(scanResults);
-      result.push(...signatureLines);
+      result = result.concat(displaySignatures(scanResults));
     }
 
     for (const testResult of testResults) {
       const depGraph = createFromJSON(testResult.depGraphData);
-      const [dependencySection, issuesSection] = selectDisplayStrategy(
+      const [dependencies, issues] = selectDisplayStrategy(
         options,
         depGraph,
         testResult,
@@ -50,21 +50,25 @@ export async function display(
         hasVulnerabilities = true;
       }
 
-      result.push(...dependencySection, ...issuesSection);
+      result = result.concat(dependencies, issues);
     }
   } catch (error) {
     debug(error.message || `Error displaying the results: ${error}`);
     exitWith(ExitCode.Error, 'Error displaying results.');
   }
 
+  const output = result.join('\n');
+
   if (hasVulnerabilities) {
-    exitWith(ExitCode.VulnerabilitiesFound, result.join('\n'), testResults);
+    exitWith(ExitCode.VulnerabilitiesFound, output, testResults);
   }
 
   if (!hasDependencies) {
-    result.push(`Could not detect supported target files in ${options?.path}`);
-    exitWith(ExitCode.NoSupportedFiles, result.join('\n'));
+    exitWith(
+      ExitCode.NoSupportedFiles,
+      `${output}\nCould not detect supported target files in ${options?.path}`,
+    );
   }
 
-  return result.join('\n');
+  return output;
 }
