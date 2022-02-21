@@ -73,6 +73,14 @@ export function selectDisplayStrategy(
   return [dependencySection, issuesSection];
 }
 
+function computeDependencyName(name: string, version?: string): string {
+  return `${name}@${version || 'unknown'}`;
+}
+
+function computeDependencyId(name: string, version?: string): string {
+  return `${name}@${version || ''}`;
+}
+
 export function displayDependencies(
   depGraph: DepGraph,
   fileSignaturesDetails?: FileSignaturesDetails,
@@ -88,8 +96,10 @@ export function displayDependencies(
 
   result.push(chalk.whiteBright('\nDependencies:\n'));
   for (const { name, version } of dependencies) {
-    const dependencyId = `${name}@${version}`;
-    result.push(`\n${leftPad(dependencyId, 2)}`);
+    const dependencyId = computeDependencyId(name, version);
+    const dependencyName = computeDependencyName(name, version);
+
+    result.push(`\n${leftPad(dependencyName, 2)}`);
 
     if (
       fileSignaturesDetails &&
@@ -175,15 +185,21 @@ export function displayIssues(
       issueId: vulnId,
     } of issues) {
       const { title, severity } = issuesData[vulnId];
+
       const color = getColorBySeverity(severity);
       const severityAndTitle = color(`\n ✗ [${capitalize(severity)}] ${title}`);
+      const dependencyName = computeDependencyName(name, version);
+
       const vulnDetailsUrl = supportUnmanagedVulnDB
         ? `https://security.snyk.io/vuln/${vulnId}`
         : `https://nvd.nist.gov/vuln/detail/${vulnId}`;
+
       const introducedThrough = leftPad(
-        `Introduced through: ${name}@${version}`,
+        `Introduced through: ${dependencyName}`,
       );
+
       const urlText = leftPad(`URL: ${vulnDetailsUrl}`);
+
       result.push(severityAndTitle);
       result.push(introducedThrough);
       result.push(urlText);

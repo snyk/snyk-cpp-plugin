@@ -555,4 +555,65 @@ describe('displayDependecies', () => {
       stripAnsi(result.join('\n')),
     );
   });
+
+  it('should support packages without version number', async () => {
+    const depGraph: DepGraph = createFromJSON({
+      schemaVersion: '1.2.0',
+      pkgManager: { name: 'cpp' },
+      pkgs: [
+        {
+          id: 'root-node@0.0.0',
+          info: { name: 'root-node', version: '0.0.0' },
+        },
+        {
+          id: 'rOoT@',
+          info: { name: 'rOoT' },
+        },
+      ],
+      graph: {
+        rootNodeId: 'root-node',
+        nodes: [
+          {
+            nodeId: 'root-node',
+            pkgId: 'root-node@0.0.0',
+            deps: [
+              {
+                nodeId: 'rOoT@',
+              },
+            ],
+          },
+          {
+            nodeId: 'rOoT@',
+            pkgId: 'rOoT@',
+            deps: [],
+          },
+        ],
+      },
+    });
+
+    // NOTE: Output should contain unknown if we lack version
+    const expected: string[] = [
+      '\nDependencies:\n',
+      '\n  rOoT@unknown',
+      '  confidence: 1.000',
+      '  matching files:',
+      '    - proj/foo.c',
+      '',
+    ];
+
+    const depsFilePaths: any = { 'rOoT@': ['proj/foo.c'] };
+    const details: any = {
+      'rOoT@': { confidence: 1.0, filePaths: ['proj/foo.c'] },
+    };
+
+    const result: string[] = displayModule.displayDependencies(
+      depGraph,
+      details,
+      depsFilePaths,
+    );
+
+    expect(stripAnsi(expected.join('\n'))).toEqual(
+      stripAnsi(result.join('\n')),
+    );
+  });
 });
