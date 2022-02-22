@@ -48,7 +48,6 @@ export interface Options {
   projectName?: string;
   'print-deps'?: boolean;
   'print-dep-paths'?: boolean;
-  supportUnmanagedVulnDB?: boolean;
   'max-depth'?: number;
 }
 
