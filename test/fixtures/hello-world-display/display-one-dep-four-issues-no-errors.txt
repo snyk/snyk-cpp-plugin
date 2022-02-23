@@ -2,18 +2,18 @@
 [91m[39m
 [91m ✗ [Critical] Information Exposure[39m
     Introduced through: hello-world@1.2.3
-    URL: https://nvd.nist.gov/vuln/detail/cpp:hello-world:000
+    URL: https://security.snyk.io/vuln/cpp:hello-world:000
 [91m[39m
 [91m ✗ [High] Information Exposure[39m
     Introduced through: hello-world@1.2.3
-    URL: https://nvd.nist.gov/vuln/detail/cpp:hello-world:123
+    URL: https://security.snyk.io/vuln/cpp:hello-world:123
 [93m[39m
 [93m ✗ [Medium] Use of Insufficiently Random Values[39m
     Introduced through: hello-world@1.2.3
-    URL: https://nvd.nist.gov/vuln/detail/cpp:hello-world:456
+    URL: https://security.snyk.io/vuln/cpp:hello-world:456
 [94m[39m
 [94m ✗ [Low] Missing Encryption of Sensitive Data[39m
     Introduced through: hello-world@1.2.3
-    URL: https://nvd.nist.gov/vuln/detail/cpp:hello-world:789
+    URL: https://security.snyk.io/vuln/cpp:hello-world:789
 
 Tested 1 dependency for known issues, found [91m4 issues[39m.

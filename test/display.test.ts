@@ -69,7 +69,6 @@ describe('display', () => {
     const errors: string[] = [];
     const options: Options = {
       path,
-      supportUnmanagedVulnDB: true,
     };
     const osName = isWindowsOS() ? 'windows' : 'unix';
     const expected = await readFixture(
@@ -228,12 +227,11 @@ describe('display', () => {
     expect(stripAnsi(errorReceived.message)).toEqual(stripAnsi(expected));
   });
 
-  it('should throw VulnerabilitiesFound error containing one dependency, one issue (using https://security.snyk.io/)', async () => {
+  it('should throw VulnerabilitiesFound error containing one dependency, one issue', async () => {
     const path = helloWorldPath;
     const { scanResults } = await scan({ path });
     const options: Options = {
       path,
-      supportUnmanagedVulnDB: true,
     };
     const osName = isWindowsOS() ? 'windows' : 'unix';
     const expected = await readFixture(

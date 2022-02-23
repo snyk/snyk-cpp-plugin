@@ -64,12 +64,7 @@ export function selectDisplayStrategy(
     depsFilePaths,
     fileSignaturesDetails,
   );
-  const issuesSection = displayIssues(
-    depGraph,
-    issues,
-    issuesData,
-    options?.supportUnmanagedVulnDB,
-  );
+  const issuesSection = displayIssues(depGraph, issues, issuesData);
   return [dependencySection, issuesSection];
 }
 
@@ -163,7 +158,6 @@ export function displayIssues(
   depGraph: DepGraph,
   issues: Issue[],
   issuesData: IssuesData,
-  supportUnmanagedVulnDB = false,
 ): string[] {
   const result: string[] = [];
   const dependencies = depGraph?.getDepPkgs();
@@ -189,10 +183,7 @@ export function displayIssues(
       const color = getColorBySeverity(severity);
       const severityAndTitle = color(`\n ✗ [${capitalize(severity)}] ${title}`);
       const dependencyName = computeDependencyName(name, version);
-
-      const vulnDetailsUrl = supportUnmanagedVulnDB
-        ? `https://security.snyk.io/vuln/${vulnId}`
-        : `https://nvd.nist.gov/vuln/detail/${vulnId}`;
+      const vulnDetailsUrl = `https://security.snyk.io/vuln/${vulnId}`;
 
       const introducedThrough = leftPad(
         `Introduced through: ${dependencyName}`,
