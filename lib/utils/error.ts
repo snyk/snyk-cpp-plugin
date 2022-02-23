@@ -13,6 +13,7 @@ export function exitWith(
 ): void {
   const err = new Error() as any;
   err.message = message;
+  err.userMessage = message;
   err.code = exitCode.valueOf();
 
   if (0 < testResults.length) {

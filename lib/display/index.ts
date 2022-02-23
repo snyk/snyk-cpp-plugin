@@ -66,7 +66,11 @@ export async function display(
   if (!hasDependencies) {
     exitWith(
       ExitCode.NoSupportedFiles,
-      `${output}\nCould not detect supported target files in ${options?.path}`,
+      `${output}\nCould not detect supported target files in ${
+        options?.path
+      }\nPlease see our documentation for supported languages and target files: ${chalk.underline(
+        'https://snyk.co/udVgQ',
+      )} and make sure you are in the right directory.`,
     );
   }
 
