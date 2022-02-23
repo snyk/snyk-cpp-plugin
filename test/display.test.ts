@@ -118,6 +118,7 @@ describe('display', () => {
 
     expect(errorReceived.code).toEqual(ExitCode.NoSupportedFiles);
     expect(stripAnsi(errorReceived.message)).toContain(stripAnsi(expected));
+    expect(stripAnsi(errorReceived.userMessage)).toContain(stripAnsi(expected));
   });
 
   it('should throw NoSupportedFiles when no projects', async () => {
@@ -138,6 +139,7 @@ describe('display', () => {
 
     expect(errorReceived.code).toEqual(ExitCode.NoSupportedFiles);
     expect(stripAnsi(errorReceived.message)).toContain(stripAnsi(expected));
+    expect(stripAnsi(errorReceived.userMessage)).toContain(stripAnsi(expected));
   });
 
   it('should throw NoSupportedFiles when invalid artifact data', async () => {
@@ -157,6 +159,7 @@ describe('display', () => {
 
     expect(errorReceived.code).toEqual(ExitCode.NoSupportedFiles);
     expect(stripAnsi(errorReceived.message)).toContain(stripAnsi(expected));
+    expect(stripAnsi(errorReceived.userMessage)).toContain(stripAnsi(expected));
   });
 
   it('should throw NoSupportedFiles when invalid artifacts', async () => {
@@ -180,6 +183,7 @@ describe('display', () => {
 
     expect(errorReceived.code).toEqual(ExitCode.NoSupportedFiles);
     expect(stripAnsi(errorReceived.message)).toContain(stripAnsi(expected));
+    expect(stripAnsi(errorReceived.userMessage)).toContain(stripAnsi(expected));
   });
 
   it('should throw NoSupportedFiles when invalid artifact data', async () => {
@@ -203,9 +207,10 @@ describe('display', () => {
 
     expect(errorReceived.code).toEqual(ExitCode.NoSupportedFiles);
     expect(stripAnsi(errorReceived.message)).toContain(stripAnsi(expected));
+    expect(stripAnsi(errorReceived.userMessage)).toContain(stripAnsi(expected));
   });
 
-  it('should throw NoSupportedFiles containing expected text for error', async () => {
+  it('should throw Error containing expected text for error', async () => {
     const { scanResults } = await scan({ path: helloWorldPath });
     const errors: string[] = [
       'Could not test dependencies in test/fixtures/invalid',
