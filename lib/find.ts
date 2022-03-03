@@ -2,7 +2,7 @@ import { Stats, promises } from 'fs';
 import { join } from 'path';
 import { isSupportedSize } from './common';
 import { debug } from './debug';
-import { FilePath } from './types';
+import { FilePath, Path, Predicate } from './types';
 import { isArchive } from './extract';
 
 export const { readdir, lstat } = promises;
@@ -11,11 +11,14 @@ interface FileHandler {
   (path: FilePath, stats: Stats): void;
 }
 
-export async function find(src: string): Promise<[FilePath[], FilePath[]]> {
+export async function find(
+  src: string,
+  excluded: readonly Path[] = [],
+): Promise<[FilePath[], FilePath[]]> {
   const fileResults: FilePath[] = [];
   const archiveResults: FilePath[] = [];
 
-  await traverse(src, async (path: FilePath, stats: Stats) => {
+  const handler = async (path: FilePath, stats: Stats) => {
     if (!isSupportedSize(stats.size)) {
       return;
     }
@@ -26,13 +29,23 @@ export async function find(src: string): Promise<[FilePath[], FilePath[]]> {
     }
 
     fileResults.push(path);
-  });
+  };
+
+  await traverse(src, handler, (p) => excluded.includes(p));
 
   return [fileResults, archiveResults];
 }
 
-async function traverse(src: string, handle: FileHandler) {
+async function traverse(
+  src: string,
+  handle: FileHandler,
+  isExcluded: Predicate<Path, boolean>,
+) {
   try {
+    if (isExcluded(src)) {
+      return;
+    }
+
     const stats = await lstat(src);
 
     if (stats.isSymbolicLink()) {
@@ -50,7 +63,7 @@ async function traverse(src: string, handle: FileHandler) {
       for (const entry of entries) {
         const absolute = join(src, entry);
 
-        await traverse(absolute, handle);
+        await traverse(absolute, handle, isExcluded);
       }
     }
   } catch (error) {

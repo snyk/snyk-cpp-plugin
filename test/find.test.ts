@@ -36,6 +36,33 @@ describe('find', () => {
     expect(actual.sort()).toEqual(expected.sort());
   });
 
+  it('should produce list of files found in directory', async () => {
+    const fixturePath = path.join(__dirname, 'fixtures', 'example');
+    const toExclude = [
+      path.join(fixturePath, 'one'),
+      path.join(fixturePath, 'test.c'),
+    ];
+    const [actual] = await findModule.find(fixturePath, toExclude);
+    const expected = [
+      path.join(fixturePath, 'README.md'),
+      path.join(fixturePath, 'main.cpp'),
+      path.join(fixturePath, 'main.cc'),
+      path.join(fixturePath, 'headers', 'test.h'),
+      path.join(fixturePath, 'headers', 'one', 'one.hh'),
+      path.join(fixturePath, 'headers', 'one', 'two', 'two.hxx'),
+      path.join(fixturePath, 'headers', 'one', 'two', 'three', 'three.h++'),
+      path.join(fixturePath, 'headers', 'main.hpp'),
+      path.join(fixturePath, 'templates', 'test.i'),
+      path.join(fixturePath, 'templates', 'test.ii'),
+      path.join(fixturePath, 'templates', 'test.ipp'),
+      path.join(fixturePath, 'templates', 'test.ixx'),
+      path.join(fixturePath, 'templates', 'test.txx'),
+      path.join(fixturePath, 'templates', 'test.tpp'),
+      path.join(fixturePath, 'templates', 'sub', 'test.tpl'),
+    ];
+    expect(actual.sort()).toEqual(expected.sort());
+  });
+
   it('should produce an empty list when file path is invalid', async () => {
     const filePath = 'path/does/not/exist';
     try {

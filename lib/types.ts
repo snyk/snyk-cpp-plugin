@@ -49,6 +49,7 @@ export interface Options {
   'print-deps'?: boolean;
   'print-dep-paths'?: boolean;
   'max-depth'?: number;
+  excludedPaths?: string[];
 }
 
 export interface Issue {
@@ -96,4 +97,9 @@ export interface FullFileHash {
 
 export type FileContent = Buffer;
 
-export type FilePath = string;
+export type Path = string;
+export type FilePath = Path;
+
+export interface Predicate<T, R> {
+  (_: T): R;
+}

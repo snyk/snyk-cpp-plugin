@@ -1,5 +1,6 @@
 import { join } from 'path';
 import { PluginResponse, scan } from '../lib';
+import { toAbsolutePaths } from '../lib/scan';
 import { Facts } from '../lib/types';
 
 const helloWorldFixturePath = join(__dirname, 'fixtures', 'hello-world');
@@ -55,6 +56,41 @@ const helloWorldSignatures: Facts[] = [
 
 const bigFixturePath = join(__dirname, 'fixtures', 'big-fixture');
 
+describe('toAbsolutePaths', () => {
+  it('support empty array', async () => {
+    const result = toAbsolutePaths(__dirname, []);
+    expect(result).toEqual([]);
+  });
+
+  it('support undefined array', async () => {
+    const result = toAbsolutePaths(__dirname, undefined);
+    expect(result).toEqual([]);
+  });
+
+  it('support no array', async () => {
+    const result = toAbsolutePaths(__dirname);
+    expect(result).toEqual([]);
+  });
+
+  it('convert both abs, and rel. list of paths to absolute path', async () => {
+    const result = toAbsolutePaths(__dirname, [
+      join(__dirname, 'fixtures', 'to-exclude-paths'),
+      join('.', 'fixtures', 'to-exclude-paths'),
+      join('.', 'fixtures', 'missing-file'),
+      join('.'),
+      join('.', 'missing-dir'),
+    ]);
+
+    expect(result).toEqual([
+      join(__dirname, 'fixtures', 'to-exclude-paths'),
+      join(__dirname, 'fixtures', 'to-exclude-paths'),
+      join(__dirname, 'fixtures', 'missing-file'),
+      join(__dirname),
+      join(__dirname, 'missing-dir'),
+    ]);
+  });
+});
+
 describe('scan', () => {
   it('should produce scanned projects', async () => {
     const actual = await scan({ path: helloWorldFixturePath });
@@ -89,6 +125,36 @@ describe('scan', () => {
     const actual = await scan({ path: bigFixturePath });
     expect(actual.scanResults).toBeDefined();
     expect(actual.scanResults[0].facts[0].data.length).toEqual(21);
+  });
+
+  it('should produce correct number of signatures for large project, with ignores provided', async () => {
+    const path = join(__dirname, 'fixtures', 'to-exclude-paths');
+
+    const excludedPaths: string[] = [
+      join('headers', 'one', 'headers', 'file-to-exclude.cpp'),
+      join('one'),
+    ];
+
+    const actual = await scan({ path, excludedPaths });
+    expect(actual.scanResults).toBeDefined();
+
+    const fingerprints: any[] = actual.scanResults[0].facts[0].data;
+    const hashedPaths: string[] = fingerprints.map((fp) => fp.path);
+
+    expect(
+      hashedPaths.includes(
+        join('headers', 'one', 'headers', 'file-to-exclude.cpp'),
+      ),
+    ).toEqual(false);
+
+    expect(hashedPaths.includes('onetonotexclude')).toEqual(true);
+
+    expect(hashedPaths.includes(join('one', 'one.cc'))).toEqual(false);
+    expect(hashedPaths.includes(join('one', 'two', 'two.cxx'))).toEqual(false);
+    expect(hashedPaths.includes(join('one', 'three', 'three.c++'))).toEqual(
+      false,
+    );
+    expect(hashedPaths.length).toEqual(17);
   });
 
   it('should produce scanned projects with project name option', async () => {
