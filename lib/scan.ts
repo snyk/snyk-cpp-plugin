@@ -1,12 +1,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { join } from 'path';
+import { join, resolve } from 'path';
 
 import {
   Analytics,
   Facts,
   FilePath,
   Options,
+  Path,
   PluginResponse,
   ScanResult,
   SignatureResult,
@@ -19,6 +20,13 @@ import { getTarget } from './git';
 import { extract } from './extract';
 import { createTemporaryDir } from './utils/fs';
 import { DECOMPRESSING_WORKSPACE_DIR } from './common';
+
+export function toAbsolutePaths(
+  basedir: Path,
+  paths: readonly Path[] = [],
+): Path[] {
+  return paths.map((p) => resolve(basedir, p));
+}
 
 export async function scan(options: Options): Promise<PluginResponse> {
   try {
@@ -40,7 +48,12 @@ export async function scan(options: Options): Promise<PluginResponse> {
 
     const start = Date.now();
 
-    const [filePaths, archivePaths] = await find(options.path);
+    const excludedPaths: FilePath[] = toAbsolutePaths(
+      options.path,
+      options.excludedPaths,
+    );
+    const [filePaths, archivePaths] = await find(options.path, excludedPaths);
+
     let extractionWorkspace: FilePath | null = null;
 
     if (0 < extractionDepthLimit && 0 < archivePaths.length) {
@@ -48,7 +61,10 @@ export async function scan(options: Options): Promise<PluginResponse> {
       extractionWorkspace = join(temporaryDir, DECOMPRESSING_WORKSPACE_DIR);
 
       await extract(archivePaths, temporaryDir, extractionDepthLimit);
-      const [newFilePaths, newArchivePaths] = await find(extractionWorkspace);
+      const [newFilePaths, newArchivePaths] = await find(
+        extractionWorkspace,
+        excludedPaths,
+      );
 
       filePaths.push(...newFilePaths, ...newArchivePaths);
     } else {
