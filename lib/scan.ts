@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { join, resolve } from 'path';
+import { join } from 'path';
 
 import {
   Analytics,
@@ -20,12 +20,23 @@ import { getTarget } from './git';
 import { extract } from './extract';
 import { createTemporaryDir } from './utils/fs';
 import { DECOMPRESSING_WORKSPACE_DIR } from './common';
+import * as dotSnyk from './utils/dotsnyk';
+import { Config as DotSnykConfig, Glob } from './utils/dotsnyk/types';
+import { DEFAULT_SNYK_POLICY_FILE } from './utils/dotsnyk/invariants';
 
-export function toAbsolutePaths(
+export function toRelativePaths(
   basedir: Path,
-  paths: readonly Path[] = [],
-): Path[] {
-  return paths.map((p) => resolve(basedir, p));
+  signatures: readonly SignatureResult[],
+  extractionWorkspace?: Path,
+): void {
+  signatures.forEach((s) => {
+    const src: FilePath =
+      extractionWorkspace && s.path.includes(extractionWorkspace)
+        ? extractionWorkspace
+        : basedir;
+
+    s.path = path.relative(src, s.path);
+  });
 }
 
 export async function scan(options: Options): Promise<PluginResponse> {
@@ -48,13 +59,15 @@ export async function scan(options: Options): Promise<PluginResponse> {
 
     const start = Date.now();
 
-    const excludedPaths: FilePath[] = toAbsolutePaths(
-      options.path,
-      options.excludedPaths,
-    );
-    const [filePaths, archivePaths] = await find(options.path, excludedPaths);
+    const projectRoot: Path = options.path;
 
-    let extractionWorkspace: FilePath | null = null;
+    const excludedPatterns: Glob[] = getExcludedPatterns(
+      projectRoot,
+      options['policy-path'],
+    );
+    const [filePaths, archivePaths] = await find(projectRoot, excludedPatterns);
+
+    let extractionWorkspace: FilePath | undefined = undefined;
 
     if (0 < extractionDepthLimit && 0 < archivePaths.length) {
       const temporaryDir = await createTemporaryDir();
@@ -63,7 +76,7 @@ export async function scan(options: Options): Promise<PluginResponse> {
       await extract(archivePaths, temporaryDir, extractionDepthLimit);
       const [newFilePaths, newArchivePaths] = await find(
         extractionWorkspace,
-        excludedPaths,
+        excludedPatterns,
       );
 
       filePaths.push(...newFilePaths, ...newArchivePaths);
@@ -77,14 +90,7 @@ export async function scan(options: Options): Promise<PluginResponse> {
       filePaths,
     );
 
-    signatures.forEach((s) => {
-      const src: FilePath =
-        extractionWorkspace && s.path.includes(extractionWorkspace)
-          ? extractionWorkspace
-          : options.path;
-
-      s.path = path.relative(src, s.path);
-    });
+    toRelativePaths(projectRoot, signatures, extractionWorkspace);
 
     const end = Date.now();
 
@@ -115,7 +121,7 @@ export async function scan(options: Options): Promise<PluginResponse> {
     debug('target %o \n', target);
     const gitInfo = fromUrl(target.remoteUrl);
     const name =
-      options.projectName || gitInfo?.project || path.basename(options.path);
+      options.projectName || gitInfo?.project || path.basename(projectRoot);
     debug('name %o \n', name);
     const scanResults: ScanResult[] = [
       {
@@ -135,4 +141,20 @@ export async function scan(options: Options): Promise<PluginResponse> {
   } catch (error) {
     throw new Error(`Could not scan C/C++ project: ${error}`);
   }
+}
+
+export function getExcludedPatterns(
+  projectRoot: Path,
+  policyFilePath: string = join(projectRoot, DEFAULT_SNYK_POLICY_FILE),
+): Glob[] {
+  if (!dotSnyk.exists(policyFilePath)) {
+    return [];
+  }
+
+  const config: DotSnykConfig = dotSnyk.parse(policyFilePath);
+
+  return [
+    policyFilePath,
+    ...dotSnyk.toAbsolutePaths(projectRoot, config.exclude.unmanaged),
+  ];
 }

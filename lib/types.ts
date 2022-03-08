@@ -49,7 +49,7 @@ export interface Options {
   'print-deps'?: boolean;
   'print-dep-paths'?: boolean;
   'max-depth'?: number;
-  excludedPaths?: string[];
+  'policy-path'?: string;
 }
 
 export interface Issue {
@@ -100,6 +100,6 @@ export type FileContent = Buffer;
 export type Path = string;
 export type FilePath = Path;
 
-export interface Predicate<T, R> {
-  (_: T): R;
+export interface Predicate<T> {
+  (_: T): boolean;
 }

@@ -1,9 +1,11 @@
 import { Stats, promises } from 'fs';
-import { join } from 'path';
-import { isSupportedSize } from './common';
+import { join, sep, posix } from 'path';
+import { isSupportedSize, isWindowsOS } from './common';
 import { debug } from './debug';
 import { FilePath, Path, Predicate } from './types';
 import { isArchive } from './extract';
+import * as minimatch from 'minimatch';
+import { Glob } from './utils/dotsnyk/types';
 
 export const { readdir, lstat } = promises;
 
@@ -12,8 +14,8 @@ interface FileHandler {
 }
 
 export async function find(
-  src: string,
-  excluded: readonly Path[] = [],
+  src: Path,
+  excludePatterns: readonly Glob[] = [],
 ): Promise<[FilePath[], FilePath[]]> {
   const fileResults: FilePath[] = [];
   const archiveResults: FilePath[] = [];
@@ -31,15 +33,20 @@ export async function find(
     fileResults.push(path);
   };
 
-  await traverse(src, handler, (p) => excluded.includes(p));
+  const isExcluded: Predicate<Path> = (path) => {
+    path = isWindowsOS() ? path.split(sep).join(posix.sep) : path;
+    return !!excludePatterns.find((pattern) => minimatch(path, pattern));
+  };
+
+  await traverse(src, handler, isExcluded);
 
   return [fileResults, archiveResults];
 }
 
 async function traverse(
-  src: string,
+  src: Path,
   handle: FileHandler,
-  isExcluded: Predicate<Path, boolean>,
+  isExcluded: Predicate<Path>,
 ) {
   try {
     if (isExcluded(src)) {
