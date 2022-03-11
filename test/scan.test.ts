@@ -1,6 +1,6 @@
 import { join } from 'path';
 import { PluginResponse, scan } from '../lib';
-import { toAbsolutePaths } from '../lib/scan';
+import { getExcludedPatterns } from '../lib/scan';
 import { Facts } from '../lib/types';
 
 const helloWorldFixturePath = join(__dirname, 'fixtures', 'hello-world');
@@ -56,41 +56,6 @@ const helloWorldSignatures: Facts[] = [
 
 const bigFixturePath = join(__dirname, 'fixtures', 'big-fixture');
 
-describe('toAbsolutePaths', () => {
-  it('support empty array', async () => {
-    const result = toAbsolutePaths(__dirname, []);
-    expect(result).toEqual([]);
-  });
-
-  it('support undefined array', async () => {
-    const result = toAbsolutePaths(__dirname, undefined);
-    expect(result).toEqual([]);
-  });
-
-  it('support no array', async () => {
-    const result = toAbsolutePaths(__dirname);
-    expect(result).toEqual([]);
-  });
-
-  it('convert both abs, and rel. list of paths to absolute path', async () => {
-    const result = toAbsolutePaths(__dirname, [
-      join(__dirname, 'fixtures', 'to-exclude-paths'),
-      join('.', 'fixtures', 'to-exclude-paths'),
-      join('.', 'fixtures', 'missing-file'),
-      join('.'),
-      join('.', 'missing-dir'),
-    ]);
-
-    expect(result).toEqual([
-      join(__dirname, 'fixtures', 'to-exclude-paths'),
-      join(__dirname, 'fixtures', 'to-exclude-paths'),
-      join(__dirname, 'fixtures', 'missing-file'),
-      join(__dirname),
-      join(__dirname, 'missing-dir'),
-    ]);
-  });
-});
-
 describe('scan', () => {
   it('should produce scanned projects', async () => {
     const actual = await scan({ path: helloWorldFixturePath });
@@ -130,12 +95,8 @@ describe('scan', () => {
   it('should produce correct number of signatures for large project, with ignores provided', async () => {
     const path = join(__dirname, 'fixtures', 'to-exclude-paths');
 
-    const excludedPaths: string[] = [
-      join('headers', 'one', 'headers', 'file-to-exclude.cpp'),
-      join('one'),
-    ];
-
-    const actual = await scan({ path, excludedPaths });
+    // excludedPaths and patterns read from fixtures .snyk-file
+    const actual = await scan({ path });
     expect(actual.scanResults).toBeDefined();
 
     const fingerprints: any[] = actual.scanResults[0].facts[0].data;
@@ -154,6 +115,10 @@ describe('scan', () => {
     expect(hashedPaths.includes(join('one', 'three', 'three.c++'))).toEqual(
       false,
     );
+    expect(hashedPaths.includes(join('templates', 'sub', 'test.tpl'))).toEqual(
+      false,
+    );
+
     expect(hashedPaths.length).toEqual(17);
   });
 
@@ -1305,5 +1270,37 @@ describe('scan', () => {
       ],
     };
     expect(actual).toEqual(expected);
+  });
+
+  describe('getExcludePatterns', () => {
+    it('should parse valid policy file with glob-patterns with default policyPath', async () => {
+      const basedir = join(__dirname, 'fixtures', 'to-exclude-paths');
+      const result: string[] = getExcludedPatterns(basedir);
+
+      expect(result).toEqual([
+        join(basedir, '.snyk'),
+        join(basedir, 'headers', 'one', 'headers', 'file-to-exclude.cpp'),
+        join(basedir, 'one'),
+        join(basedir, 'templates', '**', 'test.tpl'),
+      ]);
+    });
+
+    it('should parse valid policy file with glob-patterns with custom policyPath', async () => {
+      const basedir = join(__dirname, 'fixtures', 'to-exclude-paths');
+      const customPolicyPath = join(
+        __dirname,
+        'fixtures',
+        'to-exclude-paths',
+        '.snyk-custom',
+      );
+
+      const result: string[] = getExcludedPatterns(basedir, customPolicyPath);
+
+      expect(result).toEqual([
+        join(basedir, '.snyk-custom'),
+        join(basedir, 'headers', 'one', 'headers', 'file-to-exclude.cpp'),
+        join(basedir, 'one'),
+      ]);
+    });
   });
 });

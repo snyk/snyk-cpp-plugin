@@ -1,0 +1,4 @@
+exclude:
+  unmanaged:
+    - headers/one/headers/file-to-exclude.cpp
+    - one

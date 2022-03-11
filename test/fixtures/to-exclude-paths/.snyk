@@ -1,0 +1,5 @@
+exclude:
+  unmanaged:
+    - headers/one/headers/file-to-exclude.cpp
+    - one
+    - templates/**/test.tpl
