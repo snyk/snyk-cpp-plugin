@@ -66,7 +66,7 @@ export async function display(
   if (!hasDependencies) {
     exitWith(
       ExitCode.NoSupportedFiles,
-      `${output}\nCould not detect supported target files in ${
+      `${output}\nCould not find any source code matching the Snyk database of open source dependencies in ${
         options?.path
       }\nPlease see our documentation for supported languages and target files: ${chalk.underline(
         'https://snyk.co/udVgQ',

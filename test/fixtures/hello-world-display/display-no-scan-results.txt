@@ -1,1 +1,1 @@
-Could not detect supported target files in
+Could not find any source code matching the Snyk database of open source dependencies in
