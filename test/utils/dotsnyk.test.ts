@@ -10,7 +10,7 @@ describe('parseDotSnyk', () => {
 
     expect(result).toEqual({
       exclude: {
-        unmanaged: [
+        global: [
           'headers/one/headers/file-to-exclude.cpp',
           'one',
           'templates/**/test.tpl',
