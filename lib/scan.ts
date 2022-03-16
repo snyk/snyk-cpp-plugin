@@ -155,6 +155,6 @@ export function getExcludedPatterns(
 
   return [
     policyFilePath,
-    ...dotSnyk.toAbsolutePaths(projectRoot, config?.exclude?.unmanaged),
+    ...dotSnyk.toAbsolutePaths(projectRoot, config?.exclude?.global),
   ];
 }

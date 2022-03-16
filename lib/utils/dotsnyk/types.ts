@@ -13,4 +13,4 @@ export type Glob = string;
 //     - tests?/* # files directly inside “test” and/or “tests” directories
 //     - tests/** # all files and directories inside “tests”
 
-export type Config = { exclude?: { unmanaged?: Glob[] } };
+export type Config = { exclude?: { global?: Glob[] } };
