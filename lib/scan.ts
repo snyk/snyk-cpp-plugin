@@ -153,8 +153,23 @@ export function getExcludedPatterns(
 
   const config: DotSnykConfig = dotSnyk.parse(policyFilePath);
 
-  return [
-    policyFilePath,
-    ...dotSnyk.toAbsolutePaths(projectRoot, config?.exclude?.global),
-  ];
+  const paths: readonly string[] | undefined = config?.exclude?.global
+    ?.filter((item) => {
+      if (typeof item === 'object') {
+        const key = Object.keys(item)[0];
+
+        return !key ? false : !dotSnyk.hasExpired(item[key].expires);
+      }
+
+      return true;
+    })
+    .map((item) => {
+      if (typeof item === 'object') {
+        return Object.keys(item)[0];
+      }
+
+      return item;
+    });
+
+  return [policyFilePath, ...dotSnyk.toAbsolutePaths(projectRoot, paths)];
 }
