@@ -1,5 +1,13 @@
 export type Glob = string;
 
+type PathMeta = {
+  [key: string]: {
+    reason: string;
+    expires: string;
+    created: string;
+  };
+};
+
 // Example configuration:
 // # Snyk (https://snyk.io) policy file
 // version: v1.14.0
@@ -13,4 +21,4 @@ export type Glob = string;
 //     - tests?/* # files directly inside “test” and/or “tests” directories
 //     - tests/** # all files and directories inside “tests”
 
-export type Config = { exclude?: { global?: Glob[] } };
+export type Config = { exclude?: { global?: (Glob | PathMeta)[] } };

@@ -3,3 +3,11 @@ exclude:
     - headers/one/headers/file-to-exclude.cpp
     - one
     - templates/**/test.tpl
+    - ./deps/grep-ok-*:
+        reason: this will always work
+        expires: 2122-10-28T08:36:02.845Z
+        created: 2022-03-28T08:36:02.845Z
+    - ./deps/grep-expired-*:
+        reason: this has expired
+        expires: 2021-10-28T08:36:02.845Z
+        created: 2022-03-28T08:36:02.845Z

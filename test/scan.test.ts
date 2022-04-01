@@ -119,7 +119,7 @@ describe('scan', () => {
       false,
     );
 
-    expect(hashedPaths.length).toEqual(17);
+    expect(hashedPaths.length).toEqual(20);
   });
 
   it('should produce scanned projects with project name option', async () => {
@@ -1282,6 +1282,7 @@ describe('scan', () => {
         join(basedir, 'headers', 'one', 'headers', 'file-to-exclude.cpp'),
         join(basedir, 'one'),
         join(basedir, 'templates', '**', 'test.tpl'),
+        join(basedir, 'deps/grep-ok-*'),
       ]);
     });
 
@@ -1301,6 +1302,56 @@ describe('scan', () => {
         join(basedir, 'headers', 'one', 'headers', 'file-to-exclude.cpp'),
         join(basedir, 'one'),
       ]);
+    });
+
+    it('should not filter glob-patterns that have no expiry information', async () => {
+      const basedir = join(__dirname, 'fixtures', 'to-exclude-paths');
+      const customPolicyPath = join(
+        __dirname,
+        'fixtures',
+        'to-exclude-paths',
+        '.snyk-expires',
+      );
+
+      const result: string[] = getExcludedPatterns(basedir, customPolicyPath);
+
+      expect(result).toEqual([
+        join(basedir, '.snyk-expires'),
+        join(basedir, 'deps/grep-none-*'),
+        join(basedir, 'deps/grep-null-*'),
+      ]);
+    });
+
+    it('should filter glob-patterns that have no path', async () => {
+      const basedir = join(__dirname, 'fixtures', 'to-exclude-paths');
+      const customPolicyPath = join(
+        __dirname,
+        'fixtures',
+        'to-exclude-paths',
+        '.snyk-empty-path',
+      );
+
+      const result: string[] = getExcludedPatterns(basedir, customPolicyPath);
+
+      expect(result).toEqual([join(basedir, '.snyk-empty-path')]);
+    });
+
+    it('should throw an error with glob-patterns that have invalid expiry', async () => {
+      const basedir = join(__dirname, 'fixtures', 'to-exclude-paths');
+      const customPolicyPath = join(
+        __dirname,
+        'fixtures',
+        'to-exclude-paths',
+        '.snyk-bad-date',
+      );
+
+      try {
+        getExcludedPatterns(basedir, customPolicyPath);
+      } catch (err) {
+        expect(err).toEqual(
+          'Invalid date format provided dates should be formatted as "yyyy-MM-ddTHH:mm:ss.fffZ"',
+        );
+      }
     });
   });
 });
