@@ -110,7 +110,7 @@ workflows:
     - lint:
         name: lint
         context: nodejs-install
-        node_version: "10"
+        node_version: "12"
 
     # UNIX tests
     - test-unix:
@@ -120,7 +120,7 @@ workflows:
           - lint
         matrix:
           parameters:
-            node_version: ["14.17.6", "12.0.0", "10.21.0"]
+            node_version: ["16.13.1", "14.18.2", "12.22.7"]
 
     # Windows tests
     - test-windows:
@@ -129,7 +129,7 @@ workflows:
           - lint
         matrix:
           parameters:
-            node_version: ["14.17.6", "12.0.0", "10.21.0"]
+            node_version: ["16.13.1", "14.18.2", "12.22.7"]
 
     - release:
         name: Release
