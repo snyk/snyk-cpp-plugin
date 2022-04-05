@@ -67,6 +67,10 @@ export async function scan(options: Options): Promise<PluginResponse> {
     );
     const [filePaths, archivePaths] = await find(projectRoot, excludedPatterns);
 
+    if (!filePaths.length) {
+      throw 'There were no files in the target directory that could be scanned. Check if the directory is empty or if an ignore policy is active.';
+    }
+
     let extractionWorkspace: FilePath | undefined = undefined;
 
     if (0 < extractionDepthLimit && 0 < archivePaths.length) {
