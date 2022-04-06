@@ -165,6 +165,18 @@ describe('scan', () => {
     }
   });
 
+  it('should throw an exception if there are no files', async () => {
+    const expected = new Error(
+      `Could not scan C/C++ project: There were no files in the target directory that could be scanned. Check if the directory is empty or if an ignore policy is active.`,
+    );
+    try {
+      const fixturePath = join(__dirname, 'fixtures', 'empty');
+      await scan({ path: fixturePath });
+    } catch (err) {
+      expect(err).toEqual(expected);
+    }
+  });
+
   it('should throw exception when invalid options', async () => {
     expect.assertions(1);
     const expected = new Error(
