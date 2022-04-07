@@ -124,7 +124,7 @@ describe('scan', () => {
 
   it('should produce scanned projects with project name option', async () => {
     const fixturePath = join(__dirname, 'fixtures', 'hello-world');
-    const actual = await scan({ path: fixturePath, projectName: 'my-app' });
+    const actual = await scan({ path: fixturePath, 'project-name': 'my-app' });
     const expected: PluginResponse = {
       scanResults: [
         {

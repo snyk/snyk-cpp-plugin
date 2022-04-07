@@ -45,11 +45,11 @@ export interface Fingerprint {
 export interface Options {
   path: string;
   debug?: boolean;
-  projectName?: string;
   'print-deps'?: boolean;
   'print-dep-paths'?: boolean;
   'max-depth'?: number;
   'policy-path'?: string;
+  'project-name'?: string;
 }
 
 export interface Issue {

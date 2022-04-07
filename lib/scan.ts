@@ -125,7 +125,7 @@ export async function scan(options: Options): Promise<PluginResponse> {
     debug('target %o \n', target);
     const gitInfo = fromUrl(target.remoteUrl);
     const name =
-      options.projectName || gitInfo?.project || path.basename(projectRoot);
+      options['project-name'] || gitInfo?.project || path.basename(projectRoot);
     debug('name %o \n', name);
     const scanResults: ScanResult[] = [
       {
