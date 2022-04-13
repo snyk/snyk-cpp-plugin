@@ -11,6 +11,7 @@ export interface ScanResult {
   policy?: string;
   target: GitTarget;
   analytics?: Analytics[];
+  targetReference?: string;
 }
 
 export interface DepsFilePaths {
@@ -50,6 +51,7 @@ export interface Options {
   'max-depth'?: number;
   'policy-path'?: string;
   'project-name'?: string;
+  'target-reference'?: string;
 }
 
 export interface Issue {
