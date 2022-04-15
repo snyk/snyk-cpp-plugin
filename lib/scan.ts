@@ -127,6 +127,8 @@ export async function scan(options: Options): Promise<PluginResponse> {
     const name =
       options['project-name'] || gitInfo?.project || path.basename(projectRoot);
     debug('name %o \n', name);
+    const targetReference = options['target-reference'];
+
     const scanResults: ScanResult[] = [
       {
         facts,
@@ -136,6 +138,7 @@ export async function scan(options: Options): Promise<PluginResponse> {
         name,
         target,
         analytics,
+        targetReference,
       },
     ];
 
