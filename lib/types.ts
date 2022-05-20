@@ -52,6 +52,7 @@ export interface Options {
   'policy-path'?: string;
   'project-name'?: string;
   'target-reference'?: string;
+  'remote-repo-url'?: string;
 }
 
 export interface Issue {

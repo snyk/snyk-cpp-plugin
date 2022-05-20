@@ -129,6 +129,10 @@ export async function scan(options: Options): Promise<PluginResponse> {
     debug('name %o \n', name);
     const targetReference = options['target-reference'];
 
+    if (options['remote-repo-url']) {
+      target.remoteUrl = options['remote-repo-url'];
+    }
+
     const scanResults: ScanResult[] = [
       {
         facts,
