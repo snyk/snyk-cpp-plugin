@@ -152,6 +152,39 @@ describe('scan', () => {
     expect(actual).toEqual(expected);
   });
 
+  it('should produce scanned projects with a custom remote-repo-url', async () => {
+    const fixturePath = join(__dirname, 'fixtures', 'hello-world');
+    const actual = await scan({
+      path: fixturePath,
+      'remote-repo-url': 'custom-repo-url',
+    });
+    const expected: PluginResponse = {
+      scanResults: [
+        {
+          facts: helloWorldSignatures,
+          identity: {
+            type: 'cpp',
+          },
+          name: 'snyk-cpp-plugin',
+          target: {
+            remoteUrl: 'custom-repo-url',
+            branch: expect.any(String),
+          },
+          analytics: [
+            {
+              data: {
+                totalFileSignatures: 3,
+                totalSecondsElapsedToGenerateFileSignatures: expect.any(Number),
+              },
+              name: 'fileSignaturesAnalyticsContext',
+            },
+          ],
+        },
+      ],
+    };
+    expect(actual).toEqual(expected);
+  });
+
   it('should throw exception when invalid directory path', async () => {
     expect.assertions(1);
     const filePath = 'does/not/exist';
