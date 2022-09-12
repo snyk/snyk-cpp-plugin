@@ -1,6 +1,6 @@
 import { Stats, promises } from 'fs';
-import { join, sep, posix } from 'path';
-import { isSupportedSize, isWindowsOS } from './common';
+import { join } from 'path';
+import { isSupportedSize } from './common';
 import { debug } from './debug';
 import { FilePath, Path, Predicate } from './types';
 import { isArchive } from './extract';
@@ -34,7 +34,6 @@ export async function find(
   };
 
   const isExcluded: Predicate<Path> = (path) => {
-    path = isWindowsOS() ? path.split(sep).join(posix.sep) : path;
     return !!excludePatterns.find((pattern) => minimatch(path, pattern));
   };
 
