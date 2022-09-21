@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { join } from 'path';
+import { join, sep, posix } from 'path';
 
 import {
   Analytics,
@@ -19,7 +19,7 @@ import { computeSignaturesConcurrently } from './signatures';
 import { getTarget } from './git';
 import { extract } from './extract';
 import { createTemporaryDir } from './utils/fs';
-import { DECOMPRESSING_WORKSPACE_DIR } from './common';
+import { DECOMPRESSING_WORKSPACE_DIR, isWin } from './common';
 import * as dotSnyk from './utils/dotsnyk';
 import { Config as DotSnykConfig, Glob } from './utils/dotsnyk/types';
 import { DEFAULT_SNYK_POLICY_FILE } from './utils/dotsnyk/invariants';
@@ -65,6 +65,13 @@ export async function scan(options: Options): Promise<PluginResponse> {
       projectRoot,
       options['policy-path'],
     );
+
+    if (isWin) {
+      excludedPatterns.forEach((path, index) => {
+        excludedPatterns[index] = path.split(posix.sep).join(sep);
+      });
+    }
+
     const [filePaths, archivePaths] = await find(projectRoot, excludedPatterns);
 
     if (!filePaths.length) {
