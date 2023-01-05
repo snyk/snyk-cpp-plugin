@@ -11,7 +11,7 @@ import {
   withDepNoIssues,
   noDepOrIssues,
 } from './fixtures/hello-world-display/test-results';
-import { isWindowsOS } from '../lib/common';
+import { isWin } from '../lib/common';
 import { ExitCode } from '../lib/utils/error';
 import { DepGraph, createFromJSON } from '@snyk/dep-graph';
 
@@ -70,7 +70,7 @@ describe('display', () => {
     const options: Options = {
       path,
     };
-    const osName = isWindowsOS() ? 'windows' : 'unix';
+    const osName = isWin ? 'windows' : 'unix';
     const expected = await readFixture(
       'display-snyk-security-details-url',
       `one-dep-four-issues-no-errors-${osName}.txt`,
@@ -238,7 +238,7 @@ describe('display', () => {
     const options: Options = {
       path,
     };
-    const osName = isWindowsOS() ? 'windows' : 'unix';
+    const osName = isWin ? 'windows' : 'unix';
     const expected = await readFixture(
       'display-snyk-security-details-url',
       `one-dep-one-issue-one-error-${osName}.txt`,
