@@ -95,7 +95,7 @@ export async function scan(options: Options): Promise<PluginResponse> {
       filePaths.push(...archivePaths);
     }
 
-    debug('%d files found \n', filePaths.length);
+    debug('%d number of files found \n', filePaths.length);
 
     const signatures: SignatureResult[] = await computeSignaturesConcurrently(
       filePaths,
