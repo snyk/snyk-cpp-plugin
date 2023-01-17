@@ -3,6 +3,7 @@ import { platform } from 'process';
 
 export const isWin = platform === 'win32';
 
+// Current implementation supports up to 2GB per file
 export const MAX_SUPPORTED_FILE_SIZE: number = 2 * 1024 * 1024 * 1024 - 1;
 
 export const HASHING_CONCURRENCY_LEVEL = os.cpus().length;
