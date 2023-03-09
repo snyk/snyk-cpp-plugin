@@ -62,6 +62,7 @@ export interface Issue {
   fixInfo: {
     nearestFixedInVersion?: string;
   };
+  type?: string;
 }
 
 export interface IssuesData {

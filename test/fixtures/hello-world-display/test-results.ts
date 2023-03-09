@@ -115,6 +115,38 @@ export const withDepFourIssues: TestResult[] = [
   },
 ];
 
+export const withDepOneVulnerabilityOneLicenseIssue: TestResult[] = [
+  {
+    depGraphData: withDep(),
+    issues: [
+      {
+        pkgName: 'hello-world',
+        pkgVersion: '1.2.3',
+        issueId: 'cpp:hello-world:000',
+        fixInfo: {},
+      },
+      {
+        pkgName: 'hello-world',
+        pkgVersion: '1.2.3',
+        issueId: 'snyk:lic:unmanaged:hello-world:SomeLicense',
+        fixInfo: {},
+      }
+    ],
+    issuesData: {
+      ['cpp:hello-world:000']: {
+        id: 'cpp:hello-world:20161130',
+        severity: 'critical',
+        title: 'Information Exposure',
+      },
+      ['snyk:lic:unmanaged:hello-world:SomeLicense']: {
+        id: 'snyk:lic:unmanaged:hello-world:SomeLicense',
+        severity: 'critical',
+        title: 'SomeLicense',
+      }
+    },
+  },
+];
+
 export const withDepNoIssues: TestResult[] = [
   {
     depGraphData: withDep(),
