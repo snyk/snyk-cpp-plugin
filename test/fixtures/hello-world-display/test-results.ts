@@ -128,7 +128,7 @@ export const withDepOneVulnerabilityOneLicenseIssue: TestResult[] = [
       {
         pkgName: 'hello-world',
         pkgVersion: '1.2.3',
-        issueId: 'snyk:lic:unmanaged:hello-world:SomeLicense',
+        issueId: 'snyk:lic:unmanaged:hello-world:HU-7',
         fixInfo: {},
       }
     ],
@@ -138,10 +138,10 @@ export const withDepOneVulnerabilityOneLicenseIssue: TestResult[] = [
         severity: 'critical',
         title: 'Information Exposure',
       },
-      ['snyk:lic:unmanaged:hello-world:SomeLicense']: {
-        id: 'snyk:lic:unmanaged:hello-world:SomeLicense',
+      ['snyk:lic:unmanaged:hello-world:HU-7']: {
+        id: 'snyk:lic:unmanaged:hello-world:HU-7',
         severity: 'critical',
-        title: 'SomeLicense',
+        title: 'HU-7 license',
       }
     },
   },
