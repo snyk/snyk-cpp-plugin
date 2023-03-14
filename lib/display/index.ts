@@ -35,6 +35,12 @@ export async function display(
     }
 
     for (const testResult of testResults) {
+      testResult.issues.forEach(
+        (issue) =>
+          (issue.type = issue.issueId.startsWith('snyk:lic:unmanaged:')
+            ? 'license'
+            : 'vulnerability'),
+      );
       const depGraph = createFromJSON(testResult.depGraphData);
       const [dependencies, issues] = selectDisplayStrategy(
         options,

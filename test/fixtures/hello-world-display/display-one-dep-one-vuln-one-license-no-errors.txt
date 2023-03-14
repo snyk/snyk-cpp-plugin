@@ -1,0 +1,13 @@
+[97mIssues:[39m
+[91m[39m
+[91m ✗ [Critical] Information Exposure[39m
+   Introduced through: hello-world@1.2.3
+   URL: https://security.snyk.io/vuln/cpp:hello-world:000
+
+[97mLicense issues:[39m
+[91m[39m
+[91m ✗ [Critical] SomeLicense[39m
+   Introduced through: hello-world@1.2.3
+   URL: https://security.snyk.io/vuln/snyk:lic:unmanaged:hello-world:SomeLicense
+
+Tested 1 dependency for known issues, found [91m2 issues[39m.

@@ -8,6 +8,7 @@ import { readFixture } from './read-fixture';
 import {
   withDepOneIssueAndFix,
   withDepFourIssues,
+  withDepOneVulnerabilityOneLicenseIssue,
   withDepNoIssues,
   noDepOrIssues,
 } from './fixtures/hello-world-display/test-results';
@@ -55,6 +56,30 @@ describe('display', () => {
 
     try {
       await display(scanResults, withDepFourIssues, errors);
+    } catch (error) {
+      errorReceived = error;
+    }
+
+    expect(errorReceived.code).toEqual(ExitCode.VulnerabilitiesFound);
+    expect(stripAnsi(errorReceived.message)).toEqual(stripAnsi(expected));
+  });
+
+  it('should display vulnerabilities and licenses separated for one dependency, one vulnerabilitie issue, one license issue, no errors', async () => {
+    const { scanResults } = await scan({ path: helloWorldPath });
+    const errors: string[] = [];
+    const expected = await readFixture(
+      'hello-world-display',
+      'display-one-dep-one-vuln-one-license-no-errors.txt',
+    );
+
+    let errorReceived: any = null;
+
+    try {
+      await display(
+        scanResults,
+        withDepOneVulnerabilityOneLicenseIssue,
+        errors,
+      );
     } catch (error) {
       errorReceived = error;
     }
@@ -424,6 +449,7 @@ describe('display', () => {
         {
           pkgName: 'hello-world',
           pkgVersion: '1.2.3',
+          type: 'vulnerability',
           issueId: 'cpp:hello-world:20161130',
           fixInfo: { nearestFixedInVersion: '1.2.4' },
         },

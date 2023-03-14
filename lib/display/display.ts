@@ -172,30 +172,16 @@ export function displayIssues(
   const hasIssues = issues.length > 0;
 
   if (hasIssues) {
-    result.push(chalk.whiteBright('Issues:'));
-    for (const {
-      pkgName: name,
-      pkgVersion: version,
-      issueId: vulnId,
-    } of issues) {
-      const { title, severity } = issuesData[vulnId];
-
-      const color = getColorBySeverity(severity);
-      const severityAndTitle = color(`\n ✗ [${capitalize(severity)}] ${title}`);
-      const dependencyName = computeDependencyName(name, version);
-      const vulnDetailsUrl = `https://security.snyk.io/vuln/${vulnId}`;
-
-      const introducedThrough = leftPad(
-        `Introduced through: ${dependencyName}`,
-      );
-
-      const urlText = leftPad(`URL: ${vulnDetailsUrl}`);
-
-      result.push(severityAndTitle);
-      result.push(introducedThrough);
-      result.push(urlText);
+    const vulnerabilityIssues = issues.filter(
+      (issue) => issue.type === 'vulnerability',
+    );
+    if (vulnerabilityIssues.length > 0) {
+      prepareResults(result, vulnerabilityIssues, issuesData, 'Issues:');
     }
-    result.push('');
+    const licenseIssues = issues.filter((issue) => issue.type === 'license');
+    if (licenseIssues.length > 0) {
+      prepareResults(result, licenseIssues, issuesData, 'License issues:');
+    }
   }
 
   const issuesFound = hasIssues
@@ -208,6 +194,41 @@ export function displayIssues(
   }
 
   return result;
+}
+
+function prepareResults(
+  result: string[],
+  issues: Issue[],
+  issuesData: IssuesData,
+  typeTitle: string,
+) {
+  result.push(chalk.bold(typeTitle));
+  for (const {
+    pkgName: name,
+    pkgVersion: version,
+    issueId: vulnId,
+  } of issues) {
+    const { title, severity } = issuesData[vulnId];
+
+    const color = getColorBySeverity(severity);
+    const severityAndTitle = color.bold(
+      `\n ✗ [${capitalize(severity)}] ${title}`,
+    );
+    const dependencyName = computeDependencyName(name, version);
+    const vulnDetailsUrl = `https://security.snyk.io/vuln/${vulnId}`;
+
+    const introducedThrough = leftPad(
+      `Introduced through: ${dependencyName}`,
+      3,
+    );
+
+    const urlText = leftPad(`URL: ${vulnDetailsUrl}`, 3);
+
+    result.push(severityAndTitle);
+    result.push(introducedThrough);
+    result.push(urlText);
+  }
+  result.push('');
 }
 
 export function displayErrors(errors: string[]): string[] {
