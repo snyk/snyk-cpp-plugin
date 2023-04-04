@@ -62,7 +62,6 @@ export interface Issue {
   fixInfo: {
     nearestFixedInVersion?: string;
   };
-  type?: string;
 }
 
 export interface IssuesData {
@@ -70,9 +69,15 @@ export interface IssuesData {
     id: string;
     severity: string;
     title: string;
+    type?: string | undefined;
+    legalInstructionsArray?: LegalInstruction[];
   };
 }
 
+export interface LegalInstruction {
+  licenseName: string;
+  legalContent: string;
+}
 export interface TestResult {
   issues: Issue[];
   issuesData: IssuesData;

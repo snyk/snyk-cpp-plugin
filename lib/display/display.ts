@@ -172,13 +172,17 @@ export function displayIssues(
   const hasIssues = issues.length > 0;
 
   if (hasIssues) {
-    const vulnerabilityIssues = issues.filter(
-      (issue) => issue.type === 'vulnerability',
-    );
-    if (vulnerabilityIssues.length > 0) {
-      prepareResults(result, vulnerabilityIssues, issuesData, 'Issues:');
+    const nonLicenseIssues = issues.filter((issue) => {
+      return issuesData[issue.issueId]?.type !== 'license';
+    });
+
+    if (nonLicenseIssues.length > 0) {
+      prepareResults(result, nonLicenseIssues, issuesData, 'Issues:');
     }
-    const licenseIssues = issues.filter((issue) => issue.type === 'license');
+
+    const licenseIssues = issues.filter(
+      (issue) => issuesData[issue.issueId]?.type === 'license',
+    );
     if (licenseIssues.length > 0) {
       prepareResults(result, licenseIssues, issuesData, 'License issues:');
     }
@@ -208,7 +212,7 @@ function prepareResults(
     pkgVersion: version,
     issueId: vulnId,
   } of issues) {
-    const { title, severity } = issuesData[vulnId];
+    const { title, severity, legalInstructionsArray } = issuesData[vulnId];
 
     const color = getColorBySeverity(severity);
     const severityAndTitle = color.bold(
@@ -227,6 +231,15 @@ function prepareResults(
     result.push(severityAndTitle);
     result.push(introducedThrough);
     result.push(urlText);
+    if (legalInstructionsArray) {
+      result.push(leftPad(chalk.bold(`Legal instructions:`), 3));
+      const { licenseName, legalContent } = legalInstructionsArray[0];
+      const legalInstructionsText = leftPad(
+        `○ for ${licenseName}: ${legalContent}`,
+        3,
+      );
+      result.push(legalInstructionsText);
+    }
   }
   result.push('');
 }
