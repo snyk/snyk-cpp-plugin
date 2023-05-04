@@ -23,6 +23,7 @@ import { DECOMPRESSING_WORKSPACE_DIR, isWin } from './common';
 import * as dotSnyk from './utils/dotsnyk';
 import { Config as DotSnykConfig, Glob } from './utils/dotsnyk/types';
 import { DEFAULT_SNYK_POLICY_FILE } from './utils/dotsnyk/invariants';
+import { ExitCode, exitWith } from './utils/error';
 
 export function toRelativePaths(
   basedir: Path,
@@ -75,7 +76,10 @@ export async function scan(options: Options): Promise<PluginResponse> {
     const [filePaths, archivePaths] = await find(projectRoot, excludedPatterns);
 
     if (filePaths.length + archivePaths.length == 0) {
-      throw 'There were no files in the target directory that could be scanned. Check if the directory is empty or if an ignore policy is active.';
+      exitWith(
+        ExitCode.NoSupportedFiles,
+        `There were no files in the target directory that could be scanned. Check if the directory is empty or if an ignore policy is active.`,
+      );
     }
 
     let extractionWorkspace: FilePath | undefined = undefined;
@@ -156,8 +160,12 @@ export async function scan(options: Options): Promise<PluginResponse> {
     return {
       scanResults,
     };
-  } catch (error) {
-    throw new Error(`Could not scan C/C++ project: ${error}`);
+  } catch (err) {
+    if (err.code != undefined) {
+      throw err;
+    }
+
+    throw new Error(`Could not scan C/C++ project: ${err}`);
   }
 }
 

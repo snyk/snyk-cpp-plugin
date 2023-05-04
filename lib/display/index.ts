@@ -21,7 +21,6 @@ export async function display(
 
   let result: string[] = [];
 
-  let hasDependencies = false;
   let hasVulnerabilities = false;
 
   try {
@@ -48,10 +47,6 @@ export async function display(
         testResult,
       );
 
-      if (testResult.depGraphData.pkgs.length > 1) {
-        hasDependencies = true;
-      }
-
       if (testResult.issues.length > 0) {
         hasVulnerabilities = true;
       }
@@ -67,17 +62,6 @@ export async function display(
 
   if (hasVulnerabilities) {
     exitWith(ExitCode.VulnerabilitiesFound, output, testResults);
-  }
-
-  if (!hasDependencies) {
-    exitWith(
-      ExitCode.NoSupportedFiles,
-      `${output}\nCould not find any source code matching the Snyk database of open source dependencies in ${
-        options?.path
-      }\nPlease see our documentation for supported languages and target files: ${chalk.underline(
-        'https://snyk.co/udVgQ',
-      )} and make sure you are in the right directory.`,
-    );
   }
 
   return output;
