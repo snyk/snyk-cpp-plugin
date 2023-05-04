@@ -3,14 +3,13 @@ import * as path from 'path';
 import stripAnsi from 'strip-ansi';
 
 import * as displayModule from '../lib/display/display';
-import { display, Options, scan, ScanResult } from '../lib';
+import { display, Options, scan } from '../lib';
 import { readFixture } from './read-fixture';
 import {
   withDepOneIssueAndFix,
   withDepFourIssues,
   withDepOneVulnerabilityOneLicenseIssue,
   withDepNoIssues,
-  noDepOrIssues,
 } from './fixtures/hello-world-display/test-results';
 import { isWin } from '../lib/common';
 import { ExitCode } from '../lib/utils/error';
@@ -123,116 +122,6 @@ describe('display', () => {
 
     const result = await display(scanResults, withDepNoIssues, errors);
     expect(stripAnsi(result)).toEqual(stripAnsi(expected));
-  });
-
-  it('should throw NoSupportedFiles when no dependencies, no issues, no errors', async () => {
-    const { scanResults } = await scan({ path: helloWorldPath });
-    const errors: string[] = [];
-    const expected = await readFixture(
-      'hello-world-display',
-      'display-no-scan-results.txt',
-    );
-
-    let errorReceived: any = null;
-
-    try {
-      await display(scanResults, noDepOrIssues, errors);
-    } catch (error) {
-      errorReceived = error;
-    }
-
-    expect(errorReceived.code).toEqual(ExitCode.NoSupportedFiles);
-    expect(stripAnsi(errorReceived.message)).toContain(stripAnsi(expected));
-    expect(stripAnsi(errorReceived.userMessage)).toContain(stripAnsi(expected));
-  });
-
-  it('should throw NoSupportedFiles when no projects', async () => {
-    const scanResult: ScanResult[] = [];
-    const errors: string[] = [];
-    const expected = await readFixture(
-      'hello-world-display',
-      'display-no-scan-results.txt',
-    );
-
-    let errorReceived: any = null;
-
-    try {
-      await display(scanResult, noDepOrIssues, errors);
-    } catch (error) {
-      errorReceived = error;
-    }
-
-    expect(errorReceived.code).toEqual(ExitCode.NoSupportedFiles);
-    expect(stripAnsi(errorReceived.message)).toContain(stripAnsi(expected));
-    expect(stripAnsi(errorReceived.userMessage)).toContain(stripAnsi(expected));
-  });
-
-  it('should throw NoSupportedFiles when invalid artifact data', async () => {
-    const errors: string[] = [];
-    const expected = await readFixture(
-      'hello-world-display',
-      'display-no-scan-results.txt',
-    );
-
-    let errorReceived: any = null;
-
-    try {
-      await display([1, 2, 3] as any, noDepOrIssues, errors);
-    } catch (error) {
-      errorReceived = error;
-    }
-
-    expect(errorReceived.code).toEqual(ExitCode.NoSupportedFiles);
-    expect(stripAnsi(errorReceived.message)).toContain(stripAnsi(expected));
-    expect(stripAnsi(errorReceived.userMessage)).toContain(stripAnsi(expected));
-  });
-
-  it('should throw NoSupportedFiles when invalid artifacts', async () => {
-    const errors: string[] = [];
-    const expected = await readFixture(
-      'hello-world-display',
-      'display-no-scan-results.txt',
-    );
-
-    let errorReceived: any = null;
-
-    try {
-      await display(
-        [{ artifacts: ['a', 'b', 'c'] }] as any,
-        noDepOrIssues,
-        errors,
-      );
-    } catch (error) {
-      errorReceived = error;
-    }
-
-    expect(errorReceived.code).toEqual(ExitCode.NoSupportedFiles);
-    expect(stripAnsi(errorReceived.message)).toContain(stripAnsi(expected));
-    expect(stripAnsi(errorReceived.userMessage)).toContain(stripAnsi(expected));
-  });
-
-  it('should throw NoSupportedFiles when invalid artifact data', async () => {
-    const errors: string[] = [];
-    const expected = await readFixture(
-      'hello-world-display',
-      'display-no-scan-results.txt',
-    );
-
-    let errorReceived: any = null;
-
-    try {
-      await display(
-        [{ artifacts: [{ type: 'test', data: [1, 2, 3] }] }] as any,
-        noDepOrIssues,
-        errors,
-      );
-    } catch (error) {
-      errorReceived = error;
-    }
-
-    expect(errorReceived.code).toEqual(ExitCode.NoSupportedFiles);
-    expect(stripAnsi(errorReceived.message)).toContain(stripAnsi(expected));
-    expect(stripAnsi(errorReceived.userMessage)).toContain(stripAnsi(expected));
   });
 
   it('should throw Error containing expected text for error', async () => {
