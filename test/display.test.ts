@@ -338,7 +338,6 @@ describe('display', () => {
         {
           pkgName: 'hello-world',
           pkgVersion: '1.2.3',
-          type: 'vulnerability',
           issueId: 'cpp:hello-world:20161130',
           fixInfo: { nearestFixedInVersion: '1.2.4' },
         },
