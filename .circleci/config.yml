@@ -112,7 +112,7 @@ workflows:
     - prodsec/secrets-scan:
         name: Scan repository for secrets
         context:
-          - snyk-bot-slack
+          - snyk-on-snyk-identify
         channel: team-identify-alerts
     - lint:
         name: lint
