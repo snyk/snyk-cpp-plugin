@@ -18,6 +18,18 @@ cd snyk-cpp-plugin
 npm install
 ```
 
+### Install pre-commit
+
+`pre-commit` is required to run local secrets scanning.
+
+Install pre-commit (if not already installed):
+
+- `brew install pre-commit`
+
+After cloning the repository `cd` into it and run:
+
+- `pre-commit install`
+
 ### Run tests
 
 ```
