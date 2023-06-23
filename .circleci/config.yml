@@ -112,8 +112,8 @@ workflows:
     - prodsec/secrets-scan:
         name: Scan repository for secrets
         context:
-          - snyk-on-snyk-identify
-        channel: team-identify-alerts
+          - snyk-bot-slack
+        channel: snyk-on-snyk-identify
     - lint:
         name: lint
         context: nodejs-install
