@@ -96,6 +96,12 @@ export function displayDependencies(
 
     result.push(`\n${leftPad(dependencyName, 2)}`);
 
+    if (fileSignaturesDetails && fileSignaturesDetails[dependencyId]?.purl) {
+      result.push(
+        leftPad(`purl: ${fileSignaturesDetails[dependencyId].purl}`, 2),
+      );
+    }
+
     if (
       fileSignaturesDetails &&
       fileSignaturesDetails[dependencyId]?.confidence
