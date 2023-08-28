@@ -90,6 +90,7 @@ export interface FileSignaturesDetails {
   [pkgKey: string]: {
     confidence: number;
     filePaths: string[];
+    purl?: string;
   };
 }
 
