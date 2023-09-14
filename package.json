@@ -39,7 +39,7 @@
     "p-map": "^4.0.0",
     "tar": "^6.1.11",
     "tslib": "^2.0.0",
-    "yaml": "^1.10.2"
+    "yaml": "^2.2.2"
   },
   "devDependencies": {
     "@types/debug": "^4.1.5",
