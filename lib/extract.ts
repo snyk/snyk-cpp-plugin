@@ -16,7 +16,7 @@ const tar = require('tar');
 const { mkdir, rename } = promises;
 
 const zipFormats = ['.zip', '.zipx'];
-const tarFormats = ['.tar', '.gz', '.tgz'];
+const tarFormats = ['.tar', '.tar.gz', '.tgz'];
 
 interface ExtractionHandler {
   (path: FilePath): void;
@@ -115,7 +115,13 @@ export async function extract(
 }
 
 export function isTar(path: FilePath): boolean {
-  return tarFormats.includes(extname(path));
+  for (const format of tarFormats) {
+    if (path.endsWith(format)) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 export function isZip(path: FilePath): boolean {
