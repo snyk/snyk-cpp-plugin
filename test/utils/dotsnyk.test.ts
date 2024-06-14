@@ -5,7 +5,13 @@ import { Config } from '../../lib/utils/dotsnyk/types';
 
 describe('parseDotSnyk', () => {
   it('should parse valid policy file with glob-patterns', async () => {
-    const path = join(__dirname, '..', 'fixtures', 'to-exclude-paths', '.snyk');
+    const path = join(
+      __dirname,
+      '..',
+      'fixtures',
+      'to-exclude-paths',
+      '.to-exclude-snyk',
+    );
     const result: Config = parse(path);
 
     expect(result).toEqual({

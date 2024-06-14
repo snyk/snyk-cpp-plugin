@@ -5,4 +5,4 @@ metadata:
 spec:
   type: snyk-cli-plugin
   lifecycle: "-"
-  owner: identify
+  owner: unify

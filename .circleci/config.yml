@@ -2,8 +2,7 @@ version: 2.1
 
 orbs:
   win: circleci/windows@2.4.1
-  prodsec: snyk/prodsec-orb@1.0
-
+  prodsec: snyk/prodsec-orb@1
 
 defaults: &defaults
   parameters:
@@ -52,6 +51,19 @@ commands:
           name: Install npm dependencies
           command: npm install
 jobs:
+  security-scans:
+    docker:
+      - image: circleci/node:lts
+    resource_class: small
+    steps:
+      - checkout
+      - show_node_npm_version
+      - install_deps
+      - prodsec/security_scans:
+          mode: auto
+          open-source-additional-arguments: --exclude=test
+          iac-scan: disabled
+
   lint:
     <<: *defaults
     docker:
@@ -113,7 +125,18 @@ workflows:
         name: Scan repository for secrets
         context:
           - snyk-bot-slack
-        channel: snyk-on-snyk-identify
+        channel: team-unify-alerts
+        filters:
+          branches:
+            ignore:
+              - main
+
+    - security-scans:
+        name: Security Scans
+        context:
+          - analysis_unify
+          - nodejs-install
+
     - lint:
         name: lint
         context: nodejs-install

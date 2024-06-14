@@ -1323,7 +1323,7 @@ describe('scan', () => {
       const result: string[] = getExcludedPatterns(basedir);
 
       expect(result).toEqual([
-        join(basedir, '.snyk'),
+        join(basedir, '.to-exclude-snyk'),
         join(basedir, 'headers', 'one', 'headers', 'file-to-exclude.cpp'),
         join(basedir, 'one'),
         join(basedir, 'templates', '**', 'test.tpl'),
