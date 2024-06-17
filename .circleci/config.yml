@@ -2,8 +2,7 @@ version: 2.1
 
 orbs:
   win: circleci/windows@2.4.1
-  prodsec: snyk/prodsec-orb@1.0
-
+  prodsec: snyk/prodsec-orb@1
 
 defaults: &defaults
   parameters:
@@ -52,6 +51,22 @@ commands:
           name: Install npm dependencies
           command: npm install
 jobs:
+  security-scans:
+    docker:
+      - image: circleci/node:lts
+    resource_class: small
+    steps:
+      - checkout
+      - show_node_npm_version
+      - install_deps
+      - prodsec/security_scans:
+          mode: auto
+          release-branch: master
+          open-source-additional-arguments: --exclude=test
+          iac-scan: disabled
+          # code-scan not compatible with test .snyk file in test/fixtures/to-exclude-paths (which cannot be excluded)
+          code-scan: disabled
+
   lint:
     <<: *defaults
     docker:
@@ -109,44 +124,55 @@ workflows:
   version: 2
   test_and_release:
     jobs:
-    - prodsec/secrets-scan:
-        name: Scan repository for secrets
-        context:
-          - snyk-bot-slack
-        channel: snyk-on-snyk-identify
-    - lint:
-        name: lint
-        context: nodejs-install
-        node_version: "12"
+      - prodsec/secrets-scan:
+          name: Scan repository for secrets
+          context:
+            - snyk-bot-slack
+          channel: team-unify-alerts
+          filters:
+            branches:
+              ignore:
+                - master
 
-    # UNIX tests
-    - test-unix:
-        name: Unix Tests for Node << matrix.node_version >>
-        context: nodejs-install
-        requires:
-          - lint
-        matrix:
-          parameters:
-            node_version: ["16.13.1", "14.18.2", "12.22.7"]
+      - security-scans:
+          name: Security Scans
+          context:
+            - analysis_unify
+            - nodejs-install
 
-    # Windows tests
-    - test-windows:
-        name: Windows Tests for Node << matrix.node_version >>
-        requires:
-          - lint
-        matrix:
-          parameters:
-            node_version: ["16.13.1", "14.18.2", "12.22.7"]
+      - lint:
+          name: lint
+          context: nodejs-install
+          node_version: "12"
 
-    - release:
-        name: Release
-        context: nodejs-lib-release
-        node_version: "lts"
-        requires:
-          - lint
-          - test-unix
-          - test-windows
-        filters:
-          branches:
-            only:
-              - master
+      # UNIX tests
+      - test-unix:
+          name: Unix Tests for Node << matrix.node_version >>
+          context: nodejs-install
+          requires:
+            - lint
+          matrix:
+            parameters:
+              node_version: ["16.13.1", "14.18.2", "12.22.7"]
+
+      # Windows tests
+      - test-windows:
+          name: Windows Tests for Node << matrix.node_version >>
+          requires:
+            - lint
+          matrix:
+            parameters:
+              node_version: ["16.13.1", "14.18.2", "12.22.7"]
+
+      - release:
+          name: Release
+          context: nodejs-lib-release
+          node_version: "lts"
+          requires:
+            - lint
+            - test-unix
+            - test-windows
+          filters:
+            branches:
+              only:
+                - master
