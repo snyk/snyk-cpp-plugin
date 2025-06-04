@@ -73,6 +73,6 @@ async function traverse(
       }
     }
   } catch (error) {
-    debug(error.message || `Error reading file ${src}. ${error}`);
+    debug((error as any).message || `Error reading file ${src}. ${error}`);
   }
 }

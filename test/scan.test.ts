@@ -1212,7 +1212,7 @@ describe('scan', () => {
         'max-depth': -1,
       });
     } catch (err) {
-      expect(err.message).toEqual(
+      expect((err as any).message).toEqual(
         'Could not scan C/C++ project: invalid options: --max-depth should be greater than or equal to 0.',
       );
     }

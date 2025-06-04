@@ -161,7 +161,7 @@ export async function scan(options: Options): Promise<PluginResponse> {
       scanResults,
     };
   } catch (err) {
-    if (err.code != undefined) {
+    if ((err as any).code != undefined) {
       throw err;
     }
 
