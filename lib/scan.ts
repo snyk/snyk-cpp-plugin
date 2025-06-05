@@ -94,9 +94,18 @@ export async function scan(options: Options): Promise<PluginResponse> {
         excludedPatterns,
       );
 
-      filePaths.push(...newFilePaths, ...newArchivePaths);
+      // NOTE: we used to push + spread here (`arr1.push(...arr2)`), but this caused stack overflows with very large arrays,
+      // hence using for loops instead
+      for (const file of newFilePaths) {
+        filePaths.push(file);
+      }
+      for (const file of newArchivePaths) {
+        filePaths.push(file);
+      }
     } else {
-      filePaths.push(...archivePaths);
+      for (const archive of archivePaths) {
+        filePaths.push(archive);
+      }
     }
 
     debug('%d files found \n', filePaths.length);
@@ -161,7 +170,7 @@ export async function scan(options: Options): Promise<PluginResponse> {
       scanResults,
     };
   } catch (err) {
-    if (err.code != undefined) {
+    if ((err as any).code != undefined) {
       throw err;
     }
 

@@ -48,7 +48,7 @@ export async function display(
       result = result.concat(dependencies, issues);
     }
   } catch (error) {
-    debug(error.message || `Error displaying the results: ${error}`);
+    debug((error as any).message || `Error displaying the results: ${error}`);
     exitWith(ExitCode.Error, 'Error displaying results.');
   }
 
