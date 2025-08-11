@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-const stripAnsi = require('strip-ansi');
+import stripAnsi from 'strip-ansi';
 
 import * as displayModule from '../lib/display/display';
 import { display, Options, scan } from '../lib';

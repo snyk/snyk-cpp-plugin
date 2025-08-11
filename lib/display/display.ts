@@ -1,4 +1,4 @@
-import * as chalk from 'chalk';
+import chalk from 'chalk';
 import { DepGraph } from '@snyk/dep-graph';
 import {
   DepsFilePaths,
