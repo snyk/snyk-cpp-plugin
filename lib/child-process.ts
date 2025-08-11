@@ -12,7 +12,10 @@ export async function spawn(
   return new Promise((resolve, reject) => {
     let stdout = '';
     let stderr = '';
-    const process = childProcess.spawn(command, args, options);
+    const process = childProcess.spawn(command, args || [], {
+      ...options,
+      stdio: 'pipe',
+    });
     process.stdout.on('data', (data: string | Buffer) => {
       stdout += data;
     });
@@ -22,7 +25,7 @@ export async function spawn(
     process.on('close', (code: number) => {
       resolve({ code, stdout, stderr });
     });
-    process.on('error', (err) => {
+    process.on('error', (err: Error) => {
       reject(err);
     });
   });
