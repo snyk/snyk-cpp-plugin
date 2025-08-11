@@ -4,7 +4,7 @@ import { isSupportedSize } from './common';
 import { debug } from './debug';
 import { FilePath, Path, Predicate } from './types';
 import { isArchive } from './extract';
-import * as minimatch from 'minimatch';
+import minimatch from 'minimatch';
 import { Glob } from './utils/dotsnyk/types';
 
 export const { readdir, lstat } = promises;
