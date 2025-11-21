@@ -33,7 +33,7 @@
     "@types/minimatch": "^3.0.5",
     "@types/uuid": "^8.3.4",
     "adm-zip": "^0.5.9",
-    "chalk": "^4.1.0",
+    "chalk": "^5.0.0",
     "debug": "^4.1.1",
     "hosted-git-info": "^3.0.7",
     "p-map": "^4.0.0",
