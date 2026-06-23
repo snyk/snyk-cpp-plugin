@@ -117,9 +117,17 @@ jobs:
     steps:
       - checkout
       - install_deps
+      # Writes the read-only NPM_TOKEN (from the nodejs-install context) to
+      # .npmrc so @semantic-release/npm's verifyConditions step passes on
+      # CircleCI (it has no OIDC code path and otherwise fails with
+      # ENONPMTOKEN). The actual publish is done by the bundled npm CLI via
+      # OIDC trusted publishing using NPM_ID_TOKEN below.
+      - npmrc
       - run:
           name: Release
-          command: npx semantic-release@19
+          command: |
+            export NPM_ID_TOKEN=$(circleci run oidc get --claims '{"aud": "npm:registry.npmjs.org"}')
+            npx semantic-release@25
 
 workflows:
   version: 2
@@ -167,8 +175,10 @@ workflows:
 
       - release:
           name: Release
-          context: nodejs-lib-release
-          node_version: "lts"
+          context:
+            - nodejs-install
+            - github-release
+          node_version: "22.16"
           requires:
             - lint
             - test-unix
