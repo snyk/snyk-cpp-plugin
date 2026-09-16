@@ -32,7 +32,7 @@
     "@snyk/dep-graph": "^1.19.3",
     "@types/minimatch": "^3.0.5",
     "@types/uuid": "^8.3.4",
-    "adm-zip": "^0.5.9",
+    "adm-zip": "^0.6.1",
     "chalk": "^4.1.0",
     "debug": "^4.1.1",
     "hosted-git-info": "^3.0.7",
