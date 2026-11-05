@@ -44,7 +44,7 @@
     "yaml": "^1.10.2"
   },
   "devDependencies": {
-    "@types/babel__traverse": "7.0.4",
+    "@types/babel__traverse": "7.28.0",
     "@types/debug": "^4.1.5",
     "@types/hosted-git-info": "^3.0.1",
     "@types/jest": "^29.5.14",
