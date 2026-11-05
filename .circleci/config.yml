@@ -29,10 +29,17 @@ commands:
     steps:
       - run:
           name: Installing node version << parameters.node_version >>
-          command: nvm install << parameters.node_version >>
-      - run:
-          name: Using node version << parameters.node_version >>
-          command: nvm use << parameters.node_version >>
+          # nvm-windows panics resolving partial versions such as "24.1", so resolve to a full version first
+          command: |
+            $v = "<< parameters.node_version >>"
+            if ($v.Split('.').Count -lt 3) {
+              $v = ((Invoke-RestMethod https://nodejs.org/dist/index.json) | Where-Object { $_.version -like "v$v.*" } | Select-Object -First 1).version.TrimStart('v')
+            }
+            Write-Host "Resolved node version: $v"
+            nvm install $v
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            nvm use $v
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
   show_node_npm_version:
     description: Log Node and npm version
