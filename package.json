@@ -9,7 +9,7 @@
   "author": "snyk.io",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=10"
+    "node": ">=22"
   },
   "files": [
     "dist"
@@ -48,7 +48,7 @@
     "@types/debug": "^4.1.5",
     "@types/hosted-git-info": "^3.0.1",
     "@types/jest": "^29.5.14",
-    "@types/node": "^20.14.10",
+    "@types/node": "^22",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "eslint": "^8.57.0",

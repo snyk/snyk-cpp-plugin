@@ -53,7 +53,7 @@ commands:
 jobs:
   security-scans:
     docker:
-      - image: cimg/node:lts
+      - image: cimg/node:24
     resource_class: small
     steps:
       - checkout
@@ -154,7 +154,7 @@ workflows:
       - lint:
           name: lint
           context: nodejs-install
-          node_version: "20.19"
+          node_version: "24"
 
       # UNIX tests
       - test-unix:
@@ -164,7 +164,7 @@ workflows:
             - lint
           matrix:
             parameters:
-              node_version: ["24.1", "22.16", "20.19"]
+              node_version: ["22", "24", "26"]
 
       # Windows tests
       - test-windows:
@@ -173,14 +173,14 @@ workflows:
             - lint
           matrix:
             parameters:
-              node_version: ["24.1", "22.16", "20.19"]
+              node_version: ["22", "24", "26"]
 
       - release:
           name: Release
           context:
             - nodejs-install
             - github-release
-          node_version: "22.16"
+          node_version: "24"  # npm 11+ (Node 24) is needed for OIDC trusted publishing
           requires:
             - lint
             - test-unix
