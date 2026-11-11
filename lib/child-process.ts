@@ -1,4 +1,5 @@
 import * as childProcess from 'child_process';
+import { cleanSnykEnv } from '@snyk/cli-interface';
 
 export async function spawn(
   command: string,
@@ -9,11 +10,13 @@ export async function spawn(
   stdout: string;
   stderr: string;
 }> {
+  const env = cleanSnykEnv(options?.env ?? process.env, process.env);
   return new Promise((resolve, reject) => {
     let stdout = '';
     let stderr = '';
     const process = childProcess.spawn(command, args || [], {
       ...options,
+      env,
       stdio: 'pipe',
     });
     process.stdout.on('data', (data: string | Buffer) => {
