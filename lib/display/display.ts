@@ -52,12 +52,8 @@ export function selectDisplayStrategy(
   depGraph: DepGraph,
   testResult: TestResult,
 ): string[][] {
-  const {
-    depsFilePaths,
-    issues,
-    issuesData,
-    fileSignaturesDetails,
-  } = testResult;
+  const { depsFilePaths, issues, issuesData, fileSignaturesDetails } =
+    testResult;
   const dependencySection = findDependencyLines(
     depGraph,
     options,
@@ -150,8 +146,9 @@ function displayDepsFilePaths(
   if (depsFilePaths[dependencyId].length > 3) {
     result.push(
       leftPad(
-        `... and ${depsFilePaths[dependencyId].length -
-          maxFilePathsToBeDisplayed} more files`,
+        `... and ${
+          depsFilePaths[dependencyId].length - maxFilePathsToBeDisplayed
+        } more files`,
         4,
       ),
     );
