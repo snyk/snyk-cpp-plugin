@@ -51,7 +51,7 @@ commands:
     steps:
       - run:
           name: Install npm dependencies
-          command: npm install
+          command: npm ci
 jobs:
   security-scans:
     docker:
